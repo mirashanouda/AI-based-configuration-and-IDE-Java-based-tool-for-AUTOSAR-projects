@@ -1,0 +1,5 @@
+Rules for generating english text:
+1. Start with "Create a CanNm module with CanNmGlobalConfig"
+2. For creating subcontainers, have "Create x subcontainers text1 for container text2"
+3. For creating and setting values to parameters, you just say "set the value of parameter x inside container y to be z"
+4. If the random values of the parameter just happen to be the default value, then we don't add any sentence
