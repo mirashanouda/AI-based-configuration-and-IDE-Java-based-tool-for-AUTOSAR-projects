@@ -1,0 +1,7 @@
+CanNmGlobalConfig:
+    CanNmChannelConfig
+        CanNmRxPdu
+        CanNmTxPdu
+        CanNmUserDataTxPdu
+    CanNmPnInfo
+        CanNmPnFilterMaskByte
