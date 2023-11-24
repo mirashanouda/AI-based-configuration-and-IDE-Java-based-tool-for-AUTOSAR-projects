@@ -12,10 +12,6 @@ public class ContainerItem {
     // current index
     // level
 
-    //root:
-    //getName: TreeNode
-    //loop over children:
-    //
     public ContainerItem(String name, String UUID, String lowerMult, String upperMult) {
         this.name = name;
         this.UUID = UUID;
@@ -28,9 +24,14 @@ public class ContainerItem {
         return this.guiNode;
     }
     
-    public void setChild(ContainerItem subContainer){
-        guiNode.add(new DefaultMutableTreeNode(subContainer.name));
+    public void addChild(DefaultMutableTreeNode subContainerNode){
+        this.guiNode.add(subContainerNode);
     }
+    
+    public void setGUINode(DefaultMutableTreeNode treeNode){
+        this.guiNode = treeNode;
+    }
+   
     public String getName(){
         return this.name;
     }

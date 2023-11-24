@@ -13,7 +13,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+
 
 
 public class MainApplication extends javax.swing.JFrame {
@@ -23,6 +25,7 @@ public class MainApplication extends javax.swing.JFrame {
      */
     // Member variables
     DefaultTreeModel modulesTree;
+    DefaultMutableTreeNode canNM_root_node = new DefaultMutableTreeNode("CanNM");
     static final int maxNodes = 100000;
     static List<ContainerItem> containerDef = new ArrayList<>();
     static int[] par = new int[maxNodes];
@@ -50,34 +53,47 @@ public class MainApplication extends javax.swing.JFrame {
             Element containers = (Element) root.getElementsByTagName("CONTAINERS").item(0);
 
             dfs(containers, 0, -1);
+            
         } catch (IOException | ParserConfigurationException | SAXException e) {
         }
+        
+        for (int i = containerDef.size() - 1; i > 0; i--) {
+            DefaultMutableTreeNode parentNode = containerDef.get(par[i]).getGUINode();
+            DefaultMutableTreeNode currentNode = containerDef.get(i).getGUINode();
+            parentNode.add(currentNode);
+            ContainerItem parentContainer = containerDef.get(par[i]);
+            parentContainer.setGUINode(parentNode);
+            containerDef.set(par[i], parentContainer); // containerDef[par[i]] = parentNode
+        }
+        
+        // TODO when generalizing to all modules, make sure to attach all containers.
+        // In case of CanNM, we only have one main container.
+        canNM_root_node.add(containerDef.get(0).getGUINode()); 
         modulesTree = (DefaultTreeModel)jTree1.getModel();
-        modulesTree.setRoot(containerDef.get(0).getGUINode());
+        modulesTree.setRoot(canNM_root_node);
+        modulesTree.reload();
+        jTree1.setModel(modulesTree);
     }
-    
-    private static void dfs(Element ecucContainer, int level, int parentIndex) {
-        ContainerItem c = processContainer(ecucContainer);
-        System.out.println(c.name);
-        containerDef.add(c);
-        int currentIndex = containerDef.size() - 1;
-        par[currentIndex] = parentIndex;
-        if (parentIndex != -1) {
-            System.out.printf("parent: ", containerDef.get(parentIndex).getName());
-            System.out.printf(" - node: ", c.getName(), "\n");
-            containerDef.get(parentIndex).setChild(c);
-        }
 
-        NodeList parametersList = ecucContainer.getElementsByTagName("PARAMETERS");
-        for (int i = 0; i < parametersList.getLength(); i++) {
-            Element params = (Element) parametersList.item(i);
-            getParameters(params, currentIndex);
-        }
+    public static void dfs(Node ecucContainer, int level, int parentIndex) {
+        NodeList containerNodes = ecucContainer.getChildNodes();
+        for (int i = 0; i < containerNodes.getLength(); i++) {
+            Node containerNode = containerNodes.item(i);
+            if ( containerNode.getNodeName().equals("ECUC-PARAM-CONF-CONTAINER-DEF")) {
+                ContainerItem c = processContainer((Element) containerNode);
+                containerDef.add(c);
+                int idx = containerDef.size() - 1;
+                par[idx] = parentIndex;
 
-        NodeList subContainersList = ecucContainer.getElementsByTagName("SUB-CONTAINERS");
-        for (int i = 0; i < subContainersList.getLength(); i++) {
-            Element subContainer = (Element) subContainersList.item(i);
-            dfs(subContainer, level + 1, currentIndex);
+
+                NodeList subContainersNodes = containerNode.getChildNodes();
+                for (int k = 0; k < subContainersNodes.getLength(); k++) {
+                    Node subContainerNode = subContainersNodes.item(k);
+                    if (subContainerNode.getNodeType() == Node.ELEMENT_NODE && subContainerNode.getNodeName().equals("SUB-CONTAINERS")) {
+                        dfs(subContainerNode, level + 1, idx);
+                    }
+                }
+            }
         }
     }
 
@@ -166,10 +182,30 @@ public class MainApplication extends javax.swing.JFrame {
             }
         }
 
-        System.out.println(defName + ", " + value + ", " + dataType + ", " + declName + ", " + isDefault + ", " +
-                startRange + ", " + endRange + ", " + LM + ", " + UM);
+//        System.out.println(defName + ", " + value + ", " + dataType + ", " + declName + ", " + isDefault + ", " +
+//                startRange + ", " + endRange + ", " + LM + ", " + UM);
 
         return new ParameterItem(defName, value, dataType, declName, isDefault, startRange, endRange, LM, UM);
+    }
+    
+    public void PrintingTree(){
+        // Printing children
+        for (int i = 0 ; i < containerDef.size();i++) {
+            // if the node has children
+            if (containerDef.get(i).getGUINode().getChildCount() >= 1){
+                System.out.printf("Container: %s\n", containerDef.get(i).name);
+                for (int j = 0; j < containerDef.get(i).getGUINode().getChildCount(); j++)
+                {
+                    DefaultMutableTreeNode node = (DefaultMutableTreeNode) containerDef.get(i).getGUINode().getChildAt(j);
+                    System.out.printf("\t %s\n", node.getUserObject());
+                    for (int k = 0; k < node.getChildCount(); k++){
+                        DefaultMutableTreeNode child_node = (DefaultMutableTreeNode) node.getChildAt(k);
+                        System.out.printf("\t\t %s\n", child_node.getUserObject());
+                    }
+                }
+                break;
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
