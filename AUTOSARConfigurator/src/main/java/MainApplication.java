@@ -38,7 +38,7 @@ public class MainApplication extends javax.swing.JFrame {
     }
     
     private void SidebarTreeConstruction(){
-        String filePath = "/home/mira/AI-based-configuration-and-IDE-Java-based-tool-for-AUTOSAR-projects/AUTOSARConfigurator/src/main/java/CanNM_BSWMD.arxml";
+        String filePath = "src/main/java/CanNM_BSWMD.arxml";
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
