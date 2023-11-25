@@ -1,4 +1,3 @@
-
 import javax.swing.tree.DefaultMutableTreeNode;
 
 public class ContainerItem {
@@ -12,7 +11,11 @@ public class ContainerItem {
     // current index
     // level
 
-    public ContainerItem(String name, String UUID, String lowerMult, String upperMult) {
+    //root:
+    //getName: TreeNode
+    //loop over children:
+    //
+        public ContainerItem(String name, String UUID, String lowerMult, String upperMult) {
         this.name = name;
         this.UUID = UUID;
         this.lowerMult = lowerMult;
