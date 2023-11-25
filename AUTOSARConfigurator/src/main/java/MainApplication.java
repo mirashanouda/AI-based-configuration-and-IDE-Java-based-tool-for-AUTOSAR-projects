@@ -1,7 +1,3 @@
-
-//import static data_structures.containerDef;
-//import static data_structures.containerParameters;
-//import static data_structures.par;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,10 +8,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
 
 
 public class MainApplication extends javax.swing.JFrame {
@@ -25,7 +20,7 @@ public class MainApplication extends javax.swing.JFrame {
      */
     // Member variables
     DefaultTreeModel modulesTree;
-    DefaultMutableTreeNode canNM_root_node = new DefaultMutableTreeNode("CanNM");
+    
     static final int maxNodes = 100000;
     static List<ContainerItem> containerDef = new ArrayList<>();
     static int[] par = new int[maxNodes];
@@ -43,7 +38,7 @@ public class MainApplication extends javax.swing.JFrame {
     }
     
     private void SidebarTreeConstruction(){
-        String filePath = "/home/mira/Thesis/AI-based-configuration-and-IDE-Java-based-tool-for-AUTOSAR-projects/AUTOSARConfigurator/src/main/java/CanNM_BSWMD.arxml";
+        String filePath = "/home/mira/AI-based-configuration-and-IDE-Java-based-tool-for-AUTOSAR-projects/AUTOSARConfigurator/src/main/java/CanNM_BSWMD.arxml";
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -53,9 +48,7 @@ public class MainApplication extends javax.swing.JFrame {
             Element containers = (Element) root.getElementsByTagName("CONTAINERS").item(0);
 
             dfs(containers, 0, -1);
-            
-        } catch (IOException | ParserConfigurationException | SAXException e) {
-        }
+        } catch (IOException | ParserConfigurationException | SAXException e) {}
         
         for (int i = containerDef.size() - 1; i > 0; i--) {
             DefaultMutableTreeNode parentNode = containerDef.get(par[i]).getGUINode();
@@ -68,13 +61,15 @@ public class MainApplication extends javax.swing.JFrame {
         
         // TODO when generalizing to all modules, make sure to attach all containers.
         // In case of CanNM, we only have one main container.
-        canNM_root_node.add(containerDef.get(0).getGUINode()); 
+        DefaultMutableTreeNode canNM_root_node = new DefaultMutableTreeNode("CanNM");
+        ContainerItem c = containerDef.get(0);
+        canNM_root_node.add(c.getGUINode()); 
         modulesTree = (DefaultTreeModel)jTree1.getModel();
         modulesTree.setRoot(canNM_root_node);
         modulesTree.reload();
         jTree1.setModel(modulesTree);
     }
-
+    
     public static void dfs(Node ecucContainer, int level, int parentIndex) {
         NodeList containerNodes = ecucContainer.getChildNodes();
         for (int i = 0; i < containerNodes.getLength(); i++) {
