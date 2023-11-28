@@ -2,6 +2,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.print.DocFlavor.INPUT_STREAM;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.xml.parsers.DocumentBuilder;
@@ -80,12 +82,14 @@ public class MainApplication extends javax.swing.JFrame {
                 int idx = containerDef.size() - 1;
                 par[idx] = parentIndex;
 
-
-                NodeList subContainersNodes = containerNode.getChildNodes();
-                for (int k = 0; k < subContainersNodes.getLength(); k++) {
-                    Node subContainerNode = subContainersNodes.item(k);
-                    if (subContainerNode.getNodeType() == Node.ELEMENT_NODE && subContainerNode.getNodeName().equals("SUB-CONTAINERS")) {
-                        dfs(subContainerNode, level + 1, idx);
+                NodeList childrenNodes = containerNode.getChildNodes();
+                for (int k = 0; k < childrenNodes.getLength(); k++) {
+                    Node childNode = childrenNodes.item(k);
+                    if (childNode.getNodeType() == Node.ELEMENT_NODE && childNode.getNodeName().equals("SUB-CONTAINERS")) {
+                        dfs(childNode, level + 1, idx);
+                    }
+                    else if (childNode.getNodeType() == Node.ELEMENT_NODE && childNode.getNodeName().equals("PARAMETERS")) {
+                        getParameters((Element) childNode, idx);
                     }
                 }
             }
@@ -123,64 +127,78 @@ public class MainApplication extends javax.swing.JFrame {
         for (int i = 0; i < paramNodes.getLength(); i++) {
             Element paramNode = (Element) paramNodes.item(i);
             ParameterItem p = processParameter(paramNode, type);
+            // TODO: add to the container class instead
             containerParameters[idx].add(p);
         }
     }
 
     private static ParameterItem processParameter(Element ecucParameter, String typ) {
-        String defName = ecucParameter.getElementsByTagName("SHORT-NAME").item(0).getTextContent();
-        String dataType = typ;
-        String declName = (typ.equals("ENUMERATION")) ? "TEXTUAL" : "NUMERICAL";
-
+        String name = ecucParameter.getElementsByTagName("SHORT-NAME").item(0).getTextContent();
+//        String UUID = ecucParameter.getElementsByTagName("UUID").item(0).getTextContent();
+        String UUID = "";
+        String Desc = ecucParameter.getElementsByTagName("DESC").item(0).getTextContent();
+        
         Element defaultValueElement = (Element) ecucParameter.getElementsByTagName("DEFAULT-VALUE").item(0);
-        int isDefault = (defaultValueElement != null) ? 1 : 0;
-        String value = (isDefault == 1) ? defaultValueElement.getTextContent() : "-1";
-        String startRange = "";
-        String endRange = "";
-        if (typ.equals("INTEGER")) {
-             startRange = ecucParameter.getElementsByTagName("MIN").item(0).getTextContent();
-             endRange = ecucParameter.getElementsByTagName("MAX").item(0).getTextContent();
-        }
-        else if (typ.equals("FLOAT")) {
-            startRange = ecucParameter.getElementsByTagName("MIN").item(0).getTextContent();
-            if (startRange != null) {
-                ;
-            }
-            else {
-                startRange = "-1";
-            }
-            endRange = ecucParameter.getElementsByTagName("MAX").item(0).getTextContent();
-            if (endRange != null) {
-                ;
-            }
-            else{
-                startRange = "-1";
-            }
-        }
-      else{
-            startRange = "-1";
-            endRange = "-1";
-        }
-
-        String LM = ecucParameter.getElementsByTagName("LOWER-MULTIPLICITY").item(0).getTextContent();
+        boolean hasDefaultValue = (defaultValueElement != null) ? true : false;
+        
+        int LM = Integer.parseInt(ecucParameter.getElementsByTagName("LOWER-MULTIPLICITY").item(0).getTextContent());
         String UMElementName = "UPPER-MULTIPLICITY-INFINITE";
         Element UMElement = (Element) ecucParameter.getElementsByTagName(UMElementName).item(0);
-        String UM;
+        int UM;
         if (UMElement != null) {
-            UM = String.valueOf(Float.POSITIVE_INFINITY);
-        } else {
+            UM = Integer.MAX_VALUE;
+        } 
+        else {
             NodeList UMList = ecucParameter.getElementsByTagName("UPPER-MULTIPLICITY");
             if (UMList.getLength() > 0) {
-                UM = UMList.item(0).getTextContent();
+                UM = Integer.parseInt(UMList.item(0).getTextContent());
             } else {
-                UM = "";  // or any default value you want to assign when both are null
+                UM = 0;  // or any default value you want to assign when both are null
             }
         }
 
-//        System.out.println(defName + ", " + value + ", " + dataType + ", " + declName + ", " + isDefault + ", " +
-//                startRange + ", " + endRange + ", " + LM + ", " + UM);
+        int MINLength = ecucParameter.getElementsByTagName("MIN").getLength();
+        int MAXLength = ecucParameter.getElementsByTagName("MAX").getLength();
+        
+        float startRange = (MINLength > 0) ? Float.parseFloat(ecucParameter.getElementsByTagName("MIN").item(0).getTextContent()) : -1;
+        float endRange = Float.POSITIVE_INFINITY;
+        if (MAXLength > 0) {
+            String end = ecucParameter.getElementsByTagName("MAX").item(0).getTextContent();
+            endRange = (!end.equals("Inf")) ? Float.parseFloat(end) : Float.POSITIVE_INFINITY;
+        }
 
-        return new ParameterItem(defName, value, dataType, declName, isDefault, startRange, endRange, LM, UM);
+        System.err.printf("%s - %s - %d - %d\n", name, UUID, LM, UM);
+
+        if (typ.equals("INTEGER")) {
+            int defVal = -1;
+            String value;
+            if (hasDefaultValue) {
+                value = defaultValueElement.getTextContent();
+                defVal = Integer.parseInt(value);
+            }
+            return new IntegerParameter(name, UUID, "", Desc, LM, UM, hasDefaultValue, defVal, new Range(startRange, endRange));
+        }
+        else if (typ.equals("FLOAT")) {
+            float defVal = -1;
+            String value;
+            if (hasDefaultValue) {
+                value = defaultValueElement.getTextContent();
+                defVal = Float.parseFloat(value);
+            }
+            return new FloatParameter(name, UUID, "", Desc, LM, UM, hasDefaultValue, defVal, new Range(startRange, endRange));
+        }
+        else if (typ.equals("BOOLEAN")) {
+            boolean defVal = false;
+            String value;
+            if (hasDefaultValue) {
+                value = defaultValueElement.getTextContent();
+                defVal = (value == "false") ? false : true;
+            }
+            return new BooleanParameter(name, UUID, "", Desc, LM, UM, hasDefaultValue, defVal);
+        }
+        else { // enum 
+            return new EnumParameter(name, UUID, "", Desc, LM, UM);
+        }
     }
     
     public void PrintingTree(){
@@ -210,10 +228,14 @@ public class MainApplication extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTree1 = new javax.swing.JTree();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setAlwaysOnTop(true);
+        setBackground(new java.awt.Color(126, 231, 212));
         setFont(new java.awt.Font("Chilanka", 1, 24)); // NOI18N
+        setForeground(new java.awt.Color(153, 255, 204));
 
         jLabel1.setFont(new java.awt.Font("Chilanka", 1, 24)); // NOI18N
         jLabel1.setText("Configurator");
@@ -222,6 +244,13 @@ public class MainApplication extends javax.swing.JFrame {
         jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
         jScrollPane1.setViewportView(jTree1);
 
+        jScrollPane2.setBackground(new java.awt.Color(153, 255, 204));
+
+        jLabel2.setFont(new java.awt.Font("Meera", 1, 24)); // NOI18N
+        jLabel2.setText("jLabel2");
+        jLabel2.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        jScrollPane2.setViewportView(jLabel2);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -229,9 +258,11 @@ public class MainApplication extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(629, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane2)
+                .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(375, Short.MAX_VALUE)
                 .addComponent(jLabel1)
                 .addGap(373, 373, 373))
         );
@@ -241,7 +272,9 @@ public class MainApplication extends javax.swing.JFrame {
                 .addContainerGap(15, Short.MAX_VALUE)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 401, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2))
                 .addContainerGap())
         );
 
@@ -297,7 +330,9 @@ public class MainApplication extends javax.swing.JFrame {
 //    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables
 }

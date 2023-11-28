@@ -3,6 +3,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/*
 enum Variant {
     VARIANT_PRE_COMPILE,
     VARIANT_LINK_TIME,
@@ -19,6 +20,7 @@ enum Scope {
     ECU,
     LOCAL
 }
+*/
 
 abstract class Parameter {
     protected String name;
@@ -27,17 +29,19 @@ abstract class Parameter {
     protected String description;
     protected int minMultiplicity;
     protected int maxMultiplicity;
+/*
     protected boolean postBuildVariantValue;
     protected boolean postBuildVariantMultiplicity;
     protected Map<Container, List<Variant>> valueConfigurationClass;
     protected Map<Container, List<Variant>> MultiplicityConfigurationClass;
     protected Scope scope;
     protected DefaultMutableTreeNode guiNode;
+*/
 
     // Constructors, getters, and setters...
 
     // Abstract method for updating GUI node
-    protected abstract void updateGUINode();
+    // protected abstract void updateGUINode();
 }
 
 class BooleanParameter extends Parameter {
@@ -45,30 +49,35 @@ class BooleanParameter extends Parameter {
     private boolean defaultValue;
 
     public BooleanParameter(String name, String UUID, String parentContainer, String description,
-                            int minMultiplicity, int maxMultiplicity, boolean postBuildVariantValue,
+                            int minMultiplicity, int maxMultiplicity, /*boolean postBuildVariantValue,
                             boolean postBuildVariantMultiplicity, Map<Container, List<Variant>> valueConfigurationClass,
-                            Scope scope, DefaultMutableTreeNode guiNode, boolean value, boolean defaultValue) {
+                            Scope scope, DefaultMutableTreeNode guiNode,*/ boolean value, boolean defaultValue) {
         this.name = name;
         this.UUID = UUID;
         this.parentContainer = parentContainer;
         this.description = description;
         this.minMultiplicity = minMultiplicity;
         this.maxMultiplicity = maxMultiplicity;
+        /*
         this.postBuildVariantValue = postBuildVariantValue;
         this.postBuildVariantMultiplicity = postBuildVariantMultiplicity;
         this.valueConfigurationClass = valueConfigurationClass;
         this.scope = scope;
         this.guiNode = guiNode;
+        */
         this.value = value;
         this.defaultValue = defaultValue;
-        updateGUINode();
+        // updateGUINode();
     }
 
-    // Getters and setters...
+    // Getter for value
+    public bool getValue() {
+        return value;
+    }
 
-    @Override
-    protected void updateGUINode() {
-        // Update GUI node logic for BooleanParameter
+    // Setter for value
+    public void setValue(bool value) {
+        this.value = value;
     }
 }
 
@@ -78,31 +87,36 @@ class FloatParameter extends Parameter {
     private Range range;
 
     public FloatParameter(String name, String UUID, String parentContainer, String description,
-                          int minMultiplicity, int maxMultiplicity, boolean postBuildVariantValue,
+                          int minMultiplicity, int maxMultiplicity,/* boolean postBuildVariantValue,
                           boolean postBuildVariantMultiplicity, Map<Container, List<Variant>> valueConfigurationClass,
-                          Scope scope, DefaultMutableTreeNode guiNode, float value, float defaultValue, Range range) {
+                          Scope scope, DefaultMutableTreeNode guiNode, */ float value, float defaultValue, Range range) {
         this.name = name;
         this.UUID = UUID;
         this.parentContainer = parentContainer;
         this.description = description;
         this.minMultiplicity = minMultiplicity;
         this.maxMultiplicity = maxMultiplicity;
+        /*
         this.postBuildVariantValue = postBuildVariantValue;
         this.postBuildVariantMultiplicity = postBuildVariantMultiplicity;
         this.valueConfigurationClass = valueConfigurationClass;
         this.scope = scope;
         this.guiNode = guiNode;
+        */
         this.value = value;
         this.defaultValue = defaultValue;
         this.range = range;
-        updateGUINode();
+        // updateGUINode();
     }
 
-    // Getters and setters...
+    // Getter for value
+    public float getValue() {
+        return value;
+    }
 
-    @Override
-    protected void updateGUINode() {
-        // Update GUI node logic for FloatParameter
+    // Setter for value
+    public void setValue(float value) {
+        this.value = value;
     }
 }
 
@@ -112,31 +126,36 @@ class IntegerParameter extends Parameter {
     private Range range;
 
     public IntegerParameter(String name, String UUID, String parentContainer, String description,
-                            int minMultiplicity, int maxMultiplicity, boolean postBuildVariantValue,
+                            int minMultiplicity, int maxMultiplicity, /*boolean postBuildVariantValue,
                             boolean postBuildVariantMultiplicity, Map<Container, List<Variant>> valueConfigurationClass,
-                            Scope scope, DefaultMutableTreeNode guiNode, int value, int defaultValue, Range range) {
+                            Scope scope, DefaultMutableTreeNode guiNode,*/ int value, int defaultValue, Range range) {
         this.name = name;
         this.UUID = UUID;
         this.parentContainer = parentContainer;
         this.description = description;
         this.minMultiplicity = minMultiplicity;
         this.maxMultiplicity = maxMultiplicity;
+        /*
         this.postBuildVariantValue = postBuildVariantValue;
         this.postBuildVariantMultiplicity = postBuildVariantMultiplicity;
         this.valueConfigurationClass = valueConfigurationClass;
         this.scope = scope;
         this.guiNode = guiNode;
+        */
         this.value = value;
         this.defaultValue = defaultValue;
         this.range = range;
-        updateGUINode();
+        // updateGUINode();
     }
 
-    // Getters and setters...
+    // Getter for value
+    public int getValue() {
+        return value;
+    }
 
-    @Override
-    protected void updateGUINode() {
-        // Update GUI node logic for IntegerParameter
+    // Setter for value
+    public void setValue(int value) {
+        this.value = value;
     }
 }
 
@@ -144,29 +163,34 @@ class EnumParameter extends Parameter {
     private EnumValue value;
 
     public EnumParameter(String name, String UUID, String parentContainer, String description,
-                         int minMultiplicity, int maxMultiplicity, boolean postBuildVariantValue,
+                         int minMultiplicity, int maxMultiplicity, /* boolean postBuildVariantValue,
                          boolean postBuildVariantMultiplicity, Map<Container, List<Variant>> valueConfigurationClass,
-                         Scope scope, DefaultMutableTreeNode guiNode, EnumValue value) {
+                         Scope scope, DefaultMutableTreeNode guiNode, */ EnumValue value) {
         this.name = name;
         this.UUID = UUID;
         this.parentContainer = parentContainer;
         this.description = description;
         this.minMultiplicity = minMultiplicity;
         this.maxMultiplicity = maxMultiplicity;
+        /*
         this.postBuildVariantValue = postBuildVariantValue;
         this.postBuildVariantMultiplicity = postBuildVariantMultiplicity;
         this.valueConfigurationClass = valueConfigurationClass;
         this.scope = scope;
         this.guiNode = guiNode;
+        */
         this.value = value;
-        updateGUINode();
+        // updateGUINode();
     }
 
-    // Getters and setters...
+    // Getter for value
+    public EnumValue getValue() {
+        return value;
+    }
 
-    @Override
-    protected void updateGUINode() {
-        // Update GUI node logic for EnumParameter
+    // Setter for value
+    public void setValue(EnumValue value) {
+        this.value = value;
     }
 }
 
@@ -179,7 +203,25 @@ class Range {
         this.max = max;
     }
 
-    // Getters and setters for min and max...
+    // Getter for min
+    public float getMin() {
+        return min;
+    }
+
+    // Setter for min
+    public void setMin(float min) {
+        this.min = min;
+    }
+
+    // Getter for max
+    public float getMax() {
+        return max;
+    }
+
+    // Setter for max
+    public void setMax(float max) {
+        this.max = max;
+    }
 }
 
 enum EnumValue {
