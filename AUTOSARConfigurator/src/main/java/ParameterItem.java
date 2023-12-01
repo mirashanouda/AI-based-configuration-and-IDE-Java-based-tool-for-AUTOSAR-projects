@@ -1,9 +1,3 @@
-import javax.swing.tree.DefaultMutableTreeNode;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-
 abstract class ParameterItem {
     protected String name;
     protected String UUID;
@@ -12,16 +6,15 @@ abstract class ParameterItem {
     protected int lowerMultiplicity;
     protected int upperMultiplicity;
     protected boolean hasDefaultValue;
-    
-//    public ParameterItem (String name, String UUID, String parentContainer, String description,
-//                          int lowerMultiplicity, int upperMultiplicity) {
-//        this.name = name;
-//        this.UUID = UUID;
-//        this.parentContainer = parentContainer;
-//        this.description = description;
-//        this.lowerMultiplicity = lowerMultiplicity;
-//        this.upperMultiplicity = upperMultiplicity;
-//    }
+   
+    public ParameterItem (String name, String UUID, String parentContainer, String description, int lowerMultiplicity, int upperMultiplicity) {
+        this.name = name;
+        this.UUID = UUID;
+        this.parentContainer = parentContainer;
+        this.description = description;
+        this.lowerMultiplicity = lowerMultiplicity;
+        this.upperMultiplicity = upperMultiplicity;
+    }
 }
 
 class BooleanParameter extends ParameterItem {
@@ -31,12 +24,7 @@ class BooleanParameter extends ParameterItem {
     public BooleanParameter(String name, String UUID, String parentContainer, String description,
                             int lowerMultiplicity, int upperMultiplicity, boolean hasDefaultValue, boolean defaultValue) {
         
-        this.name = name;
-        this.UUID = UUID;
-        this.parentContainer = parentContainer;
-        this.description = description;
-        this.lowerMultiplicity = lowerMultiplicity;
-        this.upperMultiplicity = upperMultiplicity;
+        super(name, UUID, parentContainer, description, lowerMultiplicity, upperMultiplicity);
         this.hasDefaultValue = hasDefaultValue;
         this.defaultValue = defaultValue;
     }
@@ -50,6 +38,10 @@ class BooleanParameter extends ParameterItem {
     public void setValue(boolean value) {
         this.value = value;
     }
+
+    public boolean hasDefaultValue () {
+        return hasDefaultValue;
+    }
 }
 
 class FloatParameter extends ParameterItem {
@@ -57,14 +49,9 @@ class FloatParameter extends ParameterItem {
     private float defaultValue;
     private Range range;
 
-    public FloatParameter(String name, String UUID, String parentContainer, String description,
-                          int lowerMultiplicity, int upperMultiplicity, boolean hasDefaultValue, float defaultValue, Range range) {
-        this.name = name;
-        this.UUID = UUID;
-        this.parentContainer = parentContainer;
-        this.description = description;
-        this.lowerMultiplicity = lowerMultiplicity;
-        this.upperMultiplicity = upperMultiplicity;
+    public FloatParameter(String name, String UUID, String parentContainer, String description, int lowerMultiplicity, int upperMultiplicity, boolean hasDefaultValue, float defaultValue, Range range) 
+{
+        super(name, UUID, parentContainer, description, lowerMultiplicity, upperMultiplicity);
         this.hasDefaultValue = hasDefaultValue;
         this.defaultValue = defaultValue;
         this.range = range;
@@ -79,6 +66,10 @@ class FloatParameter extends ParameterItem {
     public void setValue(float value) {
         this.value = value;
     }
+
+    public boolean hasDefaultValue () {
+        return hasDefaultValue;
+    }
 }
 
 class IntegerParameter extends ParameterItem {
@@ -86,14 +77,8 @@ class IntegerParameter extends ParameterItem {
     private int defaultValue;
     private Range range;
 
-    public IntegerParameter(String name, String UUID, String parentContainer, String description,
-                            int lowerMultiplicity, int upperMultiplicity, boolean hasDefaultValue, int defaultValue, Range range) {
-        this.name = name;
-        this.UUID = UUID;
-        this.parentContainer = parentContainer;
-        this.description = description;
-        this.lowerMultiplicity = lowerMultiplicity;
-        this.upperMultiplicity = upperMultiplicity;
+    public IntegerParameter(String name, String UUID, String parentContainer, String description, int lowerMultiplicity, int upperMultiplicity, boolean hasDefaultValue, int defaultValue, Range range) {
+        super(name, UUID, parentContainer, description, lowerMultiplicity, upperMultiplicity);
         this.hasDefaultValue = hasDefaultValue;
         this.defaultValue = defaultValue;
         this.range = range;
@@ -108,19 +93,17 @@ class IntegerParameter extends ParameterItem {
     public void setValue(int value) {
         this.value = value;
     }
+
+    public boolean hasDefaultValue () {
+        return hasDefaultValue;
+    }
 }
 
 class EnumParameter extends ParameterItem {
     private EnumValue value;
 
-    public EnumParameter(String name, String UUID, String parentContainer, String description,
-                         int lowerMultiplicity, int upperMultiplicity) {
-        this.name = name;
-        this.UUID = UUID;
-        this.parentContainer = parentContainer;
-        this.description = description;
-        this.lowerMultiplicity = lowerMultiplicity;
-        this.upperMultiplicity = upperMultiplicity;
+    public EnumParameter(String name, String UUID, String parentContainer, String description, int lowerMultiplicity, int upperMultiplicity) {
+        super(name, UUID, parentContainer, description, lowerMultiplicity, upperMultiplicity);
     }
 
     // Getter for value

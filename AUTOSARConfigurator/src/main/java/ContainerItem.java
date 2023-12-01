@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+import java.util.List;
+
+
 import javax.swing.tree.DefaultMutableTreeNode;
 
 public class ContainerItem {
@@ -5,6 +9,8 @@ public class ContainerItem {
     String UUID;
     String lowerMult;
     String upperMult;
+    List<ParameterItem>parametersList;
+
     DefaultMutableTreeNode guiNode;
     // parent idx
     // list of children idx
@@ -21,6 +27,7 @@ public class ContainerItem {
         this.lowerMult = lowerMult;
         this.upperMult = upperMult;
         this.guiNode = new DefaultMutableTreeNode(name);
+        this.parametersList = new ArrayList();
     }
     
     public DefaultMutableTreeNode getGUINode(){

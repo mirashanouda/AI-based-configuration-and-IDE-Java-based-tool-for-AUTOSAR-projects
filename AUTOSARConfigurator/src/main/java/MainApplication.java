@@ -40,7 +40,7 @@ public class MainApplication extends javax.swing.JFrame {
     }
     
     private void SidebarTreeConstruction(){
-        String filePath = "src/main/java/CanNM_BSWMD.arxml";
+        String filePath = "src/main/java/CanNm_Template.arxml";
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -89,7 +89,7 @@ public class MainApplication extends javax.swing.JFrame {
                         dfs(childNode, level + 1, idx);
                     }
                     else if (childNode.getNodeType() == Node.ELEMENT_NODE && childNode.getNodeName().equals("PARAMETERS")) {
-                        getParameters((Element) childNode, idx);
+                        getParameters((Element) childNode, idx,c);
                     }
                 }
             }
@@ -109,26 +109,25 @@ public class MainApplication extends javax.swing.JFrame {
         return new ContainerItem(name, UUID, LM, UM);
     }
 
-    private static void getParameters(Element params, int idx) {
+    private static void getParameters(Element params, int idx,ContainerItem c) {
         NodeList integerParams = params.getElementsByTagName("ECUC-INTEGER-PARAM-DEF");
-        processParameters(integerParams, idx, "INTEGER");
+        processParameters(integerParams, idx, "INTEGER",c);
 
         NodeList floatParams = params.getElementsByTagName("ECUC-FLOAT-PARAM-DEF");
-        processParameters(floatParams, idx, "FLOAT");
+        processParameters(floatParams, idx, "FLOAT",c);
 
         NodeList booleanParams = params.getElementsByTagName("ECUC-BOOLEAN-PARAM-DEF");
-        processParameters(booleanParams, idx, "BOOLEAN");
+        processParameters(booleanParams, idx, "BOOLEAN",c);
 
         NodeList enumerationParams = params.getElementsByTagName("ECUC-ENUMERATION-PARAM-DEF");
-        processParameters(enumerationParams, idx, "ENUMERATION");
+        processParameters(enumerationParams, idx, "ENUMERATION",c);
     }
 
-    private static void processParameters(NodeList paramNodes, int idx, String type) {
+    private static void processParameters(NodeList paramNodes, int idx, String type,ContainerItem c) {
         for (int i = 0; i < paramNodes.getLength(); i++) {
             Element paramNode = (Element) paramNodes.item(i);
             ParameterItem p = processParameter(paramNode, type);
-            // TODO: add to the container class instead
-            containerParameters[idx].add(p);
+            c.parametersList.add(p);
         }
     }
 
