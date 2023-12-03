@@ -1,11 +1,23 @@
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.border.Border;
 
-import javax.print.DocFlavor.INPUT_STREAM;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -36,11 +48,12 @@ public class MainApplication extends javax.swing.JFrame {
     
     public MainApplication() {
         initComponents();
+        jLabel2.setText("Can Network Manager");
         SidebarTreeConstruction();
     }
     
     private void SidebarTreeConstruction(){
-        String filePath = "src/main/java/CanNm_Template.arxml";
+        String filePath = "src/main/java/CanNM_BSWMD.arxml";
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -61,9 +74,13 @@ public class MainApplication extends javax.swing.JFrame {
             containerDef.set(par[i], parentContainer); // containerDef[par[i]] = parentNode
         }
         
+//        for (int i = 0; i < containerDef.size(); i++) {
+//            PrintingParameters(containerDef.get(i));
+//        }
         // TODO when generalizing to all modules, make sure to attach all containers.
         // In case of CanNM, we only have one main container.
         DefaultMutableTreeNode canNM_root_node = new DefaultMutableTreeNode("CanNM");
+        System.out.println(containerDef);
         ContainerItem c = containerDef.get(0);
         canNM_root_node.add(c.getGUINode()); 
         modulesTree = (DefaultTreeModel)jTree1.getModel();
@@ -200,8 +217,8 @@ public class MainApplication extends javax.swing.JFrame {
         }
     }
     
-    public void PrintingTree(){
-        // Printing children
+    public void PrintingContainersTree(){
+        // Printing children containers
         for (int i = 0 ; i < containerDef.size();i++) {
             // if the node has children
             if (containerDef.get(i).getGUINode().getChildCount() >= 1){
@@ -220,6 +237,16 @@ public class MainApplication extends javax.swing.JFrame {
         }
     }
 
+    public void PrintingParameters(ContainerItem container){
+        // Printing children Parameters
+        List<ParameterItem> paramsList = container.getParametersList();
+        System.out.printf("Parameters of: %s (%d)\n", container.getName(), paramsList.size());
+        for (int i = 0 ; i < paramsList.size();i++) {
+            System.out.printf("\t%s\n", paramsList.get(i).getName());
+        }
+    }
+
+   
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -227,8 +254,9 @@ public class MainApplication extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTree1 = new javax.swing.JTree();
-        jScrollPane2 = new javax.swing.JScrollPane();
         jLabel2 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jScrollPane3 = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setAlwaysOnTop(true);
@@ -241,44 +269,168 @@ public class MainApplication extends javax.swing.JFrame {
 
         javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
         jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+        jTree1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTree1MouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTree1);
 
-        jScrollPane2.setBackground(new java.awt.Color(153, 255, 204));
+        jLabel2.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
 
-        jLabel2.setFont(new java.awt.Font("Meera", 1, 24)); // NOI18N
-        jLabel2.setText("jLabel2");
-        jLabel2.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        jScrollPane2.setViewportView(jLabel2);
+        jScrollPane2.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        jScrollPane3.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane2)
-                .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(375, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addGap(373, 373, 373))
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 612, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 445, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 451, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap(20, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jLabel1)
+                        .addGap(418, 418, 418))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(15, Short.MAX_VALUE)
+                .addGap(29, 29, 29)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 355, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 355, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jTree1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseClicked
+        //jLabel2.setText("Hi");
+        TreePath clickedPath = jTree1.getPathForLocation(evt.getX(), evt.getY());
+        JPanel innerPanel2 = new JPanel(new GridBagLayout());
+//        innerPanel2.setLayout(new BoxLayout(innerPanel2, BoxLayout.Y_AXIS));
+        jScrollPane2.setViewportView(innerPanel2);
+        
+        JPanel innerPanel3 = new JPanel(new GridBagLayout());
+//        innerPanel3.setLayout(new BoxLayout(innerPanel3, BoxLayout.Y_AXIS));
+        jScrollPane3.setViewportView(innerPanel3);
+        
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(5, 1, 5, 1); // Padding between components
+        gbc.anchor = GridBagConstraints.WEST; // Align components to the left (west)
+
+//        Border paddingBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
+
+        // Check if a valid path is clicked
+        if (clickedPath != null) {
+            // Get the last component of the path (typically a leaf node)
+            DefaultMutableTreeNode clickedNode = (DefaultMutableTreeNode) clickedPath.getLastPathComponent();
+
+            // Get the user object associated with the clicked node
+            Object userObject = clickedNode.getUserObject();
+            // Container Name:
+            if (!userObject.toString().equals("CanNM")) {
+                jLabel2.setText(userObject.toString() + " Parameters:");
+            }
+            for (int i = 0; i < containerDef.size(); i++) {
+                // TODO: change to map:
+                if (containerDef.get(i).name.equals(userObject.toString())) {
+//                    System.out.println(i);
+                    ContainerItem c = containerDef.get(i);
+                     // Clear existing tabs from containerTabbedPane
+
+                    for (int j = 0; j < c.parametersList.size(); j++) {
+                        // Here
+                        ParameterItem param = c.parametersList.get(j);
+                        JLabel paramLabel = new JLabel(param.name);
+                        paramLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+//                        paramLabel.setBorder(paddingBorder);
+
+                        JTextField textField = new JTextField();
+                        textField.setPreferredSize(new Dimension(100, 30));
+                        
+                        JPanel targetPanel = (j % 2 == 0) ? innerPanel2 : innerPanel3;
+                        gbc.gridx = 0; // Column for labels
+                        targetPanel.add(paramLabel, gbc);
+                        
+
+                        if (param instanceof IntegerParameter) {
+                            IntegerParameter intParam = (IntegerParameter) param;
+                            if (intParam.hasDefaultValue()) {
+                                textField.setText(String.valueOf(intParam.getValue()));
+                            }
+                            gbc.gridx = 1; // Column for text fields
+                            targetPanel.add(textField, gbc);
+                        }
+                        else if (param instanceof FloatParameter) {
+                            FloatParameter floatParam = (FloatParameter) param;
+                            if (floatParam.hasDefaultValue()) {
+                                textField.setText(String.valueOf(floatParam.getValue()));
+                            }
+                            gbc.gridx = 1; // Column for text fields
+                            targetPanel.add(textField, gbc);
+                        }
+                        else if (param instanceof BooleanParameter) {
+                            BooleanParameter boolParam = (BooleanParameter) param;
+                            String[] items = {"True", "False", "Not Set"};
+                            JComboBox<String> comboBox = new JComboBox<>(items);
+                            if (boolParam.hasDefaultValue) {
+                                comboBox.setSelectedItem(boolParam.getValue() ? "True" : "False");
+                            } else {
+                                comboBox.setSelectedItem("Not Set");
+                            }
+                            gbc.gridx = 1;
+                            targetPanel.add(comboBox, gbc);
+                        }
+                        else if (param instanceof EnumParameter) {
+                            EnumParameter enumParam = (EnumParameter) param;
+                            String[] items = {"CANNM_PDU_BYTE_0", "CANNM_PDU_BYTE_1", "CANNM_PDU_OFF"};
+                            JComboBox<String> comboBox = new JComboBox<>(items);
+                            // switch (enumParam.getValue()) {
+                            //     case CANNM_PDU_BYTE_0:
+                            //         comboBox.setSelectedItem("CANNM_PDU_BYTE_0");
+                            //         break;
+                            //     case CANNM_PDU_BYTE_1:
+                            //         comboBox.setSelectedItem("CANNM_PDU_BYTE_1");
+                            //         break;
+                            //     case CANNM_PDU_OFF:
+                            //         comboBox.setSelectedItem("CANNM_PDU_OFF");
+                            //         break;
+                            // }
+                            comboBox.setSelectedItem(enumParam.getValue());
+                            gbc.gridx = 1;
+                            targetPanel.add(comboBox, gbc);
+                        }
+                        gbc.gridy++; // Move to the next row for the next set of components
+                    }
+                    // Break the loop after finding the matching container
+                    break;
+                }
+            }   
+        }
+    }//GEN-LAST:event_jTree1MouseClicked
 
     /**
      * @param args the command line arguments
@@ -315,23 +467,13 @@ public class MainApplication extends javax.swing.JFrame {
         });
     }
     
-    // Member Variables
-//    DefaultTreeModel modulesTree;
-//    static final int maxNodes = 100000;
-//    static List<ContainerItem> containerDef = new ArrayList<>();
-//    static int[] par = new int[maxNodes];
-//    static List<ParameterItem>[] containerParameters = new ArrayList[maxNodes];
-//
-//    static {
-//        for (int i = 0; i < maxNodes; i++) {
-//            containerParameters[i] = new ArrayList<>();
-//        }
-//    }
+   
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables
 }
