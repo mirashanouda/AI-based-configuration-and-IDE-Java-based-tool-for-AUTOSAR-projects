@@ -9,7 +9,7 @@ public class ContainerItem {
     String UUID;
     String lowerMult;
     String upperMult;
-    List<ParameterItem>parametersList;
+    List<ParameterItem> parametersList;
 
     DefaultMutableTreeNode guiNode;
     // parent idx
@@ -44,5 +44,9 @@ public class ContainerItem {
    
     public String getName(){
         return this.name;
+    }
+
+    public List<ParameterItem> getParametersList () {
+        return parametersList;
     }
 }

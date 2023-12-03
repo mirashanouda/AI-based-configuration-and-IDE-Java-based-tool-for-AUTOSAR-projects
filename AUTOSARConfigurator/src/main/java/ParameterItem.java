@@ -15,6 +15,10 @@ abstract class ParameterItem {
         this.lowerMultiplicity = lowerMultiplicity;
         this.upperMultiplicity = upperMultiplicity;
     }
+
+    public String getName() {
+        return name;
+    }
 }
 
 class BooleanParameter extends ParameterItem {
