@@ -1,6 +1,10 @@
 ContainerItem.class
 MainApplication$2.class
+WrapTextPane$WrapColumnFactory.class
 MainApplication$1.class
+WrapTextPane$WrapEditorKit.class
 MainApplication.class
 com/mycompany/autosarconfigurator/AUTOSARConfigurator.class
 ParameterItem.class
+WrapTextPane$WrapLabelView.class
+WrapTextPane.class

@@ -7,13 +7,22 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.Border;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -256,7 +265,7 @@ public class MainApplication extends javax.swing.JFrame {
         jTree1 = new javax.swing.JTree();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jScrollPane3 = new javax.swing.JScrollPane();
+        jPanel1 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setAlwaysOnTop(true);
@@ -278,9 +287,20 @@ public class MainApplication extends javax.swing.JFrame {
 
         jLabel2.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
 
-        jScrollPane2.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        jScrollPane2.setHorizontalScrollBar(null);
 
-        jScrollPane3.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1013, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 353, Short.MAX_VALUE)
+        );
+
+        jScrollPane2.setViewportView(jPanel1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -294,11 +314,8 @@ public class MainApplication extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 612, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 445, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 451, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap(20, Short.MAX_VALUE))
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 1015, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(16, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(jLabel1)
@@ -314,9 +331,7 @@ public class MainApplication extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 355, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 355, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 355, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -328,15 +343,15 @@ public class MainApplication extends javax.swing.JFrame {
         TreePath clickedPath = jTree1.getPathForLocation(evt.getX(), evt.getY());
         JPanel innerPanel2 = new JPanel(new GridBagLayout());
         jScrollPane2.setViewportView(innerPanel2);
-        
-        JPanel innerPanel3 = new JPanel(new GridBagLayout());
-        jScrollPane3.setViewportView(innerPanel3);
+        jScrollPane2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.insets = new Insets(5, 1, 5, 1); // Padding between components
-        gbc.anchor = GridBagConstraints.WEST; // Align components to the left (west)
+        gbc.gridx = 0;  // X position
+        gbc.gridy = 0;  // Y position, increment this for each component
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;  // Fill horizontally
+        gbc.insets = new Insets(5, 5, 5, 5);  // Optional: margins around components
 
 //        Border paddingBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
 
@@ -351,61 +366,44 @@ public class MainApplication extends javax.swing.JFrame {
             if (!userObject.toString().equals("CanNM")) {
                 jLabel2.setText(userObject.toString() + " Parameters:");
             }
+            
             for (int i = 0; i < containerDef.size(); i++) {
                 // TODO: change to map:
                 if (containerDef.get(i).name.equals(userObject.toString())) {
 //                    System.out.println(i);
                     ContainerItem c = containerDef.get(i);
-                     // Clear existing tabs from containerTabbedPane
-
                     for (int j = 0; j < c.parametersList.size(); j++) {
-                        // Here
                         ParameterItem param = c.parametersList.get(j);
-                        JLabel paramLabel = new JLabel(param.name);
-                        paramLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-//                        paramLabel.setBorder(paddingBorder);
-
-                        JTextField textField = new JTextField();
-                        textField.setPreferredSize(new Dimension(100, 30));
+                        JLabel paramName = new JLabel(param.name);
+                        paramName.setFont(new Font("Arial", Font.BOLD, 16));
                         
-                        JPanel targetPanel = (j % 2 == 0) ? innerPanel2 : innerPanel3;
-                        gbc.gridx = 0; // Column for labels
-                        targetPanel.add(paramLabel, gbc);
-                        
-
+                                                
                         if (param instanceof IntegerParameter) {
                             IntegerParameter intParam = (IntegerParameter) param;
-                            
-                            if (intParam.hasDefaultValue()) {
-                                
-                            }
-                            gbc.gridx = 1; // Column for text fields
-                            targetPanel.add(textField, gbc);
+                            paramName.setText(paramName.getText() + ": Integer");
                         }
+                        
                         else if (param instanceof FloatParameter) {
                             FloatParameter floatParam = (FloatParameter) param;
-                            if (floatParam.hasDefaultValue()) {
-                                textField.setText(String.valueOf(floatParam.getValue()));
-                            }
-                            gbc.gridx = 1; // Column for text fields
-                            targetPanel.add(textField, gbc);
+                            paramName.setText(paramName.getText() + ": Float");
                         }
+                        
                         else if (param instanceof BooleanParameter) {
                             BooleanParameter boolParam = (BooleanParameter) param;
-                            String[] items = {"True", "False", "Not Set"};
-                            JComboBox<String> comboBox = new JComboBox<>(items);
-                            if (boolParam.hasDefaultValue) {
-                                comboBox.setSelectedItem(boolParam.getValue() ? "True" : "False");
-                            } else {
-                                comboBox.setSelectedItem("Not Set");
-                            }
-                            gbc.gridx = 1;
-                            targetPanel.add(comboBox, gbc);
+                            paramName.setText(paramName.getText() + ": Boolean");
+                            //String[] items = {"True", "False", "Not Set"};
+                            //JComboBox<String> comboBox = new JComboBox<>(items);
+//                            if (boolParam.hasDefaultValue) {
+//                                comboBox.setSelectedItem(boolParam.getValue() ? "True" : "False");
+//                            } else {
+//                                comboBox.setSelectedItem("Not Set");
+//                            }
                         }
                         else if (param instanceof EnumParameter) {
                             EnumParameter enumParam = (EnumParameter) param;
-                            String[] items = {"CANNM_PDU_BYTE_0", "CANNM_PDU_BYTE_1", "CANNM_PDU_OFF"};
-                            JComboBox<String> comboBox = new JComboBox<>(items);
+                            paramName.setText(paramName.getText() + ": Enum");
+                            //String[] items = {"CANNM_PDU_BYTE_0", "CANNM_PDU_BYTE_1", "CANNM_PDU_OFF"};
+                            //JComboBox<String> comboBox = new JComboBox<>(items);
                             // switch (enumParam.getValue()) {
                             //     case CANNM_PDU_BYTE_0:
                             //         comboBox.setSelectedItem("CANNM_PDU_BYTE_0");
@@ -417,11 +415,68 @@ public class MainApplication extends javax.swing.JFrame {
                             //         comboBox.setSelectedItem("CANNM_PDU_OFF");
                             //         break;
                             // }
-                            comboBox.setSelectedItem(enumParam.getValue());
-                            gbc.gridx = 1;
-                            targetPanel.add(comboBox, gbc);
+                            //comboBox.setSelectedItem(enumParam.getValue());
                         }
-                        gbc.gridy++; // Move to the next row for the next set of components
+                        innerPanel2.add(paramName, gbc);
+                        gbc.gridy++;
+                        
+                        JTextArea textArea = new JTextArea();
+                        textArea.setWrapStyleWord(true);
+                        textArea.setLineWrap(true);
+                        textArea.setText("Description: " + param.getDesc().replaceAll("[\n\t]", "").trim());
+                        innerPanel2.add(textArea, gbc);
+                        gbc.gridy++;
+                        
+                        JTextArea textArea2 = new JTextArea();
+                        textArea2.setWrapStyleWord(true);
+                        textArea2.setLineWrap(true);
+                        textArea2.setText("Default Value: ");
+
+                        if (param instanceof IntegerParameter) {
+                            IntegerParameter intParam = (IntegerParameter) param;
+                            if (intParam.hasDefaultValue()){
+                                textArea2.setText(textArea2.getText() + intParam.getDefaultValue());
+                            }
+                            else {
+                                textArea2.setText(textArea2.getText() + "None");
+                            }
+                            textArea2.setText(textArea2.getText() + "\n");
+                            textArea2.setText(textArea2.getText() + "Range: " + (int)intParam.getRange().getMin() + " --> " + (int)intParam.getRange().getMax());
+                        }
+                        
+                        else if (param instanceof FloatParameter) {
+                            FloatParameter floatParam = (FloatParameter) param;
+                            if (floatParam.hasDefaultValue()){
+                                textArea2.setText(textArea2.getText() + floatParam.getDefaultValue());
+                            }
+                            else {
+                                textArea2.setText(textArea2.getText() + "None");
+                            }
+                            textArea2.setText(textArea2.getText() + "\n");
+                            textArea2.setText(textArea2.getText() + "Range: " + floatParam.getRange().getMin() + " --> " + floatParam.getRange().getMax());
+                            
+                        }
+                        
+                        else if (param instanceof BooleanParameter) {
+                            BooleanParameter boolParam = (BooleanParameter) param;
+                            if (boolParam.hasDefaultValue()){
+                                textArea2.setText(textArea2.getText() + boolParam.getDefaultValue());
+                            }
+                            else {
+                                textArea2.setText(textArea2.getText() + "None");
+                            }
+                        }
+                        
+                        else if (param instanceof EnumParameter) {
+                            EnumParameter enumParam = (EnumParameter) param;
+                            textArea2.setText(textArea2.getText() + "None");
+                            textArea2.setText(textArea2.getText() + "\n");
+                            textArea2.setText(textArea2.getText() + "Range: CANNM_PDU_BYTE_0, CANNM_PDU_BYTE_1, CANNM_PDU_OFF");
+                            
+                        }
+                                                
+                        innerPanel2.add(textArea2, gbc);
+                        gbc.gridy++;
                     }
                     // Break the loop after finding the matching container
                     break;
@@ -469,9 +524,9 @@ public class MainApplication extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables
 }
