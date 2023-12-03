@@ -325,14 +325,11 @@ public class MainApplication extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jTree1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseClicked
-        //jLabel2.setText("Hi");
         TreePath clickedPath = jTree1.getPathForLocation(evt.getX(), evt.getY());
         JPanel innerPanel2 = new JPanel(new GridBagLayout());
-//        innerPanel2.setLayout(new BoxLayout(innerPanel2, BoxLayout.Y_AXIS));
         jScrollPane2.setViewportView(innerPanel2);
         
         JPanel innerPanel3 = new JPanel(new GridBagLayout());
-//        innerPanel3.setLayout(new BoxLayout(innerPanel3, BoxLayout.Y_AXIS));
         jScrollPane3.setViewportView(innerPanel3);
         
         GridBagConstraints gbc = new GridBagConstraints();
@@ -378,8 +375,9 @@ public class MainApplication extends javax.swing.JFrame {
 
                         if (param instanceof IntegerParameter) {
                             IntegerParameter intParam = (IntegerParameter) param;
+                            
                             if (intParam.hasDefaultValue()) {
-                                textField.setText(String.valueOf(intParam.getValue()));
+                                
                             }
                             gbc.gridx = 1; // Column for text fields
                             targetPanel.add(textField, gbc);
