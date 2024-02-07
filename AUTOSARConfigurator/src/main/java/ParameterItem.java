@@ -19,6 +19,10 @@ abstract class ParameterItem {
     public String getName() {
         return name;
     }
+    
+    public String getDesc(){
+        return description;
+    }
 }
 
 class BooleanParameter extends ParameterItem {
@@ -45,6 +49,10 @@ class BooleanParameter extends ParameterItem {
 
     public boolean hasDefaultValue () {
         return hasDefaultValue;
+    }
+    
+    public boolean getDefaultValue () {
+        return defaultValue;
     }
 }
 
@@ -74,6 +82,14 @@ class FloatParameter extends ParameterItem {
     public boolean hasDefaultValue () {
         return hasDefaultValue;
     }
+    
+    public float getDefaultValue () {
+        return defaultValue;
+    }
+    
+    public Range getRange(){
+        return range;
+    }
 }
 
 class IntegerParameter extends ParameterItem {
@@ -100,6 +116,14 @@ class IntegerParameter extends ParameterItem {
 
     public boolean hasDefaultValue () {
         return hasDefaultValue;
+    }
+
+    public int getDefaultValue () {
+        return defaultValue;
+    }
+    
+    public Range getRange(){
+        return range;
     }
 }
 
