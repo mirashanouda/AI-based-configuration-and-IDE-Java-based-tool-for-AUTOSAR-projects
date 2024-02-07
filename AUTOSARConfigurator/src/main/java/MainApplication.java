@@ -1,4 +1,3 @@
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -7,23 +6,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.border.Border;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -38,12 +24,8 @@ import org.xml.sax.SAXException;
 
 public class MainApplication extends javax.swing.JFrame {
 
-    /**
-     * Creates new form MainApplication
-     */
     // Member variables
     DefaultTreeModel modulesTree;
-    
     static final int maxNodes = 100000;
     static List<ContainerItem> containerDef = new ArrayList<>();
     static int[] par = new int[maxNodes];
