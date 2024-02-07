@@ -47,26 +47,20 @@ public class MainApplication extends javax.swing.JFrame {
     static final int maxNodes = 100000;
     static List<ContainerItem> containerDef = new ArrayList<>();
     static int[] par = new int[maxNodes];
-    static List<ParameterItem>[] containerParameters = new ArrayList[maxNodes];
 
-    static {
-        for (int i = 0; i < maxNodes; i++) {
-            containerParameters[i] = new ArrayList<>();
-        }
-    }
-    
     public MainApplication() {
         initComponents();
+        // TODO: This title needs to be set each time the 
         jLabel2.setText("Can Network Manager");
         SidebarTreeConstruction();
     }
-    
+
     private void SidebarTreeConstruction(){
-        String filePath = "src/main/java/CanNM_BSWMD.arxml";
+        String bswmdPath = "src/main/java/CanNM_BSWMD.arxml";
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            org.w3c.dom.Document doc = dBuilder.parse(new File(filePath));
+            org.w3c.dom.Document doc = dBuilder.parse(new File(bswmdPath));
 
             Element root = doc.getDocumentElement();
             Element containers = (Element) root.getElementsByTagName("CONTAINERS").item(0);
@@ -82,10 +76,7 @@ public class MainApplication extends javax.swing.JFrame {
             parentContainer.setGUINode(parentNode);
             containerDef.set(par[i], parentContainer); // containerDef[par[i]] = parentNode
         }
-        
-//        for (int i = 0; i < containerDef.size(); i++) {
-//            PrintingParameters(containerDef.get(i));
-//        }
+
         // TODO when generalizing to all modules, make sure to attach all containers.
         // In case of CanNM, we only have one main container.
         DefaultMutableTreeNode canNM_root_node = new DefaultMutableTreeNode("CanNM");
@@ -159,7 +150,6 @@ public class MainApplication extends javax.swing.JFrame {
 
     private static ParameterItem processParameter(Element ecucParameter, String typ) {
         String name = ecucParameter.getElementsByTagName("SHORT-NAME").item(0).getTextContent();
-//        String UUID = ecucParameter.getElementsByTagName("UUID").item(0).getTextContent();
         String UUID = "";
         String Desc = ecucParameter.getElementsByTagName("DESC").item(0).getTextContent();
         
@@ -172,7 +162,7 @@ public class MainApplication extends javax.swing.JFrame {
         int UM;
         if (UMElement != null) {
             UM = Integer.MAX_VALUE;
-        } 
+        }
         else {
             NodeList UMList = ecucParameter.getElementsByTagName("UPPER-MULTIPLICITY");
             if (UMList.getLength() > 0) {
@@ -191,8 +181,6 @@ public class MainApplication extends javax.swing.JFrame {
             String end = ecucParameter.getElementsByTagName("MAX").item(0).getTextContent();
             endRange = (!end.equals("Inf")) ? Float.parseFloat(end) : Float.POSITIVE_INFINITY;
         }
-
-        System.err.printf("%s - %s - %d - %d\n", name, UUID, LM, UM);
 
         if (typ.equals("INTEGER")) {
             int defVal = -1;
@@ -255,7 +243,6 @@ public class MainApplication extends javax.swing.JFrame {
         }
     }
 
-   
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
