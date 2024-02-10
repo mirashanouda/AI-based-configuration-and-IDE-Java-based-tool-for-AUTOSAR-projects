@@ -130,8 +130,9 @@ class IntegerParameter extends ParameterItem {
 class EnumParameter extends ParameterItem {
     private EnumValue value;
 
-    public EnumParameter(String name, String UUID, String parentContainer, String description, int lowerMultiplicity, int upperMultiplicity) {
+    public EnumParameter(String name, String UUID, String parentContainer, String description, int lowerMultiplicity, int upperMultiplicity, EnumValue value) {
         super(name, UUID, parentContainer, description, lowerMultiplicity, upperMultiplicity);
+        this.value= value;
     }
 
     // Getter for value
