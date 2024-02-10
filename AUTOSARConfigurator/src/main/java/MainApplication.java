@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -20,9 +22,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import javax.swing.JFrame;
+import org.w3c.dom.Document;
 
-
-public class MainApplication extends javax.swing.JFrame {
+public class MainApplication extends JFrame implements ConfiguratorInterface {
 
     // Member variables
     DefaultTreeModel modulesTree;
@@ -37,18 +40,26 @@ public class MainApplication extends javax.swing.JFrame {
         SidebarTreeConstruction();
     }
 
+    @Override
+    public Element FileReader(String filePath)
+    {
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder;
+        Document doc = null;
+        try {
+            dBuilder = dbFactory.newDocumentBuilder();
+            doc = dBuilder.parse(new File(filePath));
+        } catch (IOException | ParserConfigurationException | SAXException e) {}
+        return doc.getDocumentElement();
+    }
+
     private void SidebarTreeConstruction(){
         String bswmdPath = "src/main/java/CanNM_BSWMD.arxml";
-        try {
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            org.w3c.dom.Document doc = dBuilder.parse(new File(bswmdPath));
+        
+        Element root = FileReader(bswmdPath);
+        Element containers = (Element) root.getElementsByTagName("CONTAINERS").item(0);
 
-            Element root = doc.getDocumentElement();
-            Element containers = (Element) root.getElementsByTagName("CONTAINERS").item(0);
-
-            dfs(containers, 0, -1);
-        } catch (IOException | ParserConfigurationException | SAXException e) {}
+        dfs(containers, 0, -1);
         
         for (int i = containerDef.size() - 1; i > 0; i--) {
             DefaultMutableTreeNode parentNode = containerDef.get(par[i]).getGUINode();
