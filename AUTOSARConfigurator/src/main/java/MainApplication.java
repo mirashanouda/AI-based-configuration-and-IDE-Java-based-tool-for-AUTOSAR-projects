@@ -20,9 +20,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import javax.swing.JFrame;
+import org.w3c.dom.Document;
 
-
-public class MainApplication extends javax.swing.JFrame {
+public class MainApplication extends JFrame implements ConfiguratorInterface {
 
     // Member variables
     DefaultTreeModel modulesTree;
@@ -37,18 +38,27 @@ public class MainApplication extends javax.swing.JFrame {
         SidebarTreeConstruction();
     }
 
-    private void SidebarTreeConstruction(){
-        String bswmdPath = "src/main/java/CanNM_BSWMD.arxml";
+    @Override
+    public Element FileReader(String filePath)
+    {
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder;
+        Document doc = null;
         try {
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            org.w3c.dom.Document doc = dBuilder.parse(new File(bswmdPath));
-
-            Element root = doc.getDocumentElement();
-            Element containers = (Element) root.getElementsByTagName("CONTAINERS").item(0);
-
-            dfs(containers, 0, -1);
+            dBuilder = dbFactory.newDocumentBuilder();
+            doc = dBuilder.parse(new File(filePath));
         } catch (IOException | ParserConfigurationException | SAXException e) {}
+        return doc.getDocumentElement();
+    }
+
+    private void SidebarTreeConstruction()
+    {
+        String bswmdPath = "src/main/java/CanNM_BSWMD.arxml";
+        
+        Element root = FileReader(bswmdPath);
+        Element containers = (Element) root.getElementsByTagName("CONTAINERS").item(0);
+
+        BSWMDParserDFS(containers, -1);
         
         for (int i = containerDef.size() - 1; i > 0; i--) {
             DefaultMutableTreeNode parentNode = containerDef.get(par[i]).getGUINode();
@@ -71,12 +81,14 @@ public class MainApplication extends javax.swing.JFrame {
         jTree1.setModel(modulesTree);
     }
     
-    public static void dfs(Node ecucContainer, int level, int parentIndex) {
+    @Override
+    public void BSWMDParserDFS(Node ecucContainer, int parentIndex)
+    {
         NodeList containerNodes = ecucContainer.getChildNodes();
         for (int i = 0; i < containerNodes.getLength(); i++) {
             Node containerNode = containerNodes.item(i);
             if ( containerNode.getNodeName().equals("ECUC-PARAM-CONF-CONTAINER-DEF")) {
-                ContainerItem c = processContainer((Element) containerNode);
+                ContainerItem c = processBSWMDContainer((Element) containerNode);
                 containerDef.add(c);
                 int idx = containerDef.size() - 1;
                 par[idx] = parentIndex;
@@ -85,17 +97,51 @@ public class MainApplication extends javax.swing.JFrame {
                 for (int k = 0; k < childrenNodes.getLength(); k++) {
                     Node childNode = childrenNodes.item(k);
                     if (childNode.getNodeType() == Node.ELEMENT_NODE && childNode.getNodeName().equals("SUB-CONTAINERS")) {
-                        dfs(childNode, level + 1, idx);
+                        BSWMDParserDFS(childNode, idx);
                     }
                     else if (childNode.getNodeType() == Node.ELEMENT_NODE && childNode.getNodeName().equals("PARAMETERS")) {
-                        getParameters((Element) childNode, idx,c);
+                        GetBSWMDParameters((Element) childNode, idx,c);
                     }
                 }
             }
         }
     }
+    
+    @Override
+    public void ARXMLParserDFS(Node ecucContainer, int parentIndex)
+    {
+        NodeList containerNodes = ecucContainer.getChildNodes();
 
-    private static ContainerItem processContainer(Element ecucContainer) {
+        for (int i = 0; i < containerNodes.getLength(); i++) {
+            Node containerNode = containerNodes.item(i);
+            if ( containerNode.getNodeName().equals("ECUC-CONTAINER-VALUE")) {
+                String containerName = ((Element)containerNode).getElementsByTagName("SHORT-NAME").item(0).getTextContent();
+                ContainerItem c = new ContainerItem(containerName, "", "", "");
+                containerDef.add(c);
+                int idx = containerDef.size() - 1;
+                par[idx] = parentIndex;
+
+                NodeList parametersNodes = containerNode.getChildNodes();
+                for (int j = 0; j < parametersNodes.getLength(); j++) {
+                    Node paramsNode = parametersNodes.item(j);
+                    if (paramsNode.getNodeType() == Node.ELEMENT_NODE && paramsNode.getNodeName().equals("PARAMETER-VALUES")) {
+                        GetARXMLParameters((Element) paramsNode, idx, c);
+                    }
+                }
+
+                NodeList subContainersNodes = containerNode.getChildNodes();
+                for (int k = 0; k < subContainersNodes.getLength(); k++) {
+                    Node subContainerNode = subContainersNodes.item(k);
+                    if (subContainerNode.getNodeType() == Node.ELEMENT_NODE && subContainerNode.getNodeName().equals("SUB-CONTAINERS")) {
+                        ARXMLParserDFS(subContainerNode, idx);
+                    }
+                }
+            }
+        }
+    }
+    
+    @Override
+    public ContainerItem processBSWMDContainer(Element ecucContainer) {
         String name = ecucContainer.getElementsByTagName("SHORT-NAME").item(0).getTextContent();
         String LM = ecucContainer.getElementsByTagName("LOWER-MULTIPLICITY").item(0).getTextContent();
         String UM = String.valueOf(ecucContainer.getElementsByTagName("UPPER-MULTIPLICITY-INFINITE").item(0));
@@ -108,21 +154,96 @@ public class MainApplication extends javax.swing.JFrame {
         return new ContainerItem(name, UUID, LM, UM);
     }
 
-    private static void getParameters(Element params, int idx,ContainerItem c) {
+    @Override
+    public void GetBSWMDParameters(Element params, int idx,ContainerItem c) {
         NodeList integerParams = params.getElementsByTagName("ECUC-INTEGER-PARAM-DEF");
-        processParameters(integerParams, idx, "INTEGER",c);
+        processParameters(integerParams, "INTEGER",c);
 
         NodeList floatParams = params.getElementsByTagName("ECUC-FLOAT-PARAM-DEF");
-        processParameters(floatParams, idx, "FLOAT",c);
+        processParameters(floatParams, "FLOAT",c);
 
         NodeList booleanParams = params.getElementsByTagName("ECUC-BOOLEAN-PARAM-DEF");
-        processParameters(booleanParams, idx, "BOOLEAN",c);
+        processParameters(booleanParams, "BOOLEAN",c);
 
         NodeList enumerationParams = params.getElementsByTagName("ECUC-ENUMERATION-PARAM-DEF");
-        processParameters(enumerationParams, idx, "ENUMERATION",c);
+        processParameters(enumerationParams, "ENUMERATION",c);
     }
+    
+    @Override
+    public void GetARXMLParameters(Element params, int idx,ContainerItem c) {
+        NodeList numericalVals = params.getElementsByTagName("ECUC-NUMERICAL-PARAM-VALUE");
+        NodeList TextualVals = params.getElementsByTagName("ECUC-TEXTUAL-PARAM-VALUE");
 
-    private static void processParameters(NodeList paramNodes, int idx, String type,ContainerItem c) {
+
+        for (int i = 0; i < numericalVals.getLength(); i++) {
+            Element numericalValElement = (Element) numericalVals.item(i);
+            NodeList valueList = numericalValElement.getElementsByTagName("VALUE");
+            NodeList definitionRefList = numericalValElement.getElementsByTagName("DEFINITION-REF");
+            String val = "";
+
+            if (valueList.getLength() > 0) {
+                Element valueElement = (Element) valueList.item(0);
+                val = valueElement.getTextContent();
+            }
+
+            if (definitionRefList.getLength() > 0) {
+                Element definitionRefElement = (Element) definitionRefList.item(0);
+                String destAttribute = definitionRefElement.getAttribute("DEST");
+                if ("ECUC-INTEGER-PARAM-DEF".equals(destAttribute)) {
+                    String name = definitionRefElement.getTextContent();
+                    String[] pathParts = name.split("/");
+                    name = pathParts[pathParts.length - 1];
+                    Range range = null;
+
+                    ParameterItem p = new IntegerParameter( name,"", "","", 0, 0, true, Integer.parseInt(val), range);
+                    System.out.println(Integer.parseInt(val));
+                    c.parametersList.add(p);
+                }
+                if ("ECUC-FLOAT-PARAM-DEF".equals(destAttribute)) {
+                    String name = definitionRefElement.getTextContent();
+                    String[] pathParts = name.split("/");
+                    name = pathParts[pathParts.length - 1];
+                    ParameterItem p = new FloatParameter( name,"", "", "", 0,0, true, Float.parseFloat(val), null);
+                    c.parametersList.add(p);
+                }
+                if ("ECUC-BOOLEAN-PARAM-DEF".equals(destAttribute)) {
+                    String name = definitionRefElement.getTextContent();
+                    String[] pathParts = name.split("/");
+                    name = pathParts[pathParts.length - 1];
+                    ParameterItem p = new BooleanParameter(name, "", "", "", 0, 0, true, Boolean.parseBoolean(val));
+                    c.parametersList.add(p);
+                }
+            }
+        }
+        for (int i = 0; i < TextualVals.getLength(); i++) {
+            Element TextualValElement = (Element) TextualVals.item(i);
+
+            NodeList valueList = TextualValElement.getElementsByTagName("VALUE");
+            NodeList definitionRefList = TextualValElement.getElementsByTagName("DEFINITION-REF");
+
+            String val = "";
+            if (valueList.getLength() > 0) {
+                Element valueElement = (Element) valueList.item(0);
+                 val = valueElement.getTextContent();
+            }
+
+            if (definitionRefList.getLength() > 0) {
+                Element definitionRefElement = (Element) definitionRefList.item(0);
+                String destAttribute = definitionRefElement.getAttribute("DEST");
+                if ("ECUC-ENUMERATION-PARAM-DEF".equals(destAttribute)) {
+                    String name = definitionRefElement.getTextContent();
+                    String[] pathParts = name.split("/");
+                    name = pathParts[pathParts.length - 1];
+                    ParameterItem p = new EnumParameter(name,"", "", "",0, 0, EnumValue.valueOf(val));
+                    System.out.println(EnumValue.valueOf(val));
+                    c.parametersList.add(p);
+                }
+            }
+        }
+    }
+    
+    @Override
+    public void processParameters(NodeList paramNodes, String type,ContainerItem c) {
         for (int i = 0; i < paramNodes.getLength(); i++) {
             Element paramNode = (Element) paramNodes.item(i);
             ParameterItem p = processParameter(paramNode, type);
@@ -130,13 +251,14 @@ public class MainApplication extends javax.swing.JFrame {
         }
     }
 
-    private static ParameterItem processParameter(Element ecucParameter, String typ) {
+    @Override
+    public ParameterItem processParameter(Element ecucParameter, String typ) {
         String name = ecucParameter.getElementsByTagName("SHORT-NAME").item(0).getTextContent();
         String UUID = "";
         String Desc = ecucParameter.getElementsByTagName("DESC").item(0).getTextContent();
         
         Element defaultValueElement = (Element) ecucParameter.getElementsByTagName("DEFAULT-VALUE").item(0);
-        boolean hasDefaultValue = (defaultValueElement != null) ? true : false;
+        boolean hasDefaultValue = (defaultValueElement != null);
         
         int LM = Integer.parseInt(ecucParameter.getElementsByTagName("LOWER-MULTIPLICITY").item(0).getTextContent());
         String UMElementName = "UPPER-MULTIPLICITY-INFINITE";
@@ -164,38 +286,43 @@ public class MainApplication extends javax.swing.JFrame {
             endRange = (!end.equals("Inf")) ? Float.parseFloat(end) : Float.POSITIVE_INFINITY;
         }
 
-        if (typ.equals("INTEGER")) {
-            int defVal = -1;
-            String value;
-            if (hasDefaultValue) {
-                value = defaultValueElement.getTextContent();
-                defVal = Integer.parseInt(value);
+        switch (typ) {
+            case "INTEGER":
+            {
+                int defVal = -1;
+                String value;
+                if (hasDefaultValue) {
+                    value = defaultValueElement.getTextContent();
+                    defVal = Integer.parseInt(value);
+                }
+                return new IntegerParameter(name, UUID, "", Desc, LM, UM, hasDefaultValue, defVal, new Range(startRange, endRange));
             }
-            return new IntegerParameter(name, UUID, "", Desc, LM, UM, hasDefaultValue, defVal, new Range(startRange, endRange));
-        }
-        else if (typ.equals("FLOAT")) {
-            float defVal = -1;
-            String value;
-            if (hasDefaultValue) {
-                value = defaultValueElement.getTextContent();
-                defVal = Float.parseFloat(value);
+            case "FLOAT":
+            {
+                float defVal = -1;
+                String value;
+                if (hasDefaultValue) {
+                    value = defaultValueElement.getTextContent();
+                    defVal = Float.parseFloat(value);
+                }
+                return new FloatParameter(name, UUID, "", Desc, LM, UM, hasDefaultValue, defVal, new Range(startRange, endRange));
             }
-            return new FloatParameter(name, UUID, "", Desc, LM, UM, hasDefaultValue, defVal, new Range(startRange, endRange));
-        }
-        else if (typ.equals("BOOLEAN")) {
-            boolean defVal = false;
-            String value;
-            if (hasDefaultValue) {
-                value = defaultValueElement.getTextContent();
-                defVal = (value == "false") ? false : true;
+            case "BOOLEAN":
+            {
+                boolean defVal = false;
+                String value;
+                if (hasDefaultValue) {
+                    value = defaultValueElement.getTextContent();
+                    defVal = (!"false".equals(value));
+                }
+                return new BooleanParameter(name, UUID, "", Desc, LM, UM, hasDefaultValue, defVal);
             }
-            return new BooleanParameter(name, UUID, "", Desc, LM, UM, hasDefaultValue, defVal);
-        }
-        else { // enum 
-            return new EnumParameter(name, UUID, "", Desc, LM, UM);
+            default:
+                return new EnumParameter(name, UUID, "", Desc, LM, UM, null);
         }
     }
     
+    @Override
     public void PrintingContainersTree(){
         // Printing children containers
         for (int i = 0 ; i < containerDef.size();i++) {
@@ -216,6 +343,7 @@ public class MainApplication extends javax.swing.JFrame {
         }
     }
 
+    @Override
     public void PrintingParameters(ContainerItem container){
         // Printing children Parameters
         List<ParameterItem> paramsList = container.getParametersList();
@@ -348,17 +476,14 @@ public class MainApplication extends javax.swing.JFrame {
                         
                                                 
                         if (param instanceof IntegerParameter) {
-                            IntegerParameter intParam = (IntegerParameter) param;
                             paramName.setText(paramName.getText() + ": Integer");
                         }
                         
                         else if (param instanceof FloatParameter) {
-                            FloatParameter floatParam = (FloatParameter) param;
                             paramName.setText(paramName.getText() + ": Float");
                         }
                         
                         else if (param instanceof BooleanParameter) {
-                            BooleanParameter boolParam = (BooleanParameter) param;
                             paramName.setText(paramName.getText() + ": Boolean");
                             //String[] items = {"True", "False", "Not Set"};
                             //JComboBox<String> comboBox = new JComboBox<>(items);
@@ -369,7 +494,6 @@ public class MainApplication extends javax.swing.JFrame {
 //                            }
                         }
                         else if (param instanceof EnumParameter) {
-                            EnumParameter enumParam = (EnumParameter) param;
                             paramName.setText(paramName.getText() + ": Enum");
                             //String[] items = {"CANNM_PDU_BYTE_0", "CANNM_PDU_BYTE_1", "CANNM_PDU_OFF"};
                             //JComboBox<String> comboBox = new JComboBox<>(items);
@@ -401,8 +525,7 @@ public class MainApplication extends javax.swing.JFrame {
                         textArea2.setLineWrap(true);
                         textArea2.setText("Default Value: ");
 
-                        if (param instanceof IntegerParameter) {
-                            IntegerParameter intParam = (IntegerParameter) param;
+                        if (param instanceof IntegerParameter intParam) {
                             if (intParam.hasDefaultValue()){
                                 textArea2.setText(textArea2.getText() + intParam.getDefaultValue());
                             }
@@ -412,9 +535,7 @@ public class MainApplication extends javax.swing.JFrame {
                             textArea2.setText(textArea2.getText() + "\n");
                             textArea2.setText(textArea2.getText() + "Range: " + (int)intParam.getRange().getMin() + " --> " + (int)intParam.getRange().getMax());
                         }
-                        
-                        else if (param instanceof FloatParameter) {
-                            FloatParameter floatParam = (FloatParameter) param;
+                        else if (param instanceof FloatParameter floatParam) {
                             if (floatParam.hasDefaultValue()){
                                 textArea2.setText(textArea2.getText() + floatParam.getDefaultValue());
                             }
@@ -436,8 +557,7 @@ public class MainApplication extends javax.swing.JFrame {
                             }
                         }
                         
-                        else if (param instanceof EnumParameter) {
-                            EnumParameter enumParam = (EnumParameter) param;
+                        else if (param instanceof EnumParameter enumParam) {
                             textArea2.setText(textArea2.getText() + "None");
                             textArea2.setText(textArea2.getText() + "\n");
                             textArea2.setText(textArea2.getText() + "Range: CANNM_PDU_BYTE_0, CANNM_PDU_BYTE_1, CANNM_PDU_OFF");
@@ -454,15 +574,7 @@ public class MainApplication extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jTree1MouseClicked
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
