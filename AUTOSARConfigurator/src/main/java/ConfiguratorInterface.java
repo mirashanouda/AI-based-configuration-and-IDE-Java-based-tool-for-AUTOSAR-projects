@@ -1,13 +1,16 @@
+import java.util.List;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public interface ConfiguratorInterface {
+    void DSWMDConstructor();
+    void ARXMLConstructor();
     Element FileReader(String filePath);
     void BSWMDParserDFS(Node ecucContainer, int parentIndex);
     void ARXMLParserDFS(Node ecucContainer, int parentIndex);
     ContainerItem processBSWMDContainer(Element ecucContainer);
-    void PrintingContainersTree();
+    void PrintingContainersTree(List<ContainerItem> containerDef);
     void PrintingParameters(ContainerItem container);
     void GetBSWMDParameters(Element params, int idx, ContainerItem c);
     void GetARXMLParameters(Element params, int idx, ContainerItem c);

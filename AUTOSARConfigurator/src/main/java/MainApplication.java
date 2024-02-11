@@ -1,3 +1,4 @@
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -6,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -21,21 +23,27 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import javax.swing.JFrame;
+import javax.swing.JTextField;
 import org.w3c.dom.Document;
 
 public class MainApplication extends JFrame implements ConfiguratorInterface {
 
     // Member variables
-    DefaultTreeModel modulesTree;
+    DefaultTreeModel BSWMDTree;
+    DefaultTreeModel ARXMLTree;
     static final int maxNodes = 100000;
-    static List<ContainerItem> containerDef = new ArrayList<>();
-    static int[] par = new int[maxNodes];
+    static List<ContainerItem> BSWMDContainers = new ArrayList<>();
+    static List<ContainerItem> ARXMLContainers = new ArrayList<>();
+    static int[] BSWMDpar = new int[maxNodes];
+    static int[] ARXMLpar = new int[maxNodes];
 
     public MainApplication() {
         initComponents();
-        // TODO: This title needs to be set each time the 
-        jLabel2.setText("Can Network Manager");
-        SidebarTreeConstruction();
+        // TODO: This title needs to be set each time we lose focus.
+        BComponentName.setText("Can Network Manager");
+        DSWMDConstructor();
+        AComponentName.setText("Can Network Manager");
+        ARXMLConstructor();
     }
 
     @Override
@@ -50,8 +58,9 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         } catch (IOException | ParserConfigurationException | SAXException e) {}
         return doc.getDocumentElement();
     }
-
-    private void SidebarTreeConstruction()
+    
+    @Override
+    public void DSWMDConstructor()
     {
         String bswmdPath = "src/main/java/CanNM_BSWMD.arxml";
         
@@ -60,25 +69,59 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
 
         BSWMDParserDFS(containers, -1);
         
-        for (int i = containerDef.size() - 1; i > 0; i--) {
-            DefaultMutableTreeNode parentNode = containerDef.get(par[i]).getGUINode();
-            DefaultMutableTreeNode currentNode = containerDef.get(i).getGUINode();
+        for (int i = BSWMDContainers.size() - 1; i > 0; i--) {
+            DefaultMutableTreeNode parentNode = BSWMDContainers.get(BSWMDpar[i]).getGUINode();
+            DefaultMutableTreeNode currentNode = BSWMDContainers.get(i).getGUINode();
             parentNode.add(currentNode);
-            ContainerItem parentContainer = containerDef.get(par[i]);
+            ContainerItem parentContainer = BSWMDContainers.get(BSWMDpar[i]);
             parentContainer.setGUINode(parentNode);
-            containerDef.set(par[i], parentContainer); // containerDef[par[i]] = parentNode
+            BSWMDContainers.set(BSWMDpar[i], parentContainer);
         }
 
         // TODO when generalizing to all modules, make sure to attach all containers.
         // In case of CanNM, we only have one main container.
         DefaultMutableTreeNode canNM_root_node = new DefaultMutableTreeNode("CanNM");
-        System.out.println(containerDef);
-        ContainerItem c = containerDef.get(0);
+        System.out.println(BSWMDContainers);
+        ContainerItem c = BSWMDContainers.get(0);
         canNM_root_node.add(c.getGUINode()); 
-        modulesTree = (DefaultTreeModel)jTree1.getModel();
-        modulesTree.setRoot(canNM_root_node);
-        modulesTree.reload();
-        jTree1.setModel(modulesTree);
+        BSWMDTree = (DefaultTreeModel)jTree1.getModel();
+        BSWMDTree.setRoot(canNM_root_node);
+        BSWMDTree.reload();
+        jTree1.setModel(BSWMDTree);
+    }
+    
+    @Override
+    public void ARXMLConstructor()
+    {
+        String arxmlPath = "src/main/java/CanNm_Template.arxml";
+        
+        Element root = FileReader(arxmlPath);
+        //System.out.print(root);
+        Element first = (Element) root.getElementsByTagName("AR-PACKAGES").item(0);
+        Element second = (Element) first.getElementsByTagName("AR-PACKAGE").item(0);
+        Element third = (Element) second.getElementsByTagName("ELEMENTS").item(0);
+        Element fourth = (Element) third.getElementsByTagName("ECUC-MODULE-CONFIGURATION-VALUES").item(0);
+        Element containers = (Element) fourth.getElementsByTagName("CONTAINERS").item(0);
+
+        ARXMLParserDFS(containers, -1);
+
+        for (int i = ARXMLContainers.size() - 1; i > 0; i--) {
+            DefaultMutableTreeNode parentNode = ARXMLContainers.get(ARXMLpar[i]).getGUINode();
+            DefaultMutableTreeNode currentNode = ARXMLContainers.get(i).getGUINode();
+            parentNode.add(currentNode);
+            ContainerItem parentContainer = ARXMLContainers.get(ARXMLpar[i]);
+            parentContainer.setGUINode(parentNode);
+            ARXMLContainers.set(ARXMLpar[i], parentContainer); // containerDef[par[i]] = parentNode
+        }
+        
+        DefaultMutableTreeNode canNM_root_node = new DefaultMutableTreeNode("CanNM");
+        System.out.println(ARXMLContainers);
+        ContainerItem c = ARXMLContainers.get(0);
+        canNM_root_node.add(c.getGUINode()); 
+        ARXMLTree = (DefaultTreeModel)jTree2.getModel();
+        ARXMLTree.setRoot(canNM_root_node);
+        ARXMLTree.reload();
+        jTree2.setModel(ARXMLTree);
     }
     
     @Override
@@ -89,9 +132,9 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             Node containerNode = containerNodes.item(i);
             if ( containerNode.getNodeName().equals("ECUC-PARAM-CONF-CONTAINER-DEF")) {
                 ContainerItem c = processBSWMDContainer((Element) containerNode);
-                containerDef.add(c);
-                int idx = containerDef.size() - 1;
-                par[idx] = parentIndex;
+                BSWMDContainers.add(c);
+                int idx = BSWMDContainers.size() - 1;
+                BSWMDpar[idx] = parentIndex;
 
                 NodeList childrenNodes = containerNode.getChildNodes();
                 for (int k = 0; k < childrenNodes.getLength(); k++) {
@@ -106,7 +149,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             }
         }
     }
-    
+
     @Override
     public void ARXMLParserDFS(Node ecucContainer, int parentIndex)
     {
@@ -117,9 +160,9 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             if ( containerNode.getNodeName().equals("ECUC-CONTAINER-VALUE")) {
                 String containerName = ((Element)containerNode).getElementsByTagName("SHORT-NAME").item(0).getTextContent();
                 ContainerItem c = new ContainerItem(containerName, "", "", "");
-                containerDef.add(c);
-                int idx = containerDef.size() - 1;
-                par[idx] = parentIndex;
+                ARXMLContainers.add(c);
+                int idx = ARXMLContainers.size() - 1;
+                ARXMLpar[idx] = parentIndex;
 
                 NodeList parametersNodes = containerNode.getChildNodes();
                 for (int j = 0; j < parametersNodes.getLength(); j++) {
@@ -323,7 +366,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     }
     
     @Override
-    public void PrintingContainersTree(){
+    public void PrintingContainersTree(List<ContainerItem> containerDef){
         // Printing children containers
         for (int i = 0 ; i < containerDef.size();i++) {
             // if the node has children
@@ -357,21 +400,28 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        BjPanel = new javax.swing.JPanel();
+        BTreeScrollPane = new javax.swing.JScrollPane();
         jTree1 = new javax.swing.JTree();
-        jLabel2 = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jPanel1 = new javax.swing.JPanel();
+        BParamsScrollPane = new javax.swing.JScrollPane();
+        BParamPanel = new javax.swing.JPanel();
+        BComponentName = new javax.swing.JLabel();
+        AjPanel = new javax.swing.JPanel();
+        AComponentName = new javax.swing.JLabel();
+        ATreeScrollPane = new javax.swing.JScrollPane();
+        jTree2 = new javax.swing.JTree();
+        AParamScrollPane = new javax.swing.JScrollPane();
+        AParamPanel = new javax.swing.JPanel();
+        AParamScrollPane2 = new javax.swing.JScrollPane();
+        AParamPanel2 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setAlwaysOnTop(true);
         setBackground(new java.awt.Color(126, 231, 212));
         setFont(new java.awt.Font("Chilanka", 1, 24)); // NOI18N
         setForeground(new java.awt.Color(153, 255, 204));
-
-        jLabel1.setFont(new java.awt.Font("Chilanka", 1, 24)); // NOI18N
-        jLabel1.setText("Configurator");
 
         javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
         jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
@@ -380,58 +430,162 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                 jTree1MouseClicked(evt);
             }
         });
-        jScrollPane1.setViewportView(jTree1);
+        BTreeScrollPane.setViewportView(jTree1);
 
-        jLabel2.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
+        BParamsScrollPane.setHorizontalScrollBar(null);
 
-        jScrollPane2.setHorizontalScrollBar(null);
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1013, Short.MAX_VALUE)
+        javax.swing.GroupLayout BParamPanelLayout = new javax.swing.GroupLayout(BParamPanel);
+        BParamPanel.setLayout(BParamPanelLayout);
+        BParamPanelLayout.setHorizontalGroup(
+            BParamPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 3513, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        BParamPanelLayout.setVerticalGroup(
+            BParamPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 353, Short.MAX_VALUE)
         );
 
-        jScrollPane2.setViewportView(jPanel1);
+        BParamsScrollPane.setViewportView(BParamPanel);
+
+        BComponentName.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
+
+        javax.swing.GroupLayout BjPanelLayout = new javax.swing.GroupLayout(BjPanel);
+        BjPanel.setLayout(BjPanelLayout);
+        BjPanelLayout.setHorizontalGroup(
+            BjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(BjPanelLayout.createSequentialGroup()
+                .addGap(269, 269, 269)
+                .addGroup(BjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(BjPanelLayout.createSequentialGroup()
+                        .addComponent(BComponentName, javax.swing.GroupLayout.PREFERRED_SIZE, 755, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 311, Short.MAX_VALUE))
+                    .addComponent(BParamsScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addContainerGap())
+            .addGroup(BjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(BjPanelLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(BTreeScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(1089, Short.MAX_VALUE)))
+        );
+        BjPanelLayout.setVerticalGroup(
+            BjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(BjPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(BComponentName, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(BParamsScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+            .addGroup(BjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(BjPanelLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(BTreeScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE)
+                    .addContainerGap()))
+        );
+
+        jTabbedPane1.addTab("BSWMD", BjPanel);
+
+        AjPanel.setPreferredSize(new java.awt.Dimension(379, 308));
+
+        AComponentName.setFont(new java.awt.Font("Liberation Sans", 1, 24)); // NOI18N
+
+        treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
+        jTree2.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
+        jTree2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTree2MouseClicked(evt);
+            }
+        });
+        ATreeScrollPane.setViewportView(jTree2);
+
+        AParamScrollPane.setHorizontalScrollBar(null);
+
+        javax.swing.GroupLayout AParamPanelLayout = new javax.swing.GroupLayout(AParamPanel);
+        AParamPanel.setLayout(AParamPanelLayout);
+        AParamPanelLayout.setHorizontalGroup(
+            AParamPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1040, Short.MAX_VALUE)
+        );
+        AParamPanelLayout.setVerticalGroup(
+            AParamPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 353, Short.MAX_VALUE)
+        );
+
+        AParamScrollPane.setViewportView(AParamPanel);
+
+        AParamScrollPane2.setHorizontalScrollBar(null);
+
+        javax.swing.GroupLayout AParamPanel2Layout = new javax.swing.GroupLayout(AParamPanel2);
+        AParamPanel2.setLayout(AParamPanel2Layout);
+        AParamPanel2Layout.setHorizontalGroup(
+            AParamPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1040, Short.MAX_VALUE)
+        );
+        AParamPanel2Layout.setVerticalGroup(
+            AParamPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 353, Short.MAX_VALUE)
+        );
+
+        AParamScrollPane2.setViewportView(AParamPanel2);
+
+        javax.swing.GroupLayout AjPanelLayout = new javax.swing.GroupLayout(AjPanel);
+        AjPanel.setLayout(AjPanelLayout);
+        AjPanelLayout.setHorizontalGroup(
+            AjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(AjPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(ATreeScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(AjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(AComponentName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(AjPanelLayout.createSequentialGroup()
+                        .addComponent(AParamScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 529, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(AParamScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 529, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        AjPanelLayout.setVerticalGroup(
+            AjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(AjPanelLayout.createSequentialGroup()
+                .addGroup(AjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(AjPanelLayout.createSequentialGroup()
+                        .addComponent(AComponentName, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(AjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(AParamScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(AParamScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, AjPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(ATreeScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("ARXML Reader", AjPanel);
+
+        jLabel1.setFont(new java.awt.Font("Chilanka", 1, 24)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("AUTOSAR Configurator");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 612, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 1015, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap(16, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(jLabel1)
-                        .addGap(418, 418, 418))))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1341, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(29, 29, 29)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 355, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
+
+        jTabbedPane1.getAccessibleContext().setAccessibleName("BSWMD");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -439,9 +593,9 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     private void jTree1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseClicked
         TreePath clickedPath = jTree1.getPathForLocation(evt.getX(), evt.getY());
         JPanel innerPanel2 = new JPanel(new GridBagLayout());
-        jScrollPane2.setViewportView(innerPanel2);
-        jScrollPane2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        
+        BParamsScrollPane.setViewportView(innerPanel2);
+        BParamsScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;  // X position
         gbc.gridy = 0;  // Y position, increment this for each component
@@ -450,7 +604,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         gbc.fill = GridBagConstraints.HORIZONTAL;  // Fill horizontally
         gbc.insets = new Insets(5, 5, 5, 5);  // Optional: margins around components
 
-//        Border paddingBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
+        //        Border paddingBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
 
         // Check if a valid path is clicked
         if (clickedPath != null) {
@@ -461,65 +615,64 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             Object userObject = clickedNode.getUserObject();
             // Container Name:
             if (!userObject.toString().equals("CanNM")) {
-                jLabel2.setText(userObject.toString() + " Parameters:");
+                BComponentName.setText(userObject.toString() + " Parameters:");
             }
-            
-            for (int i = 0; i < containerDef.size(); i++) {
+
+            for (int i = 0; i < BSWMDContainers.size(); i++) {
                 // TODO: change to map:
-                if (containerDef.get(i).name.equals(userObject.toString())) {
-//                    System.out.println(i);
-                    ContainerItem c = containerDef.get(i);
+                if (BSWMDContainers.get(i).name.equals(userObject.toString())) {
+                    //                    System.out.println(i);
+                    ContainerItem c = BSWMDContainers.get(i);
                     for (int j = 0; j < c.parametersList.size(); j++) {
                         ParameterItem param = c.parametersList.get(j);
                         JLabel paramName = new JLabel(param.name);
                         paramName.setFont(new Font("Arial", Font.BOLD, 16));
-                        
-                                                
+
                         if (param instanceof IntegerParameter) {
                             paramName.setText(paramName.getText() + ": Integer");
                         }
-                        
+
                         else if (param instanceof FloatParameter) {
                             paramName.setText(paramName.getText() + ": Float");
                         }
-                        
+
                         else if (param instanceof BooleanParameter) {
                             paramName.setText(paramName.getText() + ": Boolean");
                             //String[] items = {"True", "False", "Not Set"};
                             //JComboBox<String> comboBox = new JComboBox<>(items);
-//                            if (boolParam.hasDefaultValue) {
-//                                comboBox.setSelectedItem(boolParam.getValue() ? "True" : "False");
-//                            } else {
-//                                comboBox.setSelectedItem("Not Set");
-//                            }
+                            //                            if (boolParam.hasDefaultValue) {
+                                //                                comboBox.setSelectedItem(boolParam.getValue() ? "True" : "False");
+                                //                            } else {
+                                //                                comboBox.setSelectedItem("Not Set");
+                                //                            }
                         }
                         else if (param instanceof EnumParameter) {
                             paramName.setText(paramName.getText() + ": Enum");
                             //String[] items = {"CANNM_PDU_BYTE_0", "CANNM_PDU_BYTE_1", "CANNM_PDU_OFF"};
                             //JComboBox<String> comboBox = new JComboBox<>(items);
                             // switch (enumParam.getValue()) {
-                            //     case CANNM_PDU_BYTE_0:
-                            //         comboBox.setSelectedItem("CANNM_PDU_BYTE_0");
-                            //         break;
-                            //     case CANNM_PDU_BYTE_1:
-                            //         comboBox.setSelectedItem("CANNM_PDU_BYTE_1");
-                            //         break;
-                            //     case CANNM_PDU_OFF:
-                            //         comboBox.setSelectedItem("CANNM_PDU_OFF");
-                            //         break;
-                            // }
+                                //     case CANNM_PDU_BYTE_0:
+                                //         comboBox.setSelectedItem("CANNM_PDU_BYTE_0");
+                                //         break;
+                                //     case CANNM_PDU_BYTE_1:
+                                //         comboBox.setSelectedItem("CANNM_PDU_BYTE_1");
+                                //         break;
+                                //     case CANNM_PDU_OFF:
+                                //         comboBox.setSelectedItem("CANNM_PDU_OFF");
+                                //         break;
+                                // }
                             //comboBox.setSelectedItem(enumParam.getValue());
                         }
                         innerPanel2.add(paramName, gbc);
                         gbc.gridy++;
-                        
+
                         JTextArea textArea = new JTextArea();
                         textArea.setWrapStyleWord(true);
                         textArea.setLineWrap(true);
                         textArea.setText("Description: " + param.getDesc().replaceAll("[\n\t]", "").trim());
                         innerPanel2.add(textArea, gbc);
                         gbc.gridy++;
-                        
+
                         JTextArea textArea2 = new JTextArea();
                         textArea2.setWrapStyleWord(true);
                         textArea2.setLineWrap(true);
@@ -544,9 +697,9 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             }
                             textArea2.setText(textArea2.getText() + "\n");
                             textArea2.setText(textArea2.getText() + "Range: " + floatParam.getRange().getMin() + " --> " + floatParam.getRange().getMax());
-                            
+
                         }
-                        
+
                         else if (param instanceof BooleanParameter) {
                             BooleanParameter boolParam = (BooleanParameter) param;
                             if (boolParam.hasDefaultValue()){
@@ -556,23 +709,115 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                                 textArea2.setText(textArea2.getText() + "None");
                             }
                         }
-                        
+
                         else if (param instanceof EnumParameter enumParam) {
                             textArea2.setText(textArea2.getText() + "None");
                             textArea2.setText(textArea2.getText() + "\n");
                             textArea2.setText(textArea2.getText() + "Range: CANNM_PDU_BYTE_0, CANNM_PDU_BYTE_1, CANNM_PDU_OFF");
-                            
+
                         }
-                                                
+
                         innerPanel2.add(textArea2, gbc);
                         gbc.gridy++;
                     }
                     // Break the loop after finding the matching container
                     break;
                 }
-            }   
+            }
         }
     }//GEN-LAST:event_jTree1MouseClicked
+
+    private void jTree2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree2MouseClicked
+        TreePath clickedPath = jTree2.getPathForLocation(evt.getX(), evt.getY());
+        JPanel innerPanel = new JPanel(new GridBagLayout());
+        AParamScrollPane.setViewportView(innerPanel);
+        JPanel innerPanel2 = new JPanel(new GridBagLayout());
+        AParamScrollPane2.setViewportView(innerPanel2);
+        
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(5, 1, 5, 1); // Padding between components
+        gbc.anchor = GridBagConstraints.WEST; // Align components to the left (west)
+
+        // Check if a valid path is clicked
+        if (clickedPath != null) {
+            // Get the last component of the path (typically a leaf node)
+            DefaultMutableTreeNode clickedNode = (DefaultMutableTreeNode) clickedPath.getLastPathComponent();
+
+            // Get the user object associated with the clicked node
+            Object userObject = clickedNode.getUserObject();
+            // Container Name:
+            if (!userObject.toString().equals("CanNM")) {
+                AComponentName.setText(userObject.toString() + " Parameters:");
+            }
+            for (int i = 0; i < ARXMLContainers.size(); i++) {
+                // TODO: change to map:
+                if (ARXMLContainers.get(i).name.equals(userObject.toString())) {
+                    ContainerItem c = ARXMLContainers.get(i);
+
+                    for (int j = 0; j < c.parametersList.size(); j++) {
+                        ParameterItem param = c.parametersList.get(j);
+                        JLabel paramLabel = new JLabel(param.name);
+                        paramLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+
+                        JTextField textField = new JTextField();
+                        textField.setPreferredSize(new Dimension(100, 30));
+                        
+                        JPanel targetPanel = (j % 2 == 0) ? innerPanel : innerPanel2;
+                        gbc.gridx = 0; // Column for labels
+                        targetPanel.add(paramLabel, gbc);
+                        
+
+                        if (param instanceof IntegerParameter) {
+                            IntegerParameter intParam = (IntegerParameter) param;
+                            if (intParam.hasDefaultValue() == true) {
+                                textField.setText(String.valueOf(intParam.getValue()));
+                            }
+                            gbc.gridx = 1; // Column for text fields
+                            targetPanel.add(textField, gbc);
+                        }
+                        else if (param instanceof FloatParameter) {
+                            FloatParameter floatParam = (FloatParameter) param;
+                            if (floatParam.hasDefaultValue() == true) {
+                                textField.setText(String.valueOf(floatParam.getValue()));
+                            }
+                            gbc.gridx = 1; // Column for text fields
+                            targetPanel.add(textField, gbc);
+                        }
+                        else if (param instanceof BooleanParameter) {
+                            BooleanParameter boolParam = (BooleanParameter) param;
+                            String[] items = {"True", "False", "Not Set"};
+                            JComboBox<String> comboBox = new JComboBox<>(items);
+                            if (boolParam.hasDefaultValue() ==  true) {
+                                comboBox.setSelectedItem(boolParam.getValue() ? "True" : "False");
+                            } else {
+                                comboBox.setSelectedItem("Not Set");
+                            }
+                            gbc.gridx = 1;
+                            targetPanel.add(comboBox, gbc);
+                        }
+                        else if (param instanceof EnumParameter) {
+                            EnumParameter enumParam = (EnumParameter) param;
+                            String[] items = {"CANNM_PDU_BYTE_0", "CANNM_PDU_BYTE_1", "CANNM_PDU_OFF"};
+                            JComboBox<String> comboBox = new JComboBox<>(items);
+                             switch (enumParam.getValue()) {
+                                 case CANNM_PDU_BYTE_0 -> comboBox.setSelectedItem("CANNM_PDU_BYTE_0");
+                                 case CANNM_PDU_BYTE_1 -> comboBox.setSelectedItem("CANNM_PDU_BYTE_1");
+                                 case CANNM_PDU_OFF -> comboBox.setSelectedItem("CANNM_PDU_OFF");
+                             }
+                            comboBox.setSelectedItem(enumParam.getValue());
+                            gbc.gridx = 1;
+                            targetPanel.add(comboBox, gbc);
+                        }
+                        gbc.gridy++; // Move to the next row for the next set of components
+                    }
+                    // Break the loop after finding the matching container
+                    break;
+                }
+            }   
+        }
+    }//GEN-LAST:event_jTree2MouseClicked
 
     public static void main(String args[]) {
         try {
@@ -603,11 +848,21 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     
    
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel AComponentName;
+    private javax.swing.JPanel AParamPanel;
+    private javax.swing.JPanel AParamPanel2;
+    private javax.swing.JScrollPane AParamScrollPane;
+    private javax.swing.JScrollPane AParamScrollPane2;
+    private javax.swing.JScrollPane ATreeScrollPane;
+    private javax.swing.JPanel AjPanel;
+    private javax.swing.JLabel BComponentName;
+    private javax.swing.JPanel BParamPanel;
+    private javax.swing.JScrollPane BParamsScrollPane;
+    private javax.swing.JScrollPane BTreeScrollPane;
+    private javax.swing.JPanel BjPanel;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTree jTree1;
+    private javax.swing.JTree jTree2;
     // End of variables declaration//GEN-END:variables
 }
