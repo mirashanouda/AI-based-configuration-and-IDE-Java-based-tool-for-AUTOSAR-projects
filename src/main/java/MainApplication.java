@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -12,6 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -608,6 +611,16 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
 
         // Creating a panel for the log messages
         JPanel logPanel = new JPanel(new BorderLayout());
+        // Create and add a title label for the log messages panel
+        JLabel logTitleLabel = new JLabel("Log Messages");
+        logTitleLabel.setFont(new Font("Arial", Font.BOLD, 12)); // Set font to Arial, bold, size 12
+        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT)); // A panel to hold the title on the left
+        titlePanel.add(logTitleLabel);
+    
+        logPanel.add(titlePanel, BorderLayout.NORTH); // Adding the title panel at the top of the log panel
+
+        // Adding a border to the logPanel to create a frame around the log messages
+        logPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         logPanel.add(logMessagesScrollPane);
 
         // Creating a main container panel with BorderLayout
