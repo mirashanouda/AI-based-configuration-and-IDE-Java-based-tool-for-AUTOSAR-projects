@@ -15,6 +15,7 @@ import java.util.Map;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -31,6 +32,8 @@ import javax.swing.JFrame;
 import javax.swing.JTextField;
 import org.w3c.dom.Document;
 import javafx.util.Pair; // Import Pair class
+import java.awt.BorderLayout;
+
 
 public class MainApplication extends JFrame implements ConfiguratorInterface {
 
@@ -596,6 +599,33 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
 
         jTabbedPane1.getAccessibleContext().setAccessibleName("BSWMD");
 
+        
+        // Creating the log messages text area
+        JTextArea logMessagesTextArea = new JTextArea(5, 20); // Suggests height for 5 lines
+        logMessagesTextArea.setEditable(false);
+        JScrollPane logMessagesScrollPane = new JScrollPane(logMessagesTextArea);
+        logMessagesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
+        // Creating a panel for the log messages
+        JPanel logPanel = new JPanel(new BorderLayout());
+        logPanel.add(logMessagesScrollPane);
+
+        // Creating a main container panel with BorderLayout
+        JPanel mainPanel = new JPanel(new BorderLayout());
+
+        // Adding jLabel1 at the top of the mainPanel
+        mainPanel.add(jLabel1, BorderLayout.NORTH);
+
+        // Adding the JTabbedPane to the center of mainPanel
+        mainPanel.add(jTabbedPane1, BorderLayout.CENTER);
+
+        // Adding the log messages panel at the bottom of the mainPanel
+        mainPanel.add(logPanel, BorderLayout.SOUTH);
+
+        // Setting the mainPanel as the content pane of the JFrame
+        this.getContentPane().setLayout(new BorderLayout());
+        this.getContentPane().add(mainPanel, BorderLayout.CENTER);
+        
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
