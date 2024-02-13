@@ -1,12 +1,17 @@
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -25,6 +30,7 @@ import org.xml.sax.SAXException;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import org.w3c.dom.Document;
+import javafx.util.Pair; // Import Pair class
 
 public class MainApplication extends JFrame implements ConfiguratorInterface {
 
@@ -294,7 +300,8 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         }
     }
 
-    @Override
+    
+    Map<String,Pair<String,String>>chk_values_map = new HashMap<>(); // for checking the correct values of parameters
     public ParameterItem processParameter(Element ecucParameter, String typ) {
         String name = ecucParameter.getElementsByTagName("SHORT-NAME").item(0).getTextContent();
         String UUID = "";
@@ -338,6 +345,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                     value = defaultValueElement.getTextContent();
                     defVal = Integer.parseInt(value);
                 }
+                chk_values_map.put(name, new Pair<String, String>(Float.toString(startRange), Float.toString(endRange)));
                 return new IntegerParameter(name, UUID, "", Desc, LM, UM, hasDefaultValue, defVal, new Range(startRange, endRange));
             }
             case "FLOAT":
@@ -348,6 +356,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                     value = defaultValueElement.getTextContent();
                     defVal = Float.parseFloat(value);
                 }
+                chk_values_map.put(name, new Pair<>(Float.toString(startRange),Float.toString(endRange)));
                 return new FloatParameter(name, UUID, "", Desc, LM, UM, hasDefaultValue, defVal, new Range(startRange, endRange));
             }
             case "BOOLEAN":
@@ -726,7 +735,61 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             }
         }
     }//GEN-LAST:event_jTree1MouseClicked
+    Map<Pair<JTextField, String>,String> parameters_val_update = new HashMap<>(); // map that has text field and paramter name and key is parameter val
+    public void print_paramters_val_update_map(Map<Pair<JTextField, String>,String> parameters_val_update){
+        for (Map.Entry<Pair<JTextField, String>, String> entry : parameters_val_update.entrySet()) {
+            Pair<JTextField, String> pair = entry.getKey();
+            String value = entry.getValue();
+            
+            JTextField textField = pair.getLeft();
+            String parameter_name = pair.getRight();
+            
+            System.out.println("Key (JTextField text): " + textField);
+            System.out.println("Key (String): " + parameter_name);
+            System.out.println("Value: " + value);
+            System.out.println();
+        }
+    }
+    public Boolean compare_arxml_map_to_bswmd_map(Map<Pair<JTextField, String>,String> parameters_val_update,  Map<String,Pair<String,String>>chk_values_map){
+        for (Map.Entry<Pair<JTextField, String>, String> entry : parameters_val_update.entrySet()) {
+            Pair<JTextField, String> parametrs_val_key = entry.getKey();
+            String value = entry.getValue();
+            Pair<String, String> pair = chk_values_map.get(parametrs_val_key.getRight());
+            String min_val = pair.getLeft();
+            String max_val = pair.getRight();
+            if(value.compareTo(max_val) < 0 && value.compareTo(min_val) > 0){
+                parametrs_val_key.getLeft().setBackground(Color.WHITE); // Change to default color
+            } 
+          else {
+              parametrs_val_key.getLeft().setBackground(Color.RED); // Change to red indicating incorrect value
+          }
+        }
+        return true;
+    }
+    private class CustomActionListener implements ActionListener { // for chnging values in arxml 
+        private String parameterName;
 
+        public CustomActionListener(String parameterName) {
+            this.parameterName = parameterName;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JTextField textField = (JTextField) e.getSource();
+            String newValue = textField.getText();
+            parameters_val_update.put(new Pair<>(textField, parameterName), newValue);
+            print_paramters_val_update_map(parameters_val_update);
+              Pair<String, String> pair = chk_values_map.get(parameterName);
+              String min_val = pair.getLeft();
+              String max_val = pair.getRight();
+              if(newValue.compareTo(max_val) < 0 && newValue.compareTo(min_val) > 0){
+                  textField.setBackground(Color.WHITE); // Change to default color
+              } 
+            else {
+                textField.setBackground(Color.RED); // Change to red indicating incorrect value
+            }
+        }
+    }
     private void jTree2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree2MouseClicked
         TreePath clickedPath = jTree2.getPathForLocation(evt.getX(), evt.getY());
         JPanel innerPanel = new JPanel(new GridBagLayout());
@@ -773,6 +836,8 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             IntegerParameter intParam = (IntegerParameter) param;
                             if (intParam.hasDefaultValue() == true) {
                                 textField.setText(String.valueOf(intParam.getValue()));
+                                 parameters_val_update.put(new Pair<>(textField, intParam.getName()), String.valueOf(intParam.getValue()));
+                                 textField.addActionListener(new CustomActionListener(intParam.getName()));
                             }
                             gbc.gridx = 1; // Column for text fields
                             targetPanel.add(textField, gbc);
@@ -781,6 +846,8 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             FloatParameter floatParam = (FloatParameter) param;
                             if (floatParam.hasDefaultValue() == true) {
                                 textField.setText(String.valueOf(floatParam.getValue()));
+                                 parameters_val_update.put(new Pair<>(textField, floatParam.getName()), String.valueOf(floatParam.getValue()));
+                                 textField.addActionListener(new CustomActionListener(floatParam.getName()));
                             }
                             gbc.gridx = 1; // Column for text fields
                             targetPanel.add(textField, gbc);
@@ -791,8 +858,12 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             JComboBox<String> comboBox = new JComboBox<>(items);
                             if (boolParam.hasDefaultValue() ==  true) {
                                 comboBox.setSelectedItem(boolParam.getValue() ? "True" : "False");
+                                parameters_val_update.put(new Pair<>(textField, boolParam.getName()), String.valueOf(boolParam.getValue()));
+                                 textField.addActionListener(new CustomActionListener(boolParam.getName()));
                             } else {
                                 comboBox.setSelectedItem("Not Set");
+                                 parameters_val_update.put(new Pair<>(textField, boolParam.getName()), String.valueOf(boolParam.getValue()));
+                                 textField.addActionListener(new CustomActionListener(boolParam.getName()));
                             }
                             gbc.gridx = 1;
                             targetPanel.add(comboBox, gbc);
@@ -802,9 +873,21 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             String[] items = {"CANNM_PDU_BYTE_0", "CANNM_PDU_BYTE_1", "CANNM_PDU_OFF"};
                             JComboBox<String> comboBox = new JComboBox<>(items);
                              switch (enumParam.getValue()) {
-                                 case CANNM_PDU_BYTE_0 -> comboBox.setSelectedItem("CANNM_PDU_BYTE_0");
-                                 case CANNM_PDU_BYTE_1 -> comboBox.setSelectedItem("CANNM_PDU_BYTE_1");
-                                 case CANNM_PDU_OFF -> comboBox.setSelectedItem("CANNM_PDU_OFF");
+                                 case CANNM_PDU_BYTE_0:
+                                     comboBox.setSelectedItem("CANNM_PDU_BYTE_0");
+                                      parameters_val_update.put(new Pair<>(textField, enumParam.getName().toString()), String.valueOf(enumParam.getValue()));
+                                     textField.addActionListener(new CustomActionListener(enumParam.getName()));
+                                     break;
+                                 case CANNM_PDU_BYTE_1 :
+                                     comboBox.setSelectedItem("CANNM_PDU_BYTE_1");
+                                     parameters_val_update.put(new Pair<>(textField, enumParam.getName()), String.valueOf(enumParam.getValue()));
+                                     textField.addActionListener(new CustomActionListener(enumParam.getName()));
+                                     break;
+                                 case CANNM_PDU_OFF :
+                                     comboBox.setSelectedItem("CANNM_PDU_OFF");
+                                     parameters_val_update.put(new Pair<>(textField, enumParam.getName()), String.valueOf(enumParam.getValue()));
+                                     textField.addActionListener(new CustomActionListener(enumParam.getName()));
+                                     break;
                              }
                             comboBox.setSelectedItem(enumParam.getValue());
                             gbc.gridx = 1;
@@ -815,7 +898,8 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                     // Break the loop after finding the matching container
                     break;
                 }
-            }   
+            } 
+            compare_arxml_map_to_bswmd_map(parameters_val_update, chk_values_map);
         }
     }//GEN-LAST:event_jTree2MouseClicked
 
