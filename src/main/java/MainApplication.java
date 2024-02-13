@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -43,6 +45,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     // Member variables
     DefaultTreeModel BSWMDTree;
     DefaultTreeModel ARXMLTree;
+    private JTextArea logMessagesTextArea;
     static final int maxNodes = 100000;
     static List<ContainerItem> BSWMDContainers = new ArrayList<>();
     static List<ContainerItem> ARXMLContainers = new ArrayList<>();
@@ -604,8 +607,10 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
 
         
         // Creating the log messages text area
-        JTextArea logMessagesTextArea = new JTextArea(5, 20); // Suggests height for 5 lines
+        logMessagesTextArea = new JTextArea(5, 20); // Suggests height for 5 lines
         logMessagesTextArea.setEditable(false);
+        logMessagesTextArea.setText("Welcome To Our Program!"); // Set initial message
+        
         JScrollPane logMessagesScrollPane = new JScrollPane(logMessagesTextArea);
         logMessagesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
@@ -641,6 +646,23 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+
+    // Method to append log messages
+    public void appendLogMessage(String message) {
+        // Ensure updates are made in the Event Dispatch Thread
+        SwingUtilities.invokeLater(() -> {
+            logMessagesTextArea.append(message + "\n");
+        });
+    }
+
+    // Method to set log message, overriding any existing text
+    public void setLogMessage(String message) {
+        // Ensure updates are made in the Event Dispatch Thread
+        SwingUtilities.invokeLater(() -> {
+            logMessagesTextArea.setText(message + "\n"); // Set new message, overriding existing text
+        });
+    }
 
     private void jTree1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseClicked
         TreePath clickedPath = jTree1.getPathForLocation(evt.getX(), evt.getY());
@@ -805,7 +827,8 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             } 
           else {
               parametrs_val_key.getLeft().setBackground(Color.RED); // Change to red indicating incorrect value
-          }
+              setLogMessage("Error: Entered Value is out of range [" + min_val + ", " + max_val + "].");
+            }
         }
         return true;
     }
@@ -827,9 +850,12 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
               String max_val = pair.getRight();
               if(newValue.compareTo(max_val) < 0 && newValue.compareTo(min_val) > 0){
                   textField.setBackground(Color.WHITE); // Change to default color
+                  setLogMessage(""); // Clear any error message
               } 
             else {
                 textField.setBackground(Color.RED); // Change to red indicating incorrect value
+                setLogMessage("Error: Value for " + parameterName + " is out of range [" + min_val + ", " + max_val + "].");
+
             }
         }
     }
