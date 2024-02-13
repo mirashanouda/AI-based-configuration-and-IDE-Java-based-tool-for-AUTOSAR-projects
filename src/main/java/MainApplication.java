@@ -47,6 +47,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     DefaultTreeModel ARXMLTree;
     private JTextArea logMessagesTextArea;
     static final int maxNodes = 100000;
+    private Map<String, String> errorMessages = new HashMap<>();
     static List<ContainerItem> BSWMDContainers = new ArrayList<>();
     static List<ContainerItem> ARXMLContainers = new ArrayList<>();
     static int[] BSWMDpar = new int[maxNodes];
@@ -815,6 +816,29 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             System.out.println();
         }
     }
+
+
+    // Handling the error messages independently
+    private void validateAndDisplayErrors(String parameterName, String newValue, String min_val, String max_val) {
+        if(newValue.compareTo(max_val) < 0 && newValue.compareTo(min_val) > 0) {
+            // If value is correct, remove any error for this parameter and reset background
+            errorMessages.remove(parameterName);
+        } else {
+            // If value is incorrect, update error message and set background to red
+            errorMessages.put(parameterName, "Error: Value for " + parameterName + " is out of range [" + min_val + ", " + max_val + "].");
+        }
+        updateLogMessageArea();
+    }
+    
+    private void updateLogMessageArea() {
+        // Concatenate all current error messages
+        String allErrors = String.join("\n", errorMessages.values());
+    
+        // Display in log message area
+        setLogMessage(allErrors.isEmpty() ? "No errors. Ready to Run..." : allErrors);
+    }
+
+    
     public Boolean compare_arxml_map_to_bswmd_map(Map<Pair<JTextField, String>,String> parameters_val_update,  Map<String,Pair<String,String>>chk_values_map){
         for (Map.Entry<Pair<JTextField, String>, String> entry : parameters_val_update.entrySet()) {
             Pair<JTextField, String> parametrs_val_key = entry.getKey();
@@ -827,7 +851,6 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             } 
           else {
               parametrs_val_key.getLeft().setBackground(Color.RED); // Change to red indicating incorrect value
-              setLogMessage("Error: Entered Value is out of range [" + min_val + ", " + max_val + "].");
             }
         }
         return true;
@@ -850,13 +873,12 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
               String max_val = pair.getRight();
               if(newValue.compareTo(max_val) < 0 && newValue.compareTo(min_val) > 0){
                   textField.setBackground(Color.WHITE); // Change to default color
-                  setLogMessage(""); // Clear any error message
               } 
             else {
                 textField.setBackground(Color.RED); // Change to red indicating incorrect value
-                setLogMessage("Error: Value for " + parameterName + " is out of range [" + min_val + ", " + max_val + "].");
-
             }
+            validateAndDisplayErrors(parameterName, newValue, min_val, max_val);
+
         }
     }
     private void jTree2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree2MouseClicked
