@@ -38,6 +38,7 @@ import javax.swing.JTextField;
 import org.w3c.dom.Document;
 import javafx.util.Pair; // Import Pair class
 import java.awt.BorderLayout;
+import java.math.BigDecimal;
 
 
 public class MainApplication extends JFrame implements ConfiguratorInterface {
@@ -820,7 +821,10 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
 
     // Handling the error messages independently
     private void validateAndDisplayErrors(String parameterName, String newValue, String min_val, String max_val) {
-        if(newValue.compareTo(max_val) < 0 && newValue.compareTo(min_val) > 0) {
+        BigDecimal newValuen = new BigDecimal(newValue);
+        BigDecimal min_valn = new BigDecimal(min_val);
+        BigDecimal max_valn = new BigDecimal(max_val);
+        if(newValuen.compareTo(max_valn) <= 0 && newValuen.compareTo(min_valn) >= 0) {
             // If value is correct, remove any error for this parameter and reset background
             errorMessages.remove(parameterName);
         } else {
@@ -846,7 +850,11 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             Pair<String, String> pair = chk_values_map.get(parametrs_val_key.getRight());
             String min_val = pair.getLeft();
             String max_val = pair.getRight();
-            if(value.compareTo(max_val) < 0 && value.compareTo(min_val) > 0){
+            BigDecimal valuen = new BigDecimal(value);
+            BigDecimal min_valn = new BigDecimal(min_val);
+            BigDecimal max_valn = new BigDecimal(max_val);
+             
+            if(valuen.compareTo(max_valn) <= 0 && valuen.compareTo(min_valn) >= 0){
                 parametrs_val_key.getLeft().setBackground(Color.WHITE); // Change to default color
             } 
           else {
@@ -871,7 +879,11 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
               Pair<String, String> pair = chk_values_map.get(parameterName);
               String min_val = pair.getLeft();
               String max_val = pair.getRight();
-              if(newValue.compareTo(max_val) < 0 && newValue.compareTo(min_val) > 0){
+              BigDecimal newValuen = new BigDecimal(newValue);
+              BigDecimal min_valn = new BigDecimal(min_val);
+              BigDecimal max_valn = new BigDecimal(max_val);
+             
+              if(newValuen.compareTo(max_valn) <= 0.0 && newValuen.compareTo(min_valn) >= 0.0){
                   textField.setBackground(Color.WHITE); // Change to default color
               } 
             else {
