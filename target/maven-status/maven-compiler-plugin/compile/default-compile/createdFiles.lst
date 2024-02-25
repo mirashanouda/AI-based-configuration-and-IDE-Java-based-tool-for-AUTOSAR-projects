@@ -7,6 +7,7 @@ MainApplication$1.class
 MainApplication.class
 WrapTextPane$WrapEditorKit.class
 ConfiguratorInterface.class
+MainApplication$CustomActionListener.class
 ParameterItem.class
 WrapTextPane$WrapLabelView.class
 WrapTextPane.class

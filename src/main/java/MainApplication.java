@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,6 +76,77 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     }
     
     @Override
+    public Boolean ValidateTreeStructure(Element arxmlRoot)
+    {
+        NodeList tags = arxmlRoot.getElementsByTagName("AR-PACKAGES");
+        if (tags.getLength() == 0) {
+            setLogMessage("Invalid ARXML structure: No AR-PACKAGES tag at the top of the file");
+            return false;
+        }
+        
+        arxmlRoot = (Element) tags.item(0);
+        tags = arxmlRoot.getElementsByTagName("AR-PACKAGE");
+        if (tags.getLength() == 0) {
+            setLogMessage("Invalid ARXML structure: No AR-PACKAGE tag at the top of the file");
+            return false;
+        }
+        
+        arxmlRoot = (Element) tags.item(0);
+        tags = arxmlRoot.getElementsByTagName("ELEMENTS");
+        if (tags.getLength() == 0) {
+            setLogMessage("Invalid ARXML structure: Could not parse ELEMENTS tag at the top of the file");
+            return false;
+        }
+        
+        arxmlRoot = (Element) tags.item(0);
+        tags = arxmlRoot.getElementsByTagName("ECUC-MODULE-CONFIGURATION-VALUES");
+        if (tags.getLength() == 0) {
+            setLogMessage("Invalid ARXML structure: Could not parse ECUC-MODULE-CONFIGURATION-VALUES tag at the top of the file");
+            return false;
+        }
+        
+        NodeList containers = arxmlRoot.getElementsByTagName("CONTAINERS");
+        if (containers.getLength() == 0) {
+            setLogMessage("Invalid ARXML structure: No containers found in correct place.");
+            return false;
+        }
+        
+        Boolean containersValid = true;
+        for (int i = 0; i < containers.getLength(); i++) {
+           containersValid &= ValidateContainersParams((Element)containers.item(i), i);
+        }
+        return containersValid;
+    }
+
+    @Override
+    public Boolean ValidateContainersParams(Element containerRoot, int index)
+    {
+        if (containerRoot.getElementsByTagName("ECUC-CONTAINER-VALUE").getLength() == 0)
+        {
+            appendLogMessage("Invalid ARXML structure: No ECUC-CONTAINER-VALUE tag at index " + index);
+            return false;
+        }
+        NodeList containerName = containerRoot.getElementsByTagName("SHORT-NAME");
+        if (containerName.getLength() == 0) {
+            appendLogMessage("Invalid ARXML structure: No SHORT-NAME tag at index " + index);
+            return false;
+        }
+        NodeList params = containerRoot.getElementsByTagName("PARAMETER-VALUES");
+        if (params.getLength() == 0) {
+            appendLogMessage("Invalid ARXML structure: No PARAMETER-VALUES tag for container " + containerName.item(0).getTextContent());
+            return false;
+        }
+        NodeList sub_containers = containerRoot.getElementsByTagName("SUB-CONTAINERS");
+        Boolean valid = true;
+        if (sub_containers.getLength() != 0) {
+            for (int i = 0; i < sub_containers.getLength(); i++) {
+                valid &= ValidateContainersParams((Element)sub_containers.item(i), index + i);
+            }
+        }
+        return valid;
+    }
+
+    @Override
     public void DSWMDConstructor()
     {
         String bswmdPath = "src/main/java/CanNM_BSWMD.arxml";
@@ -113,7 +183,9 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         String arxmlPath = "src/main/java/CanNm_Template.arxml";
         
         Element root = FileReader(arxmlPath);
-        //System.out.print(root);
+        if (!ValidateTreeStructure(root)) {
+            return;
+        }
         Element first = (Element) root.getElementsByTagName("AR-PACKAGES").item(0);
         Element second = (Element) first.getElementsByTagName("AR-PACKAGE").item(0);
         Element third = (Element) second.getElementsByTagName("ELEMENTS").item(0);
@@ -611,7 +683,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         // Creating the log messages text area
         logMessagesTextArea = new JTextArea(5, 20); // Suggests height for 5 lines
         logMessagesTextArea.setEditable(false);
-        logMessagesTextArea.setText("Welcome To Our Program!"); // Set initial message
+        // logMessagesTextArea.setText("Welcome To Our Program!"); // Set initial message
         
         JScrollPane logMessagesScrollPane = new JScrollPane(logMessagesTextArea);
         logMessagesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -651,14 +723,17 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
 
 
     // Method to append log messages
+    @Override
     public void appendLogMessage(String message) {
         // Ensure updates are made in the Event Dispatch Thread
+        logMessagesTextArea.setForeground(Color.RED);
         SwingUtilities.invokeLater(() -> {
             logMessagesTextArea.append(message + "\n");
         });
     }
 
     // Method to set log message, overriding any existing text
+    @Override
     public void setLogMessage(String message) {
         // Ensure updates are made in the Event Dispatch Thread
         SwingUtilities.invokeLater(() -> {

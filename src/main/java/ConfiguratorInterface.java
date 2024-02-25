@@ -16,4 +16,8 @@ public interface ConfiguratorInterface {
     void GetARXMLParameters(Element params, int idx, ContainerItem c);
     void processParameters(NodeList paramNodes, String type,ContainerItem c);
     ParameterItem processParameter(Element ecucParameter, String typ);
+    Boolean ValidateTreeStructure(Element arxmlRoot);
+    Boolean ValidateContainersParams(Element containerRoot, int index);
+    void appendLogMessage(String message);
+    void setLogMessage(String message);
 }
