@@ -32,7 +32,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import org.w3c.dom.Document;
@@ -53,6 +56,46 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     static List<ContainerItem> ARXMLContainers = new ArrayList<>();
     static int[] BSWMDpar = new int[maxNodes];
     static int[] ARXMLpar = new int[maxNodes];
+
+
+    // Method to validate XML (Part 1 of validating)
+    private void validateXMLFile(String filePath) {
+        appendLogMessage("\nCompiling input ARXML File...");
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            builder.setErrorHandler(new ErrorHandler() {
+                @Override
+                public void warning(SAXParseException exception) {
+                    appendLogMessage("Warning: " + exception.getMessage());
+                }
+
+                @Override
+                public void error(SAXParseException exception) throws SAXParseException {
+                    //appendLogMessage("Error: " + exception.getMessage());
+                    throw exception;
+                }
+
+                @Override
+                public void fatalError(SAXParseException exception) throws SAXParseException {
+                    //appendLogMessage("Fatal error: " + exception.getMessage());
+                    throw exception;
+                }
+            });
+
+            // Parse the XML file
+            Document document = builder.parse(new File(filePath));
+            appendLogMessage("XML is well-formed.");
+            } catch (SAXParseException e) {
+                appendLogMessage("Error at line " + e.getLineNumber() +
+                        ", column " + e.getColumnNumber() + ": " + e.getMessage());
+            } catch (Exception e) {
+                appendLogMessage("An error occurred while checking the XML file: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+
+
 
     public MainApplication() {
         initComponents();
@@ -110,35 +153,41 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     @Override
     public void ARXMLConstructor()
     {
-        String arxmlPath = "src/main/java/CanNm_Template.arxml";
-        
-        Element root = FileReader(arxmlPath);
-        //System.out.print(root);
-        Element first = (Element) root.getElementsByTagName("AR-PACKAGES").item(0);
-        Element second = (Element) first.getElementsByTagName("AR-PACKAGE").item(0);
-        Element third = (Element) second.getElementsByTagName("ELEMENTS").item(0);
-        Element fourth = (Element) third.getElementsByTagName("ECUC-MODULE-CONFIGURATION-VALUES").item(0);
-        Element containers = (Element) fourth.getElementsByTagName("CONTAINERS").item(0);
+        // Try-Catch to validate if XML is well-formed
+        try {
+            String arxmlPath = "src/main/java/CanNm_Template.arxml";
+            validateXMLFile(arxmlPath);
+            Element root = FileReader(arxmlPath);
+            //System.out.print(root);
+            Element first = (Element) root.getElementsByTagName("AR-PACKAGES").item(0);
+            Element second = (Element) first.getElementsByTagName("AR-PACKAGE").item(0);
+            Element third = (Element) second.getElementsByTagName("ELEMENTS").item(0);
+            Element fourth = (Element) third.getElementsByTagName("ECUC-MODULE-CONFIGURATION-VALUES").item(0);
+            Element containers = (Element) fourth.getElementsByTagName("CONTAINERS").item(0);
 
-        ARXMLParserDFS(containers, -1);
+            ARXMLParserDFS(containers, -1);
 
-        for (int i = ARXMLContainers.size() - 1; i > 0; i--) {
-            DefaultMutableTreeNode parentNode = ARXMLContainers.get(ARXMLpar[i]).getGUINode();
-            DefaultMutableTreeNode currentNode = ARXMLContainers.get(i).getGUINode();
-            parentNode.add(currentNode);
-            ContainerItem parentContainer = ARXMLContainers.get(ARXMLpar[i]);
-            parentContainer.setGUINode(parentNode);
-            ARXMLContainers.set(ARXMLpar[i], parentContainer); // containerDef[par[i]] = parentNode
+            for (int i = ARXMLContainers.size() - 1; i > 0; i--) {
+                DefaultMutableTreeNode parentNode = ARXMLContainers.get(ARXMLpar[i]).getGUINode();
+                DefaultMutableTreeNode currentNode = ARXMLContainers.get(i).getGUINode();
+                parentNode.add(currentNode);
+                ContainerItem parentContainer = ARXMLContainers.get(ARXMLpar[i]);
+                parentContainer.setGUINode(parentNode);
+                ARXMLContainers.set(ARXMLpar[i], parentContainer); // containerDef[par[i]] = parentNode
+            }
+            
+            DefaultMutableTreeNode canNM_root_node = new DefaultMutableTreeNode("CanNM");
+            System.out.println(ARXMLContainers);
+            ContainerItem c = ARXMLContainers.get(0);
+            canNM_root_node.add(c.getGUINode()); 
+            ARXMLTree = (DefaultTreeModel)jTree2.getModel();
+            ARXMLTree.setRoot(canNM_root_node);
+            ARXMLTree.reload();
+            jTree2.setModel(ARXMLTree);
+        } catch (Exception e) {
+            appendLogMessage("An error occurred and the XML cannot be processed: " + e.getMessage());
+            return;
         }
-        
-        DefaultMutableTreeNode canNM_root_node = new DefaultMutableTreeNode("CanNM");
-        System.out.println(ARXMLContainers);
-        ContainerItem c = ARXMLContainers.get(0);
-        canNM_root_node.add(c.getGUINode()); 
-        ARXMLTree = (DefaultTreeModel)jTree2.getModel();
-        ARXMLTree.setRoot(canNM_root_node);
-        ARXMLTree.reload();
-        jTree2.setModel(ARXMLTree);
     }
     
     @Override
