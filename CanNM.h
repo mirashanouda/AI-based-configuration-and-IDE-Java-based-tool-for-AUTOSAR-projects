@@ -115,7 +115,7 @@ typedef struct {
 	const CanNmPnFilterMaskByte* 	PnFilterMaskByte;
 } CanNmPnInfo;
 
-/** @brief CanNm_ConfigType [SWS_CanNm_00447]
+/** @brief CanNmConfigType [SWS_CanNm_00447]
  * 
  * This type shall contain at least all parameters that are post-build able according to chapter 10.
  */
@@ -141,7 +141,7 @@ typedef struct {
 	bool				UserDataEnabled;
 	bool				VersionInfoApi;
 	PduInfoType*		PnEiraRxNSduRef;
-} CanNm_ConfigType;
+} CanNmConfigType;
 
 /*====================================================================================================================*\
     Global variables export
