@@ -1,28 +1,20 @@
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -36,9 +28,12 @@ import org.xml.sax.SAXException;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import org.w3c.dom.Document;
-import javafx.util.Pair; // Import Pair class
-import java.awt.BorderLayout;
-import java.math.BigDecimal;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.OutputKeys;
 
 
 public class MainApplication extends JFrame implements ConfiguratorInterface {
@@ -46,13 +41,16 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     // Member variables
     DefaultTreeModel BSWMDTree;
     DefaultTreeModel ARXMLTree;
-    private JTextArea logMessagesTextArea;
     static final int maxNodes = 100000;
-    private Map<String, String> errorMessages = new HashMap<>();
     static List<ContainerItem> BSWMDContainers = new ArrayList<>();
     static List<ContainerItem> ARXMLContainers = new ArrayList<>();
+    Map<String, ArrayList<ContainerItem>> containers_children = new LinkedHashMap<>();
+    static List<String>children_with_parents =  new ArrayList<>();
+    static List<ContainerItem>ARXML_containers_with_no_parent =  new ArrayList<>();
+    HashMap<Node, Node> direct_parent = new HashMap<>();
     static int[] BSWMDpar = new int[maxNodes];
     static int[] ARXMLpar = new int[maxNodes];
+     
 
     public MainApplication() {
         initComponents();
@@ -61,6 +59,8 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         DSWMDConstructor();
         AComponentName.setText("Can Network Manager");
         ARXMLConstructor();
+        String FilePath="output.arxml";
+        generateArxml(FilePath);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         // TODO when generalizing to all modules, make sure to attach all containers.
         // In case of CanNM, we only have one main container.
         DefaultMutableTreeNode canNM_root_node = new DefaultMutableTreeNode("CanNM");
-        System.out.println(BSWMDContainers);
+       // System.out.println(BSWMDContainers);
         ContainerItem c = BSWMDContainers.get(0);
         canNM_root_node.add(c.getGUINode()); 
         BSWMDTree = (DefaultTreeModel)jTree1.getModel();
@@ -121,18 +121,23 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         Element containers = (Element) fourth.getElementsByTagName("CONTAINERS").item(0);
 
         ARXMLParserDFS(containers, -1);
+        
 
         for (int i = ARXMLContainers.size() - 1; i > 0; i--) {
-            DefaultMutableTreeNode parentNode = ARXMLContainers.get(ARXMLpar[i]).getGUINode();
-            DefaultMutableTreeNode currentNode = ARXMLContainers.get(i).getGUINode();
-            parentNode.add(currentNode);
-            ContainerItem parentContainer = ARXMLContainers.get(ARXMLpar[i]);
-            parentContainer.setGUINode(parentNode);
-            ARXMLContainers.set(ARXMLpar[i], parentContainer); // containerDef[par[i]] = parentNode
+            //System.out.println(ARXMLContainers.get(i).name + " "+ARXMLContainers.get(i).UUID);
+            //System.out.println(ARXMLContainers.get(i).name + " "+ ARXMLpar[i]);
+            //if(ARXMLpar[i] != -1){
+                DefaultMutableTreeNode parentNode = ARXMLContainers.get(ARXMLpar[i]).getGUINode();
+                DefaultMutableTreeNode currentNode = ARXMLContainers.get(i).getGUINode();
+                parentNode.add(currentNode);
+                ContainerItem parentContainer = ARXMLContainers.get(ARXMLpar[i]);
+                parentContainer.setGUINode(parentNode);
+                ARXMLContainers.set(ARXMLpar[i], parentContainer); // containerDef[par[i]] = parentNode
+            //}
         }
         
         DefaultMutableTreeNode canNM_root_node = new DefaultMutableTreeNode("CanNM");
-        System.out.println(ARXMLContainers);
+        //System.out.println(ARXMLContainers);
         ContainerItem c = ARXMLContainers.get(0);
         canNM_root_node.add(c.getGUINode()); 
         ARXMLTree = (DefaultTreeModel)jTree2.getModel();
@@ -167,7 +172,13 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         }
     }
 
-    @Override
+    Integer id = 0;
+
+    /**
+     *
+     * @param ecucContainer
+     * @param parentIndex
+     */
     public void ARXMLParserDFS(Node ecucContainer, int parentIndex)
     {
         NodeList containerNodes = ecucContainer.getChildNodes();
@@ -176,8 +187,10 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             Node containerNode = containerNodes.item(i);
             if ( containerNode.getNodeName().equals("ECUC-CONTAINER-VALUE")) {
                 String containerName = ((Element)containerNode).getElementsByTagName("SHORT-NAME").item(0).getTextContent();
-                ContainerItem c = new ContainerItem(containerName, "", "", "");
+                ContainerItem c = new ContainerItem(containerName, String.valueOf(id), "", "");
+                id++;
                 ARXMLContainers.add(c);
+                //containers_children.put(c.UUID, new ArrayList<>());
                 int idx = ARXMLContainers.size() - 1;
                 ARXMLpar[idx] = parentIndex;
 
@@ -193,12 +206,16 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                 for (int k = 0; k < subContainersNodes.getLength(); k++) {
                     Node subContainerNode = subContainersNodes.item(k);
                     if (subContainerNode.getNodeType() == Node.ELEMENT_NODE && subContainerNode.getNodeName().equals("SUB-CONTAINERS")) {
+                        Node sub_node = subContainerNode.getFirstChild();
+                          
                         ARXMLParserDFS(subContainerNode, idx);
                     }
                 }
+                
             }
         }
     }
+
     
     @Override
     public ContainerItem processBSWMDContainer(Element ecucContainer) {
@@ -256,7 +273,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                     Range range = null;
 
                     ParameterItem p = new IntegerParameter( name,"", "","", 0, 0, true, Integer.parseInt(val), range);
-                    System.out.println(Integer.parseInt(val));
+                    //System.out.println(Integer.parseInt(val));
                     c.parametersList.add(p);
                 }
                 if ("ECUC-FLOAT-PARAM-DEF".equals(destAttribute)) {
@@ -295,7 +312,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                     String[] pathParts = name.split("/");
                     name = pathParts[pathParts.length - 1];
                     ParameterItem p = new EnumParameter(name,"", "", "",0, 0, EnumValue.valueOf(val));
-                    System.out.println(EnumValue.valueOf(val));
+                   // System.out.println(EnumValue.valueOf(val));
                     c.parametersList.add(p);
                 }
             }
@@ -311,8 +328,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         }
     }
 
-    
-    Map<String,Pair<String,String>>chk_values_map = new HashMap<>(); // for checking the correct values of parameters
+    @Override
     public ParameterItem processParameter(Element ecucParameter, String typ) {
         String name = ecucParameter.getElementsByTagName("SHORT-NAME").item(0).getTextContent();
         String UUID = "";
@@ -356,7 +372,6 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                     value = defaultValueElement.getTextContent();
                     defVal = Integer.parseInt(value);
                 }
-                chk_values_map.put(name, new Pair<String, String>(Float.toString(startRange), Float.toString(endRange)));
                 return new IntegerParameter(name, UUID, "", Desc, LM, UM, hasDefaultValue, defVal, new Range(startRange, endRange));
             }
             case "FLOAT":
@@ -367,7 +382,6 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                     value = defaultValueElement.getTextContent();
                     defVal = Float.parseFloat(value);
                 }
-                chk_values_map.put(name, new Pair<>(Float.toString(startRange),Float.toString(endRange)));
                 return new FloatParameter(name, UUID, "", Desc, LM, UM, hasDefaultValue, defVal, new Range(startRange, endRange));
             }
             case "BOOLEAN":
@@ -607,64 +621,8 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
 
         jTabbedPane1.getAccessibleContext().setAccessibleName("BSWMD");
 
-        
-        // Creating the log messages text area
-        logMessagesTextArea = new JTextArea(5, 20); // Suggests height for 5 lines
-        logMessagesTextArea.setEditable(false);
-        logMessagesTextArea.setText("Welcome To Our Program!"); // Set initial message
-        
-        JScrollPane logMessagesScrollPane = new JScrollPane(logMessagesTextArea);
-        logMessagesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-
-        // Creating a panel for the log messages
-        JPanel logPanel = new JPanel(new BorderLayout());
-        // Create and add a title label for the log messages panel
-        JLabel logTitleLabel = new JLabel("Log Messages");
-        logTitleLabel.setFont(new Font("Arial", Font.BOLD, 12)); // Set font to Arial, bold, size 12
-        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT)); // A panel to hold the title on the left
-        titlePanel.add(logTitleLabel);
-    
-        logPanel.add(titlePanel, BorderLayout.NORTH); // Adding the title panel at the top of the log panel
-
-        // Adding a border to the logPanel to create a frame around the log messages
-        logPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        logPanel.add(logMessagesScrollPane);
-
-        // Creating a main container panel with BorderLayout
-        JPanel mainPanel = new JPanel(new BorderLayout());
-
-        // Adding jLabel1 at the top of the mainPanel
-        mainPanel.add(jLabel1, BorderLayout.NORTH);
-
-        // Adding the JTabbedPane to the center of mainPanel
-        mainPanel.add(jTabbedPane1, BorderLayout.CENTER);
-
-        // Adding the log messages panel at the bottom of the mainPanel
-        mainPanel.add(logPanel, BorderLayout.SOUTH);
-
-        // Setting the mainPanel as the content pane of the JFrame
-        this.getContentPane().setLayout(new BorderLayout());
-        this.getContentPane().add(mainPanel, BorderLayout.CENTER);
-        
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-
-    // Method to append log messages
-    public void appendLogMessage(String message) {
-        // Ensure updates are made in the Event Dispatch Thread
-        SwingUtilities.invokeLater(() -> {
-            logMessagesTextArea.append(message + "\n");
-        });
-    }
-
-    // Method to set log message, overriding any existing text
-    public void setLogMessage(String message) {
-        // Ensure updates are made in the Event Dispatch Thread
-        SwingUtilities.invokeLater(() -> {
-            logMessagesTextArea.setText(message + "\n"); // Set new message, overriding existing text
-        });
-    }
 
     private void jTree1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseClicked
         TreePath clickedPath = jTree1.getPathForLocation(evt.getX(), evt.getY());
@@ -683,6 +641,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         //        Border paddingBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
 
         // Check if a valid path is clicked
+       
         if (clickedPath != null) {
             // Get the last component of the path (typically a leaf node)
             DefaultMutableTreeNode clickedNode = (DefaultMutableTreeNode) clickedPath.getLastPathComponent();
@@ -802,97 +761,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             }
         }
     }//GEN-LAST:event_jTree1MouseClicked
-    Map<Pair<JTextField, String>,String> parameters_val_update = new HashMap<>(); // map that has text field and paramter name and key is parameter val
-    public void print_paramters_val_update_map(Map<Pair<JTextField, String>,String> parameters_val_update){
-        for (Map.Entry<Pair<JTextField, String>, String> entry : parameters_val_update.entrySet()) {
-            Pair<JTextField, String> pair = entry.getKey();
-            String value = entry.getValue();
-            
-            JTextField textField = pair.getLeft();
-            String parameter_name = pair.getRight();
-            
-            System.out.println("Key (JTextField text): " + textField);
-            System.out.println("Key (String): " + parameter_name);
-            System.out.println("Value: " + value);
-            System.out.println();
-        }
-    }
 
-
-    // Handling the error messages independently
-    private void validateAndDisplayErrors(String parameterName, String newValue, String min_val, String max_val) {
-        BigDecimal newValuen = new BigDecimal(newValue);
-        BigDecimal min_valn = new BigDecimal(min_val);
-        BigDecimal max_valn = new BigDecimal(max_val);
-        if(newValuen.compareTo(max_valn) <= 0 && newValuen.compareTo(min_valn) >= 0) {
-            // If value is correct, remove any error for this parameter and reset background
-            errorMessages.remove(parameterName);
-        } else {
-            // If value is incorrect, update error message and set background to red
-            errorMessages.put(parameterName, "Error: Value for " + parameterName + " is out of range [" + min_val + ", " + max_val + "].");
-        }
-        updateLogMessageArea();
-    }
-    
-    private void updateLogMessageArea() {
-        // Concatenate all current error messages
-        String allErrors = String.join("\n", errorMessages.values());
-    
-        // Display in log message area
-        setLogMessage(allErrors.isEmpty() ? "No errors. Ready to Run..." : allErrors);
-    }
-
-    
-    public Boolean compare_arxml_map_to_bswmd_map(Map<Pair<JTextField, String>,String> parameters_val_update,  Map<String,Pair<String,String>>chk_values_map){
-        for (Map.Entry<Pair<JTextField, String>, String> entry : parameters_val_update.entrySet()) {
-            Pair<JTextField, String> parametrs_val_key = entry.getKey();
-            String value = entry.getValue();
-            Pair<String, String> pair = chk_values_map.get(parametrs_val_key.getRight());
-            String min_val = pair.getLeft();
-            String max_val = pair.getRight();
-            BigDecimal valuen = new BigDecimal(value);
-            BigDecimal min_valn = new BigDecimal(min_val);
-            BigDecimal max_valn = new BigDecimal(max_val);
-             
-            if(valuen.compareTo(max_valn) <= 0 && valuen.compareTo(min_valn) >= 0){
-                parametrs_val_key.getLeft().setBackground(Color.WHITE); // Change to default color
-            } 
-          else {
-              parametrs_val_key.getLeft().setBackground(Color.RED); // Change to red indicating incorrect value
-            }
-        }
-        return true;
-    }
-    private class CustomActionListener implements ActionListener { // for chnging values in arxml 
-        private String parameterName;
-
-        public CustomActionListener(String parameterName) {
-            this.parameterName = parameterName;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            JTextField textField = (JTextField) e.getSource();
-            String newValue = textField.getText();
-            parameters_val_update.put(new Pair<>(textField, parameterName), newValue);
-            print_paramters_val_update_map(parameters_val_update);
-              Pair<String, String> pair = chk_values_map.get(parameterName);
-              String min_val = pair.getLeft();
-              String max_val = pair.getRight();
-              BigDecimal newValuen = new BigDecimal(newValue);
-              BigDecimal min_valn = new BigDecimal(min_val);
-              BigDecimal max_valn = new BigDecimal(max_val);
-             
-              if(newValuen.compareTo(max_valn) <= 0.0 && newValuen.compareTo(min_valn) >= 0.0){
-                  textField.setBackground(Color.WHITE); // Change to default color
-              } 
-            else {
-                textField.setBackground(Color.RED); // Change to red indicating incorrect value
-            }
-            validateAndDisplayErrors(parameterName, newValue, min_val, max_val);
-
-        }
-    }
     private void jTree2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree2MouseClicked
         TreePath clickedPath = jTree2.getPathForLocation(evt.getX(), evt.getY());
         JPanel innerPanel = new JPanel(new GridBagLayout());
@@ -905,7 +774,21 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         gbc.gridy = 0;
         gbc.insets = new Insets(5, 1, 5, 1); // Padding between components
         gbc.anchor = GridBagConstraints.WEST; // Align components to the left (west)
-
+        //System.out.println("contents");
+        for (Map.Entry<String, ArrayList<ContainerItem>> entry : containers_children.entrySet()) {
+            String parent = entry.getKey();
+            ArrayList<ContainerItem> children = entry.getValue();
+            //System.out.println("Parent: " + parent);
+            for(ContainerItem child : children){
+               // System.out.println("child: " + child.name);
+                children_with_parents.add(child.UUID);
+            }
+           //System.out.println();
+        }
+        for(ContainerItem c:ARXMLContainers){
+            System.out.println(c.UUID);
+            System.out.println(c.name);
+        }
         // Check if a valid path is clicked
         if (clickedPath != null) {
             // Get the last component of the path (typically a leaf node)
@@ -939,8 +822,6 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             IntegerParameter intParam = (IntegerParameter) param;
                             if (intParam.hasDefaultValue() == true) {
                                 textField.setText(String.valueOf(intParam.getValue()));
-                                 parameters_val_update.put(new Pair<>(textField, intParam.getName()), String.valueOf(intParam.getValue()));
-                                 textField.addActionListener(new CustomActionListener(intParam.getName()));
                             }
                             gbc.gridx = 1; // Column for text fields
                             targetPanel.add(textField, gbc);
@@ -949,8 +830,6 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             FloatParameter floatParam = (FloatParameter) param;
                             if (floatParam.hasDefaultValue() == true) {
                                 textField.setText(String.valueOf(floatParam.getValue()));
-                                 parameters_val_update.put(new Pair<>(textField, floatParam.getName()), String.valueOf(floatParam.getValue()));
-                                 textField.addActionListener(new CustomActionListener(floatParam.getName()));
                             }
                             gbc.gridx = 1; // Column for text fields
                             targetPanel.add(textField, gbc);
@@ -961,12 +840,8 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             JComboBox<String> comboBox = new JComboBox<>(items);
                             if (boolParam.hasDefaultValue() ==  true) {
                                 comboBox.setSelectedItem(boolParam.getValue() ? "True" : "False");
-                                parameters_val_update.put(new Pair<>(textField, boolParam.getName()), String.valueOf(boolParam.getValue()));
-                                 textField.addActionListener(new CustomActionListener(boolParam.getName()));
                             } else {
                                 comboBox.setSelectedItem("Not Set");
-                                 parameters_val_update.put(new Pair<>(textField, boolParam.getName()), String.valueOf(boolParam.getValue()));
-                                 textField.addActionListener(new CustomActionListener(boolParam.getName()));
                             }
                             gbc.gridx = 1;
                             targetPanel.add(comboBox, gbc);
@@ -976,21 +851,9 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             String[] items = {"CANNM_PDU_BYTE_0", "CANNM_PDU_BYTE_1", "CANNM_PDU_OFF"};
                             JComboBox<String> comboBox = new JComboBox<>(items);
                              switch (enumParam.getValue()) {
-                                 case CANNM_PDU_BYTE_0:
-                                     comboBox.setSelectedItem("CANNM_PDU_BYTE_0");
-                                      parameters_val_update.put(new Pair<>(textField, enumParam.getName().toString()), String.valueOf(enumParam.getValue()));
-                                     textField.addActionListener(new CustomActionListener(enumParam.getName()));
-                                     break;
-                                 case CANNM_PDU_BYTE_1 :
-                                     comboBox.setSelectedItem("CANNM_PDU_BYTE_1");
-                                     parameters_val_update.put(new Pair<>(textField, enumParam.getName()), String.valueOf(enumParam.getValue()));
-                                     textField.addActionListener(new CustomActionListener(enumParam.getName()));
-                                     break;
-                                 case CANNM_PDU_OFF :
-                                     comboBox.setSelectedItem("CANNM_PDU_OFF");
-                                     parameters_val_update.put(new Pair<>(textField, enumParam.getName()), String.valueOf(enumParam.getValue()));
-                                     textField.addActionListener(new CustomActionListener(enumParam.getName()));
-                                     break;
+                                 case CANNM_PDU_BYTE_0 -> comboBox.setSelectedItem("CANNM_PDU_BYTE_0");
+                                 case CANNM_PDU_BYTE_1 -> comboBox.setSelectedItem("CANNM_PDU_BYTE_1");
+                                 case CANNM_PDU_OFF -> comboBox.setSelectedItem("CANNM_PDU_OFF");
                              }
                             comboBox.setSelectedItem(enumParam.getValue());
                             gbc.gridx = 1;
@@ -1001,8 +864,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                     // Break the loop after finding the matching container
                     break;
                 }
-            } 
-            compare_arxml_map_to_bswmd_map(parameters_val_update, chk_values_map);
+            }   
         }
     }//GEN-LAST:event_jTree2MouseClicked
 
@@ -1031,9 +893,215 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                 new MainApplication().setVisible(true);
             }
         });
+        
+        
+    }
+
+    @Override
+    public void generateArxml( String filePath) {
+        try {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.newDocument();
+
+            
+            // Root element with namespace and schema location
+            Element autosar = doc.createElement("AUTOSAR");
+            autosar.setAttribute("xmlns", "http://autosar.org/schema/r4.0");
+            autosar.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+            autosar.setAttribute("xsi:schemaLocation", "http://autosar.org/schema/r4.0 AUTOSAR_00046.xsd");
+            doc.appendChild(autosar);
+            
+            
+            // AR-PACKAGES element
+            Element arPackages = doc.createElement("AR-PACKAGES");
+            autosar.appendChild(arPackages);
+            
+            // Add the following lines right after the above code to insert the <AR-PACKAGE> element
+            Element arPackage = doc.createElement("AR-PACKAGE");
+            arPackages.appendChild(arPackage); // Append <AR-PACKAGE> to <AR-PACKAGES>
+
+            // Create and append the <SHORT-NAME> element to <AR-PACKAGE>
+            Element shortName = doc.createElement("SHORT-NAME");
+            shortName.appendChild(doc.createTextNode("AutosarConfigurator")); // Set the text content for <SHORT-NAME>
+            arPackage.appendChild(shortName); // Append <SHORT-NAME> to <AR-PACKAGE>
+
+            // Create and append the <ELEMENTS> element to <AR-PACKAGE>, if you plan to add elements under it
+            Element elements = doc.createElement("ELEMENTS");
+            arPackage.appendChild(elements); // Append <ELEMENTS> to <AR-PACKAGE>
+            
+            //module
+            Element ecucModuleConfigurationValues = doc.createElement("ECUC-MODULE-CONFIGURATION-VALUES");
+            //ecucModuleConfigurationValues.setAttribute("UUID", ""); // For an empty UUID for now
+            elements.appendChild(ecucModuleConfigurationValues);
+            
+            // Create and append <SHORT-NAME>
+            Element modShortName = doc.createElement("SHORT-NAME");
+            modShortName.appendChild(doc.createTextNode("CanNm"));
+            ecucModuleConfigurationValues.appendChild(modShortName); // Append to <ECUC-MODULE-CONFIGURATION-VALUES>
+
+            // Create and append <DEFINITION-REF>
+            Element definitionRef = doc.createElement("DEFINITION-REF");
+            definitionRef.setAttribute("DEST", "ECUC-MODULE-DEF");
+            definitionRef.appendChild(doc.createTextNode("/AUTOSAR/EcucDefs/CanNm"));
+            ecucModuleConfigurationValues.appendChild(definitionRef); // Append to <ECUC-MODULE-CONFIGURATION-VALUES>
+
+            // Create and append <IMPLEMENTATION-CONFIG-VARIANT>
+            Element implementationConfigVariant = doc.createElement("IMPLEMENTATION-CONFIG-VARIANT");
+            implementationConfigVariant.appendChild(doc.createTextNode("VARIANT-POST-BUILD"));
+            ecucModuleConfigurationValues.appendChild(implementationConfigVariant); // Append to <ECUC-MODULE-CONFIGURATION-VALUES>
+
+            // Create and append <MODULE-DESCRIPTION-REF>
+            Element moduleDescriptionRef = doc.createElement("MODULE-DESCRIPTION-REF");
+            moduleDescriptionRef.setAttribute("DEST", "BSW-IMPLEMENTATION");
+            moduleDescriptionRef.appendChild(doc.createTextNode("/AUTOSAR/EcucDefs/CanNm"));
+            ecucModuleConfigurationValues.appendChild(moduleDescriptionRef); // Append to <ECUC-MODULE-CONFIGURATION-VALUES>
+            
+            //CONTAINERS
+            Element containers = doc.createElement("CONTAINERS");
+            ecucModuleConfigurationValues.appendChild(containers);
+            ARXML_containers_with_no_parent.add(ARXMLContainers.get(0));
+            System.out.println(ARXMLContainers.get(0).parametersList);
+            for(ContainerItem container : ARXMLContainers){
+                  //System.out.println(container.name+" "+container.UUID );
+                if(container.UUID == String.valueOf(0)){
+                   
+                    ARXML_containers_with_no_parent.add(container);
+                }
+            }
+            for(int i = 1; i < ARXMLContainers.size();i++){
+                if (!containers_children.containsKey(ARXMLContainers.get(ARXMLpar[i]).UUID)) {
+                    containers_children.put(ARXMLContainers.get(ARXMLpar[i]).UUID, new ArrayList<>());
+                }
+                containers_children.get(ARXMLContainers.get(ARXMLpar[i]).UUID).add(ARXMLContainers.get(i));
+            }
+//            for (Map.Entry<String, ArrayList<ContainerItem>> entry : containers_children.entrySet()) {
+//                String key = entry.getKey();
+//                ArrayList<ContainerItem> value = entry.getValue();
+//                for(ContainerItem c: value)
+//                    System.out.println("Key: " + key + ", Values: " + c.name);
+//                System.out.println();
+//            }
+            
+            
+            // Loop through each container to add them to the document
+            
+            for (ContainerItem container : ARXML_containers_with_no_parent) {
+                System.out.println(container.name);
+                containers.appendChild(createContainerElement(doc, container));
+                containers.appendChild(ARXML_DFS_Costruct_containers(doc, container));
+            }
+
+            // Write the content into the ARXML file
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            
+            // Set properties for formatted output
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4"); // Set indentation amount to 4 spaces
+
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(new File(filePath));
+
+            transformer.transform(source, result);
+
+            System.out.println("ARXML file has been generated at: " + filePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
-   
+
+    private Element createContainerElement(Document doc, ContainerItem container) {
+        Element containerElement = doc.createElement("ECUC-CONTAINER-VALUE");
+        //containerElement.setAttribute("UUID", container.getUUID());
+        
+        // Short name
+        Element shortName = doc.createElement("SHORT-NAME");
+        shortName.setTextContent(container.getName());
+        containerElement.appendChild(shortName);
+    
+        // Definition reference
+        Element definitionRef = doc.createElement("DEFINITION-REF");
+        definitionRef.setAttribute("DEST", "ECUC-PARAM-CONF-CONTAINER-DEF");
+        definitionRef.setTextContent("/AUTOSAR/EcucDefs/CanNm/"+container.name);
+        containerElement.appendChild(definitionRef);
+
+        // Parameter values
+        Element parameterValues = doc.createElement("PARAMETER-VALUES");
+        containerElement.appendChild(parameterValues);
+
+        // Adding parameters
+        //System.out.println(container);
+        for (ParameterItem parameter : container.getParametersList()) {
+            System.out.println(container.name);
+            Element parameterElement = createParameterElement(doc, parameter);
+            parameterValues.appendChild(parameterElement);
+        }
+        return containerElement;
+
+    }
+    
+
+    private Element createParameterElement(Document doc, ParameterItem parameter) {
+        String elementType = "ECUC-NUMERICAL-PARAM-VALUE"; // Default type
+        String value = null;
+        if ( parameter instanceof IntegerParameter){
+            elementType = "ECUC-INTEGER-PARAM-DEF";
+            value = String.valueOf(((IntegerParameter) parameter).getValue());
+        }
+        
+        else if ( parameter instanceof FloatParameter){
+            elementType = "ECUC-FLOAT-PARAM-DEF";
+            value = String.valueOf(((FloatParameter) parameter).getValue());
+        }
+        
+        else if ( parameter instanceof BooleanParameter){
+            elementType = "ECUC-BOOLEAN-PARAM-DEF";
+             value = String.valueOf(((BooleanParameter) parameter).getValue());
+        }
+        
+        else if ( parameter instanceof EnumParameter){
+            elementType = "ECUC-ENUMERATION-PARAM-DEF";
+            value = String.valueOf(((EnumParameter) parameter).getValue());
+        }
+        Element parametertype = doc.createElement("ECUC-NUMERICAL-PARAM-VALUE");
+        Element parameterElement = doc.createElement("DEFINITION-REF");
+        parameterElement.setAttribute("DEST", elementType);
+        parameterElement.setTextContent("/AUTOSAR/EcucDefs/CanNm/"+parameter.name);
+        Element parameterValue = doc.createElement("Value");
+       // System.out.print(value);
+        parameterValue.setTextContent(value);
+        parametertype.appendChild(parameterElement);
+        parametertype.appendChild(parameterValue);
+        return parametertype;
+    
+    }
+    public Element ARXML_DFS_Costruct_containers(Document doc,ContainerItem c)
+    {   
+        
+        ArrayList<ContainerItem> children = containers_children.get(c.UUID);
+       
+        if (children != null  && !children.isEmpty()) {
+            Element contain = doc.createElement("SUB-CONTAINERS");
+            for (ContainerItem child : children) {
+                Element subContainer = createContainerElement(doc, child); // Create sub-container
+                Element subContainersElement = ARXML_DFS_Costruct_containers(doc, child); // Recursive call
+
+                if (subContainersElement != null) {
+                subContainer.appendChild(subContainersElement);
+                }
+
+                // Append the sub-container to the main container
+                contain.appendChild(subContainer);
+            }
+            return contain;
+        }
+        else return null;
+        
+    }
+
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel AComponentName;
     private javax.swing.JPanel AParamPanel;
@@ -1052,4 +1120,9 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     private javax.swing.JTree jTree1;
     private javax.swing.JTree jTree2;
     // End of variables declaration//GEN-END:variables
+
+//    @Override
+//    public void ARXMLParserDFS(Node ecucContainer, int parentIndex) {
+//        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+//    }
 }
