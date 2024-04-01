@@ -43,7 +43,7 @@ typedef struct {
 	Nm_StateType				State;					//[SWS_CanNm_00089]
 	bool						Requested;
 	bool						TxEnabled;
-	int8_t						RxLastPdu;
+	// int8_t						RxLastPdu;
 	CanNm_Timer					TimeoutTimer;			//NM-Timeout Timer, Tx Timeout Timer
 	CanNm_Timer					MessageCycleTimer;
 	CanNm_Timer					RepeatMessageTimer;
@@ -52,7 +52,7 @@ typedef struct {
 	uint8_t						ImmediateNmTransmissions;
 	bool						BusLoadReduction;		//[SWS_CanNm_00238]
 	bool						RemoteSleepInd;
-	bool						RemoteSleepIndEnabled;
+	// bool						RemoteSleepIndEnabled;
 	bool						NmPduFilterAlgorithm;
 } CanNm_Internal_ChannelType;
 
@@ -80,9 +80,10 @@ static const CanNmConfigType* CanNm_ConfigPtr;
 static inline void CanNm_Internal_TimersInit( uint8_t channel );
 
 /* Additional functions */
-static inline void CanNm_Internal_ClearPduCbv( const CanNm_ChannelType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
-static inline uint8_t* CanNm_Internal_GetUserDataPtr( const CanNm_ChannelType* ChannelConf, uint8_t* MessageSduPtr );
-static inline uint8_t CanNm_Internal_GetUserDataLength( const CanNm_ChannelType* ChannelConf );
+static inline uint8_t* CanNm_Internal_GetUserDataPtr( const CanNmChannelType* ChannelConf, uint8_t* MessageSduPtr );
+static inline uint8_t CanNm_Internal_GetUserDataLength( const CanNmChannelType* ChannelConf );
+static inline uint8 CanNm_Internal_GetUserDataOffset( const CanNm_ChannelType* ChannelConf );
+
 
 /*====================================================================================================================*\
     Global functions code
@@ -92,24 +93,25 @@ static inline uint8_t CanNm_Internal_GetUserDataLength( const CanNm_ChannelType*
  * 
  * Initialize the CanNm module passed as a constant pointer to the function to be assigned to the global CanNm_ConfigPtr.
  * There are some default values to be initialized from the SWS and they are labeled by a comment in the code.
+ * ! TODO: Some are not documented in the SWS such as ChannelInternal.
  */
 void CanNm_Init(const CanNmConfigType* canNmConfigPtr)
 {
     CanNm_ConfigPtr = canNmConfigPtr;	//[SWS_CanNm_00060]
 
 	for (uint8_t channel = 0; channel < CANNM_CHANNEL_COUNT; channel++) {
-		const CanNm_ChannelType* ChannelConf = CanNm_ConfigPtr->ChannelConfig[channel];
+		const CanNmChannelType* ChannelConf = CanNm_ConfigPtr->ChannelConfig[channel];
 		CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[channel];
 
 		ChannelInternal->Channel = channel;
 		ChannelInternal->Mode = NM_MODE_BUS_SLEEP;														//[SWS_CanNm_00144]
 		ChannelInternal->State = NM_STATE_BUS_SLEEP;													//[SWS_CanNm_00141][SWS_CanNm_00094]
 		ChannelInternal->Requested = FALSE;																//[SWS_CanNm_00143]
-		ChannelInternal->TxEnabled = FALSE;
-		ChannelInternal->RxLastPdu = NO_PDU_RECEIVED;
-		ChannelInternal->ImmediateNmTransmissions = 0; 													//[ECUC_CanNm_00056]
+		// ChannelInternal->TxEnabled = FALSE;
+		// ChannelInternal->RxLastPdu = NO_PDU_RECEIVED;
+		ChannelInternal->ImmediateNmTransmissions = ChannelConf->ImmediateNmTransmissions; 				//[ECUC_CanNm_00056]
 		ChannelInternal->BusLoadReduction = FALSE;														//[SWS_CanNm_00023]
-		ChannelInternal->RemoteSleepInd = FALSE;
+		// ChannelInternal->RemoteSleepInd = FALSE;
 		ChannelInternal->RemoteSleepIndEnabled = CanNm_ConfigPtr->RemoteSleepIndEnabled;
 		ChannelInternal->NmPduFilterAlgorithm = FALSE;
 
@@ -117,7 +119,9 @@ void CanNm_Init(const CanNmConfigType* canNmConfigPtr)
 			ChannelConf->TxPdu->TxPduRef->SduDataPtr[ChannelConf->PduNidPosition] = ChannelConf->NodeId;//[SWS_CanNm_00013]
 		}
 
-		CanNm_Internal_ClearPduCbv(ChannelConf, ChannelInternal);										//[SWS_CanNm_00085]
+		if (ChannelConf->PduCbvPosition != CANNM_PDU_OFF) {
+			ChannelConf->TxPdu->TxPduRef->SduDataPtr[ChannelConf->PduCbvPosition] = 0x00;				//[SWS_CanNm_00085]
+		}										
 
 		uint8_t* destUserData = CanNm_Internal_GetUserDataPtr(ChannelConf, ChannelConf->UserDataTxPdu->TxUserDataPduRef->SduDataPtr);
 		uint8_t userDataLength = CanNm_Internal_GetUserDataLength(ChannelConf);
@@ -162,14 +166,15 @@ static inline void CanNm_Internal_TimersInit( uint8_t channel )
 	ChannelInternal->RemoteSleepIndTimer.TimeLeft = 0;
 }
 
-static inline void CanNm_Internal_ClearPduCbv( const CanNm_ChannelType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal )
+static inline uint8 CanNm_Internal_GetUserDataOffset( const CanNm_ChannelType* ChannelConf )
 {
-	if (ChannelConf->PduCbvPosition != CANNM_PDU_OFF) {
-		ChannelConf->TxPdu->TxPduRef->SduDataPtr[ChannelConf->PduCbvPosition] = 0x00;
-	}
+	uint8 userDataPos = 0;
+	userDataPos += (ChannelConf->PduNidPosition == CANNM_PDU_OFF) ? 0 : 1;
+	userDataPos += (ChannelConf->PduCbvPosition == CANNM_PDU_OFF) ? 0 : 1;
+	return userDataPos;
 }
 
-static inline uint8_t* CanNm_Internal_GetUserDataPtr( const CanNm_ChannelType* ChannelConf, uint8_t* MessageSduPtr )
+static inline uint8_t* CanNm_Internal_GetUserDataPtr( const CanNmChannelType* ChannelConf, uint8_t* MessageSduPtr )
 {
 	uint8_t userDataOffset = CanNm_Internal_GetUserDataOffset(ChannelConf);
 	return &MessageSduPtr[userDataOffset];
@@ -179,14 +184,7 @@ static inline uint8_t* CanNm_Internal_GetUserDataPtr( const CanNm_ChannelType* C
 /************************/
 /* Additional functions */
 /************************/
-static inline void CanNm_Internal_ClearPduCbv( const CanNm_ChannelType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal )
-{
-	if (ChannelConf->PduCbvPosition != CANNM_PDU_OFF) {
-		ChannelConf->TxPdu->TxPduRef->SduDataPtr[ChannelConf->PduCbvPosition] = 0x00;
-	}
-}
-
-static inline uint8_t CanNm_Internal_GetUserDataLength( const CanNm_ChannelType* ChannelConf )
+static inline uint8_t CanNm_Internal_GetUserDataLength( const CanNmChannelType* ChannelConf )
 {
 	uint8_t userDataOffset = CanNm_Internal_GetUserDataOffset(ChannelConf);
 	return ChannelConf->UserDataTxPdu->TxUserDataPduRef->SduLength - userDataOffset;
