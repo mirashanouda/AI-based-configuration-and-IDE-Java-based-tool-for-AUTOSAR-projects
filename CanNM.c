@@ -49,7 +49,7 @@ typedef struct {
 	CanNm_Timer					RepeatMessageTimer;
 	CanNm_Timer					WaitBusSleepTimer;
 	CanNm_Timer					RemoteSleepIndTimer;
-	uint8_t						ImmediateTransmissions;
+	uint8_t						ImmediateNmTransmissions;
 	bool						BusLoadReduction;		//[SWS_CanNm_00238]
 	bool						RemoteSleepInd;
 	bool						RemoteSleepIndEnabled;
@@ -90,11 +90,12 @@ static inline uint8_t CanNm_Internal_GetUserDataLength( const CanNm_ChannelType*
 
 /** @brief CanNm_Init [SWS_CanNm_00208]
  * 
- * Initialize the CanNm module.
+ * Initialize the CanNm module passed as a constant pointer to the function to be assigned to the global CanNm_ConfigPtr.
+ * There are some default values to be initialized from the SWS and they are labeled by a comment in the code.
  */
-void CanNm_Init(const CanNmConfigType* cannmConfigPtr)
+void CanNm_Init(const CanNmConfigType* canNmConfigPtr)
 {
-    CanNm_ConfigPtr = cannmConfigPtr;	//[SWS_CanNm_00060]
+    CanNm_ConfigPtr = canNmConfigPtr;	//[SWS_CanNm_00060]
 
 	for (uint8_t channel = 0; channel < CANNM_CHANNEL_COUNT; channel++) {
 		const CanNm_ChannelType* ChannelConf = CanNm_ConfigPtr->ChannelConfig[channel];
@@ -106,7 +107,7 @@ void CanNm_Init(const CanNmConfigType* cannmConfigPtr)
 		ChannelInternal->Requested = FALSE;																//[SWS_CanNm_00143]
 		ChannelInternal->TxEnabled = FALSE;
 		ChannelInternal->RxLastPdu = NO_PDU_RECEIVED;
-		ChannelInternal->ImmediateTransmissions = 0;
+		ChannelInternal->ImmediateNmTransmissions = 0; 													//[ECUC_CanNm_00056]
 		ChannelInternal->BusLoadReduction = FALSE;														//[SWS_CanNm_00023]
 		ChannelInternal->RemoteSleepInd = FALSE;
 		ChannelInternal->RemoteSleepIndEnabled = CanNm_ConfigPtr->RemoteSleepIndEnabled;
