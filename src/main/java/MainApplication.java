@@ -55,6 +55,8 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
 
     public MainApplication() {
         initComponents();
+        DefaultMutableTreeNode initalTreeRoot = new DefaultMutableTreeNode("No input file");
+        jTree2.setModel(new DefaultTreeModel(initalTreeRoot));
         // TODO: This title needs to be set each time we lose focus.
         BComponentName.setText("Can Network Manager");
         DSWMDConstructor();
@@ -164,7 +166,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             parentContainer.setGUINode(parentNode);
             BSWMDContainers.set(BSWMDpar[i], parentContainer);
         }
-
+        
         // TODO when generalizing to all modules, make sure to attach all containers.
         // In case of CanNM, we only have one main container.
         DefaultMutableTreeNode canNM_root_node = new DefaultMutableTreeNode("CanNM");
