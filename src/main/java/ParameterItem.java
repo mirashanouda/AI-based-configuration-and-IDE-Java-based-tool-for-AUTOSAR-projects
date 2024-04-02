@@ -6,7 +6,7 @@ abstract class ParameterItem {
     protected int lowerMultiplicity;
     protected int upperMultiplicity;
     protected boolean hasDefaultValue;
-   
+    protected ContainerItem container;
     public ParameterItem (String name, String UUID, String parentContainer, String description, int lowerMultiplicity, int upperMultiplicity) {
         this.name = name;
         this.UUID = UUID;
@@ -14,6 +14,7 @@ abstract class ParameterItem {
         this.description = description;
         this.lowerMultiplicity = lowerMultiplicity;
         this.upperMultiplicity = upperMultiplicity;
+        this.container = container;
     }
 
     public String getName() {
