@@ -24,7 +24,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 import org.w3c.dom.Document;
@@ -65,6 +68,46 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     HashMap<Pair<ParameterItem,String>, Pair<String, String>> parameters_names_BSWMD = new HashMap<>();
     HashMap<String, Pair<ParameterItem,String>> parameters_names_ARXML = new HashMap<>();
    
+
+
+    // Method to validate XML (Part 1 of validating)
+    private void validateXMLFile(String filePath) {
+        appendLogMessage("\nCompiling input ARXML File...");
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            builder.setErrorHandler(new ErrorHandler() {
+                @Override
+                public void warning(SAXParseException exception) {
+                    appendLogMessage("Warning: " + exception.getMessage());
+                }
+
+                @Override
+                public void error(SAXParseException exception) throws SAXParseException {
+                    //appendLogMessage("Error: " + exception.getMessage());
+                    throw exception;
+                }
+
+                @Override
+                public void fatalError(SAXParseException exception) throws SAXParseException {
+                    //appendLogMessage("Fatal error: " + exception.getMessage());
+                    throw exception;
+                }
+            });
+
+            // Parse the XML file
+            Document document = builder.parse(new File(filePath));
+            appendLogMessage("XML is well-formed.");
+            } catch (SAXParseException e) {
+                appendLogMessage("Error at line " + e.getLineNumber() +
+                        ", column " + e.getColumnNumber() + ": " + e.getMessage());
+            } catch (Exception e) {
+                appendLogMessage("An error occurred while checking the XML file: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+
+
 
     public MainApplication() {
         initComponents();
@@ -124,40 +167,44 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     @Override
     public void ARXMLConstructor()
     {
-        String arxmlPath = "src/main/java/CanNm_Template.arxml";
-        
-        Element root = FileReader(arxmlPath);
-        //System.out.print(root);
-        Element first = (Element) root.getElementsByTagName("AR-PACKAGES").item(0);
-        Element second = (Element) first.getElementsByTagName("AR-PACKAGE").item(0);
-        Element third = (Element) second.getElementsByTagName("ELEMENTS").item(0);
-        Element fourth = (Element) third.getElementsByTagName("ECUC-MODULE-CONFIGURATION-VALUES").item(0);
-        Element containers = (Element) fourth.getElementsByTagName("CONTAINERS").item(0);
+        // Try-Catch to validate if XML is well-formed
+        try {
+            String arxmlPath = "src/main/java/CanNm_Template.arxml";
+            validateXMLFile(arxmlPath);
+            Element root = FileReader(arxmlPath);
+            //System.out.print(root);
+            Element first = (Element) root.getElementsByTagName("AR-PACKAGES").item(0);
+            Element second = (Element) first.getElementsByTagName("AR-PACKAGE").item(0);
+            Element third = (Element) second.getElementsByTagName("ELEMENTS").item(0);
+            Element fourth = (Element) third.getElementsByTagName("ECUC-MODULE-CONFIGURATION-VALUES").item(0);
+            Element containers = (Element) fourth.getElementsByTagName("CONTAINERS").item(0);
 
-        ARXMLParserDFS(containers, -1);
-        
+            ARXMLParserDFS(containers, -1);
 
-        for (int i = ARXMLContainers.size() - 1; i > 0; i--) {
-            //System.out.println(ARXMLContainers.get(i).name + " "+ARXMLContainers.get(i).UUID);
-            //System.out.println(ARXMLContainers.get(i).name + " "+ ARXMLpar[i]);
-            //if(ARXMLpar[i] != -1){
+            for (int i = ARXMLContainers.size() - 1; i > 0; i--) {
+
                 DefaultMutableTreeNode parentNode = ARXMLContainers.get(ARXMLpar[i]).getGUINode();
                 DefaultMutableTreeNode currentNode = ARXMLContainers.get(i).getGUINode();
                 parentNode.add(currentNode);
                 ContainerItem parentContainer = ARXMLContainers.get(ARXMLpar[i]);
                 parentContainer.setGUINode(parentNode);
                 ARXMLContainers.set(ARXMLpar[i], parentContainer); // containerDef[par[i]] = parentNode
-            //}
+              
+            }
+            
+            DefaultMutableTreeNode canNM_root_node = new DefaultMutableTreeNode("CanNM");
+            System.out.println(ARXMLContainers);
+            ContainerItem c = ARXMLContainers.get(0);
+            canNM_root_node.add(c.getGUINode()); 
+            ARXMLTree = (DefaultTreeModel)jTree2.getModel();
+            ARXMLTree.setRoot(canNM_root_node);
+            ARXMLTree.reload();
+            jTree2.setModel(ARXMLTree);
+        } catch (Exception e) {
+            appendLogMessage("An error occurred and the XML cannot be processed: " + e.getMessage());
+            return;
         }
-        
-        DefaultMutableTreeNode canNM_root_node = new DefaultMutableTreeNode("CanNM");
-        //System.out.println(ARXMLContainers);
-        ContainerItem c = ARXMLContainers.get(0);
-        canNM_root_node.add(c.getGUINode()); 
-        ARXMLTree = (DefaultTreeModel)jTree2.getModel();
-        ARXMLTree.setRoot(canNM_root_node);
-        ARXMLTree.reload();
-        jTree2.setModel(ARXMLTree);
+
     }
     
     @Override
@@ -883,25 +930,21 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             }
         }
     }//GEN-LAST:event_jTree1MouseClicked
-    Map<Pair<JTextField, String>,String> parameters_val_update = new HashMap<>(); // map that has text field and paramter name and key is parameter val
-    public void print_paramters_val_update_map(Map<Pair<JTextField, String>,String> parameters_val_update){
-        for (Map.Entry<Pair<JTextField, String>, String> entry : parameters_val_update.entrySet()) {
-            Pair<JTextField, String> pair = entry.getKey();
+    Map<String, String> parameters_val_update = new HashMap<>(); // map: paramter name and key
+    public void print_paramters_val_update_map(Map<String ,String> parameters_val_update){
+        for (Map.Entry<String, String> entry : parameters_val_update.entrySet()) {
+            String parameterName = entry.getKey();
             String value = entry.getValue();
             
-            JTextField textField = pair.getLeft();
-            String parameter_name = pair.getRight();
-            
-            System.out.println("Key (JTextField text): " + textField);
-            System.out.println("Key (String): " + parameter_name);
-            System.out.println("Value: " + value);
+            System.out.println("Parameter Name: " + parameterName);
+            System.out.println("Updated Value: " + value);
             System.out.println();
         }
     }
 
 
     // Handling the error messages independently
-    private void validateAndDisplayErrors(String parameterName, String newValue, String min_val, String max_val) {
+    private void validateAndDisplayErrors(String containerName, String parameterName, String newValue, String min_val, String max_val) {
         BigDecimal newValuen = new BigDecimal(newValue);
         BigDecimal min_valn = new BigDecimal(min_val);
         BigDecimal max_valn = new BigDecimal(max_val);
@@ -910,43 +953,50 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             errorMessages.remove(parameterName);
         } else {
             // If value is incorrect, update error message and set background to red
-            errorMessages.put(parameterName, "Error: Value for " + parameterName + " is out of range [" + min_val + ", " + max_val + "].");
-        }
+            errorMessages.put(containerName + "." + parameterName, 
+            "Error in Container (" + containerName + "): Value for Parameter (" + parameterName + 
+            ") is out of range [" + min_val + ", " + max_val + "].");
+    }        
         updateLogMessageArea();
     }
     
     private void updateLogMessageArea() {
         // Concatenate all current error messages
         String allErrors = String.join("\n", errorMessages.values());
-    
         // Display in log message area
         setLogMessage(allErrors.isEmpty() ? "No errors. Ready to Run..." : allErrors);
     }
 
     
-    public Boolean compare_arxml_map_to_bswmd_map(Map<Pair<JTextField, String>,String> parameters_val_update,  Map<String,Pair<String,String>>chk_values_map){
-        for (Map.Entry<Pair<JTextField, String>, String> entry : parameters_val_update.entrySet()) {
-            Pair<JTextField, String> parametrs_val_key = entry.getKey();
+    public Boolean compare_arxml_map_to_bswmd_map(Map<String, String> parameters_val_update, Map<String, Pair<String, String>> chk_values_map) {    
+        boolean allValuesValid = true; // Tracks if all values are valid
+        for (Map.Entry<String, String> entry : parameters_val_update.entrySet()) {
+            String parameterName = entry.getKey();
             String value = entry.getValue();
-            Pair<String, String> pair = chk_values_map.get(parametrs_val_key.getRight());
-            if(pair != null){
-                String min_val = pair.getLeft();
-                String max_val = pair.getRight();
+            Pair<String, String> range = chk_values_map.get(parameterName);
+    
+            if (range != null) { // Ensure the parameter is found in the chk_values_map
+                String min_val = range.getLeft();
+                String max_val = range.getRight();
                 BigDecimal valuen = new BigDecimal(value);
                 BigDecimal min_valn = new BigDecimal(min_val);
-                if(max_val == "Infinity") max_val = String.valueOf(Float.MAX_VALUE);
                 BigDecimal max_valn = new BigDecimal(max_val);
+    
+                // Not needed
+                if (!(valuen.compareTo(min_valn) >= 0 && valuen.compareTo(max_valn) <= 0)) {
+                    // If any value is not valid, update allValuesValid to false
+                    //allValuesValid = false;
+                    // Log or handle the invalid value
+                    //System.out.println("Parameter " + parameterName + " with value " + value + " is out of range [" + min_val + ", " + max_val + "]");
 
-                if(valuen.compareTo(max_valn) <= 0 && valuen.compareTo(min_valn) >= 0){
-                    parametrs_val_key.getLeft().setBackground(Color.WHITE); // Change to default color
-                } 
-                else {
-                  parametrs_val_key.getLeft().setBackground(Color.RED); // Change to red indicating incorrect value
                 }
             }
         }
-        return true;
+    
+        // Return true if all values are valid, false otherwise
+        return allValuesValid;
     }
+
     public void check_multiplicity_of_continers_and_parameters(){ // checking the upper and lower multiplicty of containers
         for (Map.Entry<String, Pair<String, String>> entry : containers_names_BSWMD.entrySet()) {
             String container_name = entry.getKey();
@@ -1018,34 +1068,82 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
 
     private class CustomActionListener implements ActionListener { // for chnging values in arxml 
         private String parameterName;
+        private String containerName;
 
-        public CustomActionListener(String parameterName) {
+        public CustomActionListener(String containerName, String parameterName) {
             this.parameterName = parameterName;
+            this.containerName = containerName;
         }
+
+       
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            JTextField textField = (JTextField) e.getSource();
-            String newValue = textField.getText();
-            parameters_val_update.put(new Pair<>(textField, parameterName), newValue);
-            //print_paramters_val_update_map(parameters_val_update);
-              Pair<String, String> pair = chk_values_map.get(parameterName);
-              String min_val = pair.getLeft();
-              String max_val = pair.getRight();
-              BigDecimal newValuen = new BigDecimal(newValue);
-              BigDecimal min_valn = new BigDecimal(min_val);
-              BigDecimal max_valn = new BigDecimal(max_val);
-             
-              if(newValuen.compareTo(max_valn) <= 0 && newValuen.compareTo(min_valn) >= 0){
-                  textField.setBackground(Color.WHITE); // Change to default color
-              } 
-            else {
-                textField.setBackground(Color.RED); // Change to red indicating incorrect value
-            }
-            validateAndDisplayErrors(parameterName, newValue, min_val, max_val);
+            Object source = e.getSource();
+            String newValue = null;
 
+            if (source instanceof JTextField) {
+                JTextField textField = (JTextField) source;
+                newValue = textField.getText();
+            } else if (source instanceof JComboBox) {
+                @SuppressWarnings("unchecked")
+                JComboBox<String> comboBox = (JComboBox<String>) source;
+                String selectedValue = (String) comboBox.getSelectedItem();
+                
+                // Determine if the parameter is boolean or enum based on the items in the JComboBox
+                if (comboBox.getItemCount() > 0 && ("True".equals(comboBox.getItemAt(0)) || "False".equals(comboBox.getItemAt(0)) || "Not Set".equals(comboBox.getItemAt(0)))) {
+                    // Handle boolean parameters, including "Not Set" as a possible value.
+                    newValue = "True".equals(selectedValue) ? "true" : "False".equals(selectedValue) ? "false" : "Not Set"; // "null" represents "Not Set".
+                } else {
+                    // Handle enum parameters.
+                    newValue = selectedValue; // Directly use the enum value as the new value.
+                }
+            }
+
+            if (newValue != null) {
+                // Update the parameter value in the map, handling null for "Not Set" boolean values.
+                parameters_val_update.put(parameterName, newValue);
+                print_paramters_val_update_map(parameters_val_update);
+
+                // Validation and feedback logic for JTextField inputs.
+                if (source instanceof JTextField) {
+                    validateTextFieldAndUpdateUI((JTextField) source, parameterName, newValue);
+                } else if (source instanceof JComboBox && newValue != null) {
+                    // For JComboBox, you might want to add additional validation or feedback logic here.
+                    // Note: Since enum and boolean values are straightforward, extensive validation might not be necessary,
+                    // but you can implement any specific logic as needed.
+                }
+
+            }
+        }
+
+        
+        
+        private void validateTextFieldAndUpdateUI(JTextField textField, String parameterName, String newValue) {
+            Pair<String, String> pair = chk_values_map.get(parameterName);
+            if (pair != null) {
+                String min_val = pair.getLeft();
+                String max_val = pair.getRight();
+                try {
+                    BigDecimal newValuen = new BigDecimal(newValue);
+                    BigDecimal min_valn = new BigDecimal(min_val);
+                    BigDecimal max_valn = new BigDecimal(max_val);
+
+                    if (newValuen.compareTo(min_valn) >= 0 && newValuen.compareTo(max_valn) <= 0) {
+                        textField.setBackground(Color.WHITE); // Value within range.
+                    } else {
+                        textField.setBackground(Color.RED); // Value out of range.
+                    }
+                    validateAndDisplayErrors(containerName, parameterName, newValue, min_val, max_val);
+                } catch (NumberFormatException nfe) {
+                    textField.setBackground(Color.RED); // Invalid format.
+                    errorMessages.put(containerName + "." + parameterName, "Invalid format for " + parameterName);
+                    updateLogMessageArea();
+                }
+            }
         }
     }
+    
     private void jTree2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree2MouseClicked
         TreePath clickedPath = jTree2.getPathForLocation(evt.getX(), evt.getY());
         JPanel innerPanel = new JPanel(new GridBagLayout());
@@ -1094,83 +1192,72 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                         ParameterItem param = c.parametersList.get(j);
                         JLabel paramLabel = new JLabel(param.name);
                         paramLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-
-                        JTextField textField = new JTextField();
-                        textField.setPreferredSize(new Dimension(100, 30));
-                        
+                    
                         JPanel targetPanel = (j % 2 == 0) ? innerPanel : innerPanel2;
                         gbc.gridx = 0; // Column for labels
                         targetPanel.add(paramLabel, gbc);
+                    
+                        if (param instanceof IntegerParameter || param instanceof FloatParameter) {
+                            JTextField textField = new JTextField();
+                            textField.setPreferredSize(new Dimension(100, 30));
+                    
+                            // Fetch the updated value if it exists; otherwise, use the default value
+                            String value = parameters_val_update.getOrDefault(param.getName(), 
+                            (param instanceof IntegerParameter) ? String.valueOf(((IntegerParameter) param).getDefaultValue()) :
+                            (param instanceof FloatParameter) ? String.valueOf(((FloatParameter) param).getDefaultValue()) : "");
                         
+                            textField.setText(value);
+                    
+                            textField.addActionListener(new CustomActionListener(c.name, param.getName()));
 
-                        if (param instanceof IntegerParameter) {
-                            IntegerParameter intParam = (IntegerParameter) param;
-                            if (intParam.hasDefaultValue() == true) {
-                                textField.setText(String.valueOf(intParam.getValue()));
-                                parameters_val_update.put(new Pair<>(textField, intParam.getName()), String.valueOf(intParam.getValue()));
-                                textField.addActionListener(new CustomActionListener(intParam.getName()));
-
-                            }
                             gbc.gridx = 1; // Column for text fields
                             targetPanel.add(textField, gbc);
-                        }
-                        else if (param instanceof FloatParameter) {
-                            FloatParameter floatParam = (FloatParameter) param;
-                            if (floatParam.hasDefaultValue() == true) {
-                                textField.setText(String.valueOf(floatParam.getValue()));
-                                parameters_val_update.put(new Pair<>(textField, floatParam.getName()), String.valueOf(floatParam.getValue()));
-                                textField.addActionListener(new CustomActionListener(floatParam.getName()));
 
-                            }
-                            gbc.gridx = 1; // Column for text fields
-                            targetPanel.add(textField, gbc);
-                        }
-                        else if (param instanceof BooleanParameter) {
+                        } else if (param instanceof BooleanParameter) {
+
                             BooleanParameter boolParam = (BooleanParameter) param;
                             String[] items = {"True", "False", "Not Set"};
                             JComboBox<String> comboBox = new JComboBox<>(items);
-                            if (boolParam.hasDefaultValue() ==  true) {
-                                comboBox.setSelectedItem(boolParam.getValue() ? "True" : "False");
-                                parameters_val_update.put(new Pair<>(textField, boolParam.getName()), String.valueOf(boolParam.getValue()));
-                                textField.addActionListener(new CustomActionListener(boolParam.getName()));
-    
+
+                            // Attempt to fetch an updated value for this parameter, if available
+                            String updatedValue = parameters_val_update.get(param.getName());
+                            String selectedValue;
+
+                            if (updatedValue != null) {
+                                // Convert the string representation back to a boolean and then to the corresponding display value
+                                selectedValue = Boolean.parseBoolean(updatedValue) ? "True" : "False";
+                            } else if (boolParam.hasDefaultValue()) {
+                                // Use the default value if no updated value is found
+                                selectedValue = boolParam.getDefaultValue() ? "True" : "False";
                             } else {
-                                comboBox.setSelectedItem("Not Set");
-                                parameters_val_update.put(new Pair<>(textField, boolParam.getName()), String.valueOf(boolParam.getValue()));
-                                textField.addActionListener(new CustomActionListener(boolParam.getName()));
+                                selectedValue = "Not Set";
 
                             }
+                            
+                            comboBox.setSelectedItem(selectedValue);
+                            comboBox.addActionListener(new CustomActionListener(c.name, param.getName()));
                             gbc.gridx = 1;
                             targetPanel.add(comboBox, gbc);
-                        }
-                        else if (param instanceof EnumParameter) {
+                            
+                        
+                        } else if (param instanceof EnumParameter) {
                             EnumParameter enumParam = (EnumParameter) param;
                             String[] items = {"CANNM_PDU_BYTE_0", "CANNM_PDU_BYTE_1", "CANNM_PDU_OFF"};
                             JComboBox<String> comboBox = new JComboBox<>(items);
-                             switch (enumParam.getValue()) {
-                                 case CANNM_PDU_BYTE_0:
-                                     comboBox.setSelectedItem("CANNM_PDU_BYTE_0");
-                                      parameters_val_update.put(new Pair<>(textField, enumParam.getName().toString()), String.valueOf(enumParam.getValue()));
-                                     textField.addActionListener(new CustomActionListener(enumParam.getName()));
-                                     break;
-                                 case CANNM_PDU_BYTE_1 :
-                                     comboBox.setSelectedItem("CANNM_PDU_BYTE_1");
-                                     parameters_val_update.put(new Pair<>(textField, enumParam.getName()), String.valueOf(enumParam.getValue()));
-                                     textField.addActionListener(new CustomActionListener(enumParam.getName()));
-                                     break;
-                                 case CANNM_PDU_OFF :
-                                     comboBox.setSelectedItem("CANNM_PDU_OFF");
-                                     parameters_val_update.put(new Pair<>(textField, enumParam.getName()), String.valueOf(enumParam.getValue()));
-                                     textField.addActionListener(new CustomActionListener(enumParam.getName()));
-                                     break;
+                    
+                            String selectedValue = parameters_val_update.getOrDefault(param.getName(), 
+                            enumParam.getValue().toString());
+                            
+                            comboBox.setSelectedItem(selectedValue);
+                    
+                            comboBox.addActionListener(new CustomActionListener(c.name, param.getName()));
 
-                             }
-                            comboBox.setSelectedItem(enumParam.getValue());
                             gbc.gridx = 1;
                             targetPanel.add(comboBox, gbc);
                         }
                         gbc.gridy++; // Move to the next row for the next set of components
                     }
+                    
                     // Break the loop after finding the matching container
                     break;
                 }
