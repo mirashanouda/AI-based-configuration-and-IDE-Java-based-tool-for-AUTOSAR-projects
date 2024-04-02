@@ -12,18 +12,20 @@ dataset_name = "try_dataset.jsonl"
 
 beginning_english = ""
 beginning_yaml = ""
-beginning = "{\"text\": \"<s>[INST] "
+beginning = "{\"text\": \"<s> [INST] "
 
 beginning_english += "Create a CanNm module with a GlobalConfig container. "
-beginning_yaml += "[/INST] "
+beginning_yaml += " [/INST] "
 beginning_yaml += "\\nModule:"
 beginning_yaml += "\\n\\tName: CanNm"
 beginning_yaml += "\\n\\tContainer:\\n"
 beginning_yaml += base_code.bslashts(2) + "- Name: CanNmGlobalConfig\\n"
 
+files_multiplier = 1
+
 # ------------------------------ Case 1 ------------------------------ 
 with open(dataset_name, "a") as file:
-  num_files = 1000 # number of input/output pairs to generate
+  num_files = files_multiplier * 1000 # number of input/output pairs to generate
   max_rand = 25 # maximum number of subcontainers inside containers
   for _ in range(num_files):
 
@@ -62,7 +64,7 @@ with open(dataset_name, "a") as file:
 
 # ------------------------------ Case 2 ------------------------------ 
 with open(dataset_name, "a") as file:
-  num_files = 2000 # number of input/output pairs to generate
+  num_files = files_multiplier * 2000 # number of input/output pairs to generate
   max_rand = 25 # maximum number of subcontainers inside containers
   for _ in range(num_files):
 
@@ -110,7 +112,7 @@ with open(dataset_name, "a") as file:
 
 # ------------------------------ Case 3 ------------------------------ 
 with open(dataset_name, "a") as file:
-  num_files = 500 # number of input/output pairs to generate
+  num_files = files_multiplier * 500 # number of input/output pairs to generate
   max_rand = 25 # maximum number of subcontainers inside containers
   for _ in range(num_files):
 
@@ -147,7 +149,7 @@ with open(dataset_name, "a") as file:
 
 # ------------------------------ Case 4 ------------------------------ 
 with open(dataset_name, "a") as file:
-  num_files = 500 # number of input/output pairs to generate
+  num_files = files_multiplier * 500 # number of input/output pairs to generate
   max_rand = 25 # maximum number of subcontainers inside containers
   for _ in range(num_files):
 
@@ -184,7 +186,7 @@ with open(dataset_name, "a") as file:
 
 # ------------------------------ Case 5 ------------------------------
 with open(dataset_name, "a") as file:
-  num_files = 500 # number of input/output pairs to generate
+  num_files = files_multiplier * 500 # number of input/output pairs to generate
   max_rand = 25 # maximum number of subcontainers inside containers
   for _ in range(num_files):
 
@@ -231,7 +233,7 @@ with open(dataset_name, "a") as file:
 
 # ------------------------------ Case 6 ------------------------------
 with open(dataset_name, "a") as file:
-  num_files = 500 # number of input/output pairs to generate
+  num_files = files_multiplier * 500 # number of input/output pairs to generate
   max_rand = 25 # maximum number of subcontainers inside containers
   for _ in range(num_files):
 
@@ -280,7 +282,7 @@ with open(dataset_name, "a") as file:
 
 # ------------------------------ Case 11 ------------------------------ 
 with open(dataset_name, "a") as file:
-  num_files = 1000 # number of input/output pairs to generate
+  num_files = files_multiplier * 1000 # number of input/output pairs to generate
   max_rand = 25 # maximum number of subcontainers inside containers
   for _ in range(num_files):
 
@@ -316,7 +318,7 @@ with open(dataset_name, "a") as file:
 
 # ------------------------------ Case 8 ------------------------------ 
 with open(dataset_name, "a") as file:
-  num_files = 1000 # number of input/output pairs to generate
+  num_files = files_multiplier * 1000 # number of input/output pairs to generate
   max_rand = 25 # maximum number of subcontainers inside containers
   for _ in range(num_files):
 
@@ -365,7 +367,7 @@ with open(dataset_name, "a") as file:
 
 # ------------------------------ Case 12 ------------------------------ 
 with open(dataset_name, "a") as file:
-  num_files = 2000 # number of input/output pairs to generate
+  num_files = files_multiplier * 2000 # number of input/output pairs to generate
   max_rand = 25 # maximum number of subcontainers inside containers
   for _ in range(num_files):
 
@@ -424,7 +426,7 @@ with open(dataset_name, "a") as file:
 
 # ------------------------------ Case 9 ------------------------------ 
 with open(dataset_name, "a") as file:
-  num_files = 1000 # number of input/output pairs to generate
+  num_files = files_multiplier * 1000 # number of input/output pairs to generate
   max_rand = 25 # maximum number of subcontainers inside containers
   for _ in range(num_files):
 
@@ -464,7 +466,7 @@ with open(dataset_name, "a") as file:
 
 # ------------------------------ Case 10 ------------------------------ 
 with open(dataset_name, "a") as file:
-  num_files = 2000 # number of input/output pairs to generate
+  num_files = files_multiplier * 2000 # number of input/output pairs to generate
   max_rand = 25 # maximum number of subcontainers inside containers
   for _ in range(num_files):
 
