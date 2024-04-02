@@ -64,7 +64,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     HashMap<String, String> containers_names_ARXML = new HashMap<>();
     HashMap<Pair<ParameterItem,String>, Pair<String, String>> parameters_names_BSWMD = new HashMap<>();
     HashMap<String, Pair<ParameterItem,String>> parameters_names_ARXML = new HashMap<>();
-    
+   
 
     public MainApplication() {
         initComponents();
@@ -211,6 +211,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                 } else {
                      containers_names_ARXML.put(containerName, "1");
                 }
+
                 int idx = ARXMLContainers.size() - 1;
                 ARXMLpar[idx] = parentIndex;
 
@@ -250,6 +251,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         String UUID = ecucContainer.getAttribute("UUID");
         Pair<String, String> pair = new Pair<>((LM), (UM));
         containers_names_BSWMD.put(name, pair);
+
         return new ContainerItem(name, UUID, LM, UM);
     }
 
@@ -306,6 +308,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                     }
                     c.parametersList.add(p);
                     p.container = c;
+
                 }
                 if ("ECUC-FLOAT-PARAM-DEF".equals(destAttribute)) {
                     String name = definitionRefElement.getTextContent();
@@ -339,7 +342,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                     c.parametersList.add(p);
                     p.container = c;
                 }
-                
+
             }
         }
         for (int i = 0; i < TextualVals.getLength(); i++) {
@@ -384,6 +387,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
      * @param type
      * @param c
      */
+
     @Override
     public void processParameters(NodeList paramNodes, String type,ContainerItem c) {
         for (int i = 0; i < paramNodes.getLength(); i++) {
@@ -392,6 +396,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             p.container = c;
             Pair<String, String> pair = new Pair<>(String.valueOf(p.lowerMultiplicity), String.valueOf(p.upperMultiplicity));
             parameters_names_BSWMD.put(new Pair<>(p, p.name), pair);
+
             c.parametersList.add(p);
         }
     }
@@ -461,6 +466,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                     defVal = Float.parseFloat(value);
                 }
                 chk_values_map.put(name, new Pair<>(Float.toString(startRange),Float.toString(endRange)));
+
                 return new FloatParameter(name, UUID, "", Desc, LM, UM, hasDefaultValue, defVal, new Range(startRange, endRange));
             }
             case "BOOLEAN":
@@ -526,6 +532,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         }
     }
 
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -589,6 +596,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                     .addGroup(BjPanelLayout.createSequentialGroup()
                         .addComponent(BComponentName, javax.swing.GroupLayout.PREFERRED_SIZE, 755, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 367, Short.MAX_VALUE))
+
                     .addComponent(BParamsScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
             .addGroup(BjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -596,6 +604,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                     .addContainerGap()
                     .addComponent(BTreeScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addContainerGap(1145, Short.MAX_VALUE)))
+
         );
         BjPanelLayout.setVerticalGroup(
             BjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -704,6 +713,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 1341, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1397, javax.swing.GroupLayout.PREFERRED_SIZE))
+
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -735,6 +745,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             logMessagesTextArea.setText(message + "\n"); // Set new message, overriding existing text
         });
     }
+
     private void jTree1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseClicked
         TreePath clickedPath = jTree1.getPathForLocation(evt.getX(), evt.getY());
         JPanel innerPanel2 = new JPanel(new GridBagLayout());
@@ -1058,7 +1069,11 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             }
            //System.out.println();
         }
-        
+
+        for(ContainerItem c:ARXMLContainers){
+            System.out.println(c.UUID);
+            System.out.println(c.name);
+        }
         // Check if a valid path is clicked
         if (clickedPath != null) {
             // Get the last component of the path (typically a leaf node)
@@ -1094,7 +1109,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                                 textField.setText(String.valueOf(intParam.getValue()));
                                 parameters_val_update.put(new Pair<>(textField, intParam.getName()), String.valueOf(intParam.getValue()));
                                 textField.addActionListener(new CustomActionListener(intParam.getName()));
-                            
+
                             }
                             gbc.gridx = 1; // Column for text fields
                             targetPanel.add(textField, gbc);
@@ -1105,6 +1120,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                                 textField.setText(String.valueOf(floatParam.getValue()));
                                 parameters_val_update.put(new Pair<>(textField, floatParam.getName()), String.valueOf(floatParam.getValue()));
                                 textField.addActionListener(new CustomActionListener(floatParam.getName()));
+
                             }
                             gbc.gridx = 1; // Column for text fields
                             targetPanel.add(textField, gbc);
@@ -1122,6 +1138,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                                 comboBox.setSelectedItem("Not Set");
                                 parameters_val_update.put(new Pair<>(textField, boolParam.getName()), String.valueOf(boolParam.getValue()));
                                 textField.addActionListener(new CustomActionListener(boolParam.getName()));
+
                             }
                             gbc.gridx = 1;
                             targetPanel.add(comboBox, gbc);
@@ -1146,6 +1163,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                                      parameters_val_update.put(new Pair<>(textField, enumParam.getName()), String.valueOf(enumParam.getValue()));
                                      textField.addActionListener(new CustomActionListener(enumParam.getName()));
                                      break;
+
                              }
                             comboBox.setSelectedItem(enumParam.getValue());
                             gbc.gridx = 1;
@@ -1253,7 +1271,6 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             Element containers = doc.createElement("CONTAINERS");
             ecucModuleConfigurationValues.appendChild(containers);
             ARXML_containers_with_no_parent.add(ARXMLContainers.get(0));
-            //System.out.println(ARXMLContainers.get(0).parametersList);
             for(ContainerItem container : ARXMLContainers){
                   //System.out.println(container.name+" "+container.UUID );
                 if(container.UUID == String.valueOf(0)){
@@ -1279,7 +1296,6 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             // Loop through each container to add them to the document
             
             for (ContainerItem container : ARXML_containers_with_no_parent) {
-                //System.out.println(container.name);
                 containers.appendChild(createContainerElement(doc, container));
                 containers.appendChild(ARXML_DFS_Costruct_containers(doc, container));
             }
@@ -1326,7 +1342,6 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         // Adding parameters
         //System.out.println(container);
         for (ParameterItem parameter : container.getParametersList()) {
-            //System.out.println(container.name);
             Element parameterElement = createParameterElement(doc, parameter);
             parameterValues.appendChild(parameterElement);
         }

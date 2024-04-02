@@ -147,6 +147,7 @@ class EnumParameter extends ParameterItem {
         this.value = value;
     }
 }
+
 class Range {
     private float min;
     private float max;
