@@ -98,6 +98,36 @@ def gen_rand_parameter(container_idx):
 
 
 # -------------------------------------------------------------------------
+def gen_rand_parameters(container_idx, num_params):
+  # Returns a list of pairs (param_name, param_value)
+  num_params = int(min(num_params, len(parsing.container_parameters[container_idx])))
+  whole = []
+  for i in range(len(parsing.container_parameters[container_idx])):
+    whole.append(i)
+  
+  # generating a random permutation
+  selected = []
+  back_idx = len(whole) - 1
+  for _ in range(len(whole)):
+    sel_idx = random.randint(0, back_idx)
+    selected.append(whole[sel_idx])
+    
+    # swap(whole[sel_idx], whole[back_idx])
+    temp = whole[sel_idx]
+    whole[sel_idx] = whole[back_idx]
+    whole[back_idx] = temp
+    
+    back_idx -= 1
+    
+  res = []
+  for i in range(num_params):
+    res.append(gen_parameter(container_idx, selected[i]))
+  
+  return res
+# -------------------------------------------------------------------------
+
+
+# -------------------------------------------------------------------------
 container_dict = {} # container_dict[container_name] = container_index
 for i in range(7):
   container_dict.update({str(parsing.container_def[i].name): i})

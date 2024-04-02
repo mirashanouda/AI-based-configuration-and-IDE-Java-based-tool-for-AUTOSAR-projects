@@ -67,7 +67,7 @@ def process_parameter(ecuc_parameter, typ):
     UM = float('inf')
   else:
     UM = ecuc_parameter.find('./UPPER-MULTIPLICITY').text
-  print(def_name, value, data_type, decl_name, is_default, start_range, end_range, LM, UM)
+  #print(def_name, value, data_type, decl_name, is_default, start_range, end_range, LM, UM)
   p = items.parameter_item(def_name, value, data_type, decl_name, is_default, start_range, end_range, LM, UM)
   return p
 
