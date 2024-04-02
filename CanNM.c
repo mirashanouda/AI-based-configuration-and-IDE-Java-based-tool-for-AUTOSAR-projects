@@ -37,6 +37,8 @@ typedef enum {
 	CANNM_UNINIT
 } CanNm_InitStatusType;
 
+// This struct is used to store the internal state of the CanNm individual channels
+// It can't be combined with the CanNmChannelType struct because it is not part of the params and containers. 
 typedef struct {
 	uint8_t						Channel;
 	Nm_ModeType					Mode;					//[SWS_CanNm_00092]
