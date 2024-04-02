@@ -1,3 +1,4 @@
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -10,9 +11,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -38,12 +42,11 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.OutputKeys;
 import javafx.util.Pair; // Import Pair class
-import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import javax.swing.SwingUtilities;
 
 public class MainApplication extends JFrame implements ConfiguratorInterface {
@@ -774,6 +777,43 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
 
         jTabbedPane1.getAccessibleContext().setAccessibleName("BSWMD");
 
+        // Creating the log messages text area
+        logMessagesTextArea = new JTextArea(5, 20); // Suggests height for 5 lines
+        logMessagesTextArea.setEditable(false);
+        logMessagesTextArea.setText("Welcome To Our Program!"); // Set initial message
+        
+        JScrollPane logMessagesScrollPane = new JScrollPane(logMessagesTextArea);
+        logMessagesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
+        // Creating a panel for the log messages
+        JPanel logPanel = new JPanel(new BorderLayout());
+        // Create and add a title label for the log messages panel
+        JLabel logTitleLabel = new JLabel("Log Messages");
+        logTitleLabel.setFont(new Font("Arial", Font.BOLD, 12)); // Set font to Arial, bold, size 12
+        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT)); // A panel to hold the title on the left
+        titlePanel.add(logTitleLabel);
+    
+        logPanel.add(titlePanel, BorderLayout.NORTH); // Adding the title panel at the top of the log panel
+
+        // Adding a border to the logPanel to create a frame around the log messages
+        logPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        logPanel.add(logMessagesScrollPane);
+
+        // Creating a main container panel with BorderLayout
+        JPanel mainPanel = new JPanel(new BorderLayout());
+
+        // Adding jLabel1 at the top of the mainPanel
+        mainPanel.add(jLabel1, BorderLayout.NORTH);
+
+        // Adding the JTabbedPane to the center of mainPanel
+        mainPanel.add(jTabbedPane1, BorderLayout.CENTER);
+
+        // Adding the log messages panel at the bottom of the mainPanel
+        mainPanel.add(logPanel, BorderLayout.SOUTH);
+
+        // Setting the mainPanel as the content pane of the JFrame
+        this.getContentPane().setLayout(new BorderLayout());
+        this.getContentPane().add(mainPanel, BorderLayout.CENTER);
         pack();
     }// </editor-fold>//GEN-END:initComponents
    
