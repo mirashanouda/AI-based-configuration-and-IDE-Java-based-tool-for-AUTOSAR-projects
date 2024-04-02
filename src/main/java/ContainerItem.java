@@ -45,8 +45,14 @@ public class ContainerItem {
     public String getName(){
         return this.name;
     }
-
+    
+    public String getUUID(){
+        return this.UUID;
+    }
+    
     public List<ParameterItem> getParametersList () {
         return parametersList;
     }
+
+
 }
