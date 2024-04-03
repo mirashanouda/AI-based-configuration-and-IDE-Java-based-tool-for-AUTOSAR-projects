@@ -30,20 +30,12 @@
 /*====================================================================================================================*\
     Included Types from ComStack_Types.h [SWS_CanNm_00305]
 \*====================================================================================================================*/
-typedef uint16_t PduIdType;
-typedef uint16_t PduLengthType;
 typedef struct {
 	uint8_t *SduDataPtr;			// payload
-	PduLengthType SduLength;	// length of SDU
+	uint16_t SduLength;				// length of SDU
 } PduInfoType;
 
 typedef uint8_t NetworkHandleType;
-
-
-/*====================================================================================================================*\
-    Included Types from Std_Types.h [SWS_CanNm_00305]
-\*====================================================================================================================*/
-typedef uint8_t Std_ReturnType;
 
 
 /*====================================================================================================================*\
@@ -53,20 +45,20 @@ typedef enum {
 	CANNM_PDU_BYTE_0 = 0x00,
 	CANNM_PDU_BYTE_1 = 0x01,
 	CANNM_PDU_OFF = 0xFF
-} CanNmPduBytePositionType;	//[SWS_CanNm_00074][SWS_CanNm_00075]
+} CanNmPduBytePositionEnum;	//[SWS_CanNm_00074][SWS_CanNm_00075]
 
 typedef struct {
-	PduIdType	 RxPduId;
+	uint16_t	 RxPduId;
 	PduInfoType* RxPduRef;
 } CanNmRxPdu;
 
 typedef struct {
-	PduIdType	 TxConfirmationPduId;
+	uint16_t	 TxConfirmationPduId;
 	PduInfoType* TxPduRef;
 } CanNmTxPdu;
 
 typedef struct {
-	PduIdType	 TxUserDataPduId;
+	uint16_t	 TxUserDataPduId;
 	PduInfoType* TxUserDataPduRef;
 } CanNmUserDataTxPdu;
 
@@ -76,6 +68,12 @@ typedef struct {
 } CanNmPnFilterMaskByte;
 
 typedef struct {
+	// Containers:
+	CanNmUserDataTxPdu*		    UserDataTxPdu;
+	CanNmRxPdu*			    	RxPdu[CANNM_RXPDU_MAX_COUNT];
+	CanNmTxPdu*			    	TxPdu;
+
+	// Parameters:
 	bool						ActiveWakeupBitEnabled;
 	bool						AllNmMessagesKeepAwake;
 	bool 					BusLoadReductionActive;
@@ -92,37 +90,41 @@ typedef struct {
 	bool						NodeDetectionEnabled;
 	uint8_t						NodeId;
 	bool						NodeIdEnabled;
-	CanNmPduBytePositionType	PduCbvPosition;
-	CanNmPduBytePositionType	PduNidPosition;
+	CanNmPduBytePositionEnum	PduCbvPosition;
+	CanNmPduBytePositionEnum	PduNidPosition;
 	bool						PnEnabled;
 	bool						PnEraCalcEnabled;
 	bool						PnHandleMultipleNetworkRequests;
 	float						RemoteSleepIndTime;
 	float						RepeatMessageTime;
 	bool						RepeatMsgIndEnabled;
-	CanNmRxPdu*			    	RxPdu[CANNM_RXPDU_MAX_COUNT];
 	float						TimeoutTime;
-	CanNmTxPdu*			    	TxPdu;
-	CanNmUserDataTxPdu*		    UserDataTxPdu;
 	float						WaitBusSleepTime;
 	NetworkHandleType			ComMNetworkHandleRef;
 	PduInfoType					PnEraRxNSduRef;
-} CanNmChannelType;
+} CanNmChannelConfigType;
 
 typedef struct {
+	// Containers:
+	const CanNmPnFilterMaskByte* 	PnFilterMaskByte;
+	
+	// Parameters:
 	const uint8_t 					PnInfoLength;
 	const uint8_t 					PnInfoOffset;
-	const CanNmPnFilterMaskByte* 	PnFilterMaskByte;
 } CanNmPnInfo;
 
-/** @brief CanNmConfigType [SWS_CanNm_00447]
+/** @brief CanNmGlobalConfigType [SWS_CanNm_00447]
  * 
  * This type shall contain at least all parameters that are post-build able according to chapter 10.
  */
 typedef struct {
+	// Containers:
+	CanNmChannelConfigType*	ChannelConfig[CANNM_CHANNEL_COUNT];
+	CanNmPnInfo*		PnInfo;
+
+	// Parameters:
 	bool				BusLoadReductionEnabled;
 	bool				BusSynchronizationEnabled;
-	CanNmChannelType*	ChannelConfig[CANNM_CHANNEL_COUNT];
 	bool				ComControlEnabled;
 	bool				ComUserDataSupport;
 	bool				CoordinationSyncSupport;
@@ -134,49 +136,89 @@ typedef struct {
 	bool				PassiveModeEnabled;
 	bool				PduRxIndicationEnabled;
 	bool				PnEiraCalcEnabled;
-	CanNmPnInfo*		PnInfo;
 	float				PnResetTime;
 	bool				RemoteSleepIndEnabled;
 	bool				StateChangeIndEnabled;
 	bool				UserDataEnabled;
 	bool				VersionInfoApi;
 	PduInfoType*		PnEiraRxNSduRef;
-} CanNmConfigType;
+} CanNmGlobalConfigType;
+
 
 /*====================================================================================================================*\
-    Global variables export
+    Local types
 \*====================================================================================================================*/
+typedef void (*CanNmTimerCallback)(void* Timer, const uint8_t_t channel);
 
-/*====================================================================================================================*\
-    Global functions declarations
-\*====================================================================================================================*/
+typedef enum {
+	CANNM_TIMER_STOPPED,
+	CANNM_TIMER_STARTED
+} CanNmTimerState;
+
+typedef struct {
+	uint8_t						Channel;				
+	CanNmTimerCallback 	    	ExpiredCallback;
+	CanNmTimerState 			State;
+	float						TimeLeft;
+} CanNm_Timer;
+
+typedef enum {
+	CANNM_INIT,
+	CANNM_UNINIT
+} CanNm_InitStatusType;
+
+// This struct is used to store the internal state of the CanNm individual channels
+// It can't be combined with the CanNmChannelConfigType struct because it is not part of the params and containers. 
+typedef struct {
+	uint8_t						Channel;
+	Nm_ModeType					Mode;					//[SWS_CanNm_00092] // Defined in "NmStack_Types.h"
+	Nm_StateType				State;					//[SWS_CanNm_00089]
+	bool						Requested;
+	bool						TxEnabled;
+	// int8_t						RxLastPdu;
+	CanNm_Timer					TimeoutTimer;			//NM-Timeout Timer, Tx Timeout Timer
+	CanNm_Timer					MessageCycleTimer;
+	CanNm_Timer					RepeatMessageTimer;
+	CanNm_Timer					WaitBusSleepTimer;
+	CanNm_Timer					RemoteSleepIndTimer;
+	uint8_t						ImmediateNmTransmissions;
+	bool						BusLoadReduction;		//[SWS_CanNm_00238]
+	bool						RemoteSleepInd;
+	// bool						RemoteSleepIndEnabled;
+	bool						NmPduFilterAlgorithm;
+} CanNm_Internal_ChannelType;
+
+typedef struct {
+	CanNm_InitStatusType 		InitStatus;
+	CanNm_Internal_ChannelType	Channels[CANNM_CHANNEL_COUNT];
+} CanNm_InternalType;
+
 
 /*====================================================================================================================*\
     Global inline functions and function macros code
 \*====================================================================================================================*/
 void CanNm_Init(const CanNm_ConfigType* cannmConfigPtr);
 void CanNm_DeInit(void);
-Std_ReturnType CanNm_PassiveStartUp(NetworkHandleType nmChannelHandle);
-Std_ReturnType CanNm_NetworkRequest(NetworkHandleType nmChannelHandle);
-Std_ReturnType CanNm_NetworkRelease(NetworkHandleType nmChannelHandle);
-Std_ReturnType CanNm_DisableCommunication(NetworkHandleType nmChannelHandle);
-Std_ReturnType CanNm_EnableCommunication(NetworkHandleType nmChannelHandle);
-Std_ReturnType CanNm_SetUserData(NetworkHandleType nmChannelHandle, const uint8_t* nmUserDataPtr);
-Std_ReturnType CanNm_GetUserData(NetworkHandleType nmChannelHandle, uint8_t* nmUserDataPtr);
-Std_ReturnType CanNm_Transmit(PduIdType TxPduId, const PduInfoType* PduInfoPtr);
-Std_ReturnType CanNm_GetNodeIdentifier(NetworkHandleType nmChannelHandle, uint8_t*nmNodeIdPtr);
-Std_ReturnType CanNm_GetLocalNodeIdentifier(NetworkHandleType nmChannelHandle, uint8_t* nmNodeIdPtr);
-Std_ReturnType CanNm_RepeatMessageRequest(NetworkHandleType nmChannelHandle);
-Std_ReturnType CanNm_GetPduData(NetworkHandleType nmChannelHandle, uint8_t* nmPduDataPtr);
-Std_ReturnType CanNm_GetState(NetworkHandleType nmChannelHandle, Nm_StateType* nmStatePtr, Nm_ModeType* nmModePtr);
-void CanNm_GetVersionInfo(Std_VersionInfoType* versioninfo);
-Std_ReturnType CanNm_RequestBusSynchronization(NetworkHandleType nmChannelHandle);
-Std_ReturnType CanNm_CheckRemoteSleepIndication(NetworkHandleType nmChannelHandle, bool* nmRemoteSleepIndPtr);
-Std_ReturnType CanNm_SetSleepReadyBit(NetworkHandleType nmChannelHandle,bool nmSleepReadyBit);
+uint8_t CanNm_PassiveStartUp(NetworkHandleType nmChannelHandle);
+uint8_t CanNm_NetworkRequest(NetworkHandleType nmChannelHandle); //! [Skipped]
+uint8_t CanNm_NetworkRelease(NetworkHandleType nmChannelHandle);
+uint8_t CanNm_DisableCommunication(NetworkHandleType nmChannelHandle);
+uint8_t CanNm_EnableCommunication(NetworkHandleType nmChannelHandle);
+uint8_t CanNm_SetUserData(NetworkHandleType nmChannelHandle, const uint8_t* nmUserDataPtr);
+uint8_t CanNm_GetUserData(NetworkHandleType nmChannelHandle, uint8_t* nmUserDataPtr);
+uint8_t CanNm_Transmit(uint16_t TxPduId, const PduInfoType* PduInfoPtr);
+uint8_t CanNm_GetNodeIdentifier(NetworkHandleType nmChannelHandle, uint8_t*nmNodeIdPtr);
+uint8_t CanNm_GetLocalNodeIdentifier(NetworkHandleType nmChannelHandle, uint8_t* nmNodeIdPtr);
+uint8_t CanNm_RepeatMessageRequest(NetworkHandleType nmChannelHandle);
+uint8_t CanNm_GetPduData(NetworkHandleType nmChannelHandle, uint8_t* nmPduDataPtr);
+uint8_t CanNm_GetState(NetworkHandleType nmChannelHandle, Nm_StateType* nmStatePtr, Nm_ModeType* nmModePtr);
+uint8_t CanNm_RequestBusSynchronization(NetworkHandleType nmChannelHandle);
+uint8_t CanNm_CheckRemoteSleepIndication(NetworkHandleType nmChannelHandle, bool* nmRemoteSleepIndPtr);
+uint8_t CanNm_SetSleepReadyBit(NetworkHandleType nmChannelHandle,bool nmSleepReadyBit);
 
-void CanNm_TxConfirmation(PduIdType TxPduId, Std_ReturnType result);
-void CanNm_RxIndication(PduIdType RxPduId, const PduInfoType* PduInfoPtr);
+void CanNm_TxConfirmation(uint16_t TxPduId, uint8_t result);
+void CanNm_RxIndication(uint16_t RxPduId, const PduInfoType* PduInfoPtr);//! [Skipped]
 void CanNm_ConfirmPnAvailability(NetworkHandleType nmChannelHandle);
-Std_ReturnType CanNm_TriggerTransmit(PduIdType TxPduId, PduInfoType* PduInfoPtr);
+uint8_t CanNm_TriggerTransmit(uint16_t TxPduId, PduInfoType* PduInfoPtr);
 
 #endif /* CANNM_H */
