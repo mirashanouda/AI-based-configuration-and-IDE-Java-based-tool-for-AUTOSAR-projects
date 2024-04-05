@@ -15,12 +15,14 @@ from transformers import (
 )
 from peft import LoraConfig, PeftModel
 from trl import SFTTrainer
+from sklearn.model_selection import KFold
+import pprint
 
 ############################################# Choose the model name and dataset name #############################################
 
 model_name = "NousResearch/Llama-2-7b-hf"
-dataset_name = "Proofyy/thousand_dataset"
-new_model = "Llama-2-7b-chat-finetune"
+dataset_name = "Proofyy/hopefully_final_dataset"
+new_model = "Llama-2-7b-finetune"
 
 ############################################# Setting the fine-tuning parameters #############################################
 
@@ -46,7 +48,7 @@ bnb_4bit_quant_type = "nf4"
 use_nested_quant = False
 
 # Output directory where the model predictions and checkpoints will be stored
-output_dir = "./results"
+output_dir = "./results_llama"
 
 # Number of training epochs
 num_train_epochs = 1
@@ -128,6 +130,9 @@ if compute_dtype == torch.float16 and use_4bit:
         print("Your GPU supports bfloat16: accelerate training with bf16=True")
         print("=" * 80)
 
+
+file_num = 1
+    
 # Load base model
 model = AutoModelForCausalLM.from_pretrained(
     model_name,
@@ -187,17 +192,20 @@ trainer = SFTTrainer(
 # Train model
 trainer.train()
 
-# Save trained model
-trainer.model.save_pretrained(new_model)
+# Evaluate model on this fold, store or print results
+# eval_results = trainer.evaluate()
 
-#############################################  Testing the model #############################################
+# Define the directories
+base_dir = "pretrained_models"
+sub_dir = new_model
 
-# Ignore warnings
-logging.set_verbosity(logging.CRITICAL)
+# Create the base directory if it doesn't exist
+if not os.path.exists(base_dir):
+    os.makedirs(base_dir)
 
-# Run text generation pipeline with our next model
-prompt = "Use a CanNmGlobalConfig container to create a CanNm module. Make 77 CanNmChannelConfig containers inside the CanNmGlobalConfig container. Put 66 as the value of CanNmCarWakeUpFilterNodeId in each of these containers.."
-pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=200)
-result = pipe(f"<s>[INST] {prompt} [/INST]")
-with open("output.yaml", "w") as f:
-    f.write(result[0]['generated_text'])
+# Create the subdirectory inside the base directory if it doesn't exist
+full_path = os.path.join(base_dir, sub_dir)
+if not os.path.exists(full_path):
+    os.makedirs(full_path)
+# Save the model for each fold if needed
+trainer.model.save_pretrained(full_path)
