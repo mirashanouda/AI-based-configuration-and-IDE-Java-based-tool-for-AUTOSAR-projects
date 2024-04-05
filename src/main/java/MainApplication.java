@@ -59,7 +59,6 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     DefaultTreeModel BSWMDTree;
     DefaultTreeModel ARXMLTree;
     static final int maxNodes = 100000;
-    private JTextArea logMessagesTextArea;
     private Map<String, String> errorMessages = new HashMap<>();
 
     static List<ContainerItem> BSWMDContainers = new ArrayList<>();
@@ -124,7 +123,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         AComponentName.setText("Can Network Manager");
         ARXMLConstructor();
         
-        generateArxml(FilePath);
+//        generateArxml(FilePath);
     }
 
     @Override
@@ -607,6 +606,11 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         AParamScrollPane2 = new javax.swing.JScrollPane();
         AParamPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        logPanel = new javax.swing.JPanel();
+        titlePanel = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        logMessagesTextArea = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setAlwaysOnTop(true);
@@ -647,18 +651,14 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             .addGroup(BjPanelLayout.createSequentialGroup()
                 .addGap(269, 269, 269)
                 .addGroup(BjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(BjPanelLayout.createSequentialGroup()
-                        .addComponent(BComponentName, javax.swing.GroupLayout.PREFERRED_SIZE, 755, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 367, Short.MAX_VALUE))
-
-                    .addComponent(BParamsScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addContainerGap())
+                    .addComponent(BComponentName, javax.swing.GroupLayout.PREFERRED_SIZE, 755, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(BParamsScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 1075, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(BjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(BjPanelLayout.createSequentialGroup()
                     .addContainerGap()
                     .addComponent(BTreeScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(1145, Short.MAX_VALUE)))
-
+                    .addContainerGap(1098, Short.MAX_VALUE)))
         );
         BjPanelLayout.setVerticalGroup(
             BjPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -758,6 +758,44 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("AUTOSAR Configurator");
 
+        jButton1.setBackground(new java.awt.Color(0, 255, 51));
+        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jButton1.setForeground(new java.awt.Color(0, 0, 0));
+        jButton1.setText("Extract ARXML");
+        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton1MouseClicked(evt);
+            }
+        });
+
+        titlePanel.setText("Log Messages");
+
+        logMessagesTextArea.setColumns(20);
+        logMessagesTextArea.setRows(5);
+        jScrollPane1.setViewportView(logMessagesTextArea);
+
+        javax.swing.GroupLayout logPanelLayout = new javax.swing.GroupLayout(logPanel);
+        logPanel.setLayout(logPanelLayout);
+        logPanelLayout.setHorizontalGroup(
+            logPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(logPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(logPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(logPanelLayout.createSequentialGroup()
+                        .addComponent(titlePanel, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addContainerGap())
+        );
+        logPanelLayout.setVerticalGroup(
+            logPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(logPanelLayout.createSequentialGroup()
+                .addComponent(titlePanel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 79, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -765,59 +803,34 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 1341, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1397, javax.swing.GroupLayout.PREFERRED_SIZE))
-
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(269, 269, 269)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 734, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(211, 211, 211)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1348, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(logPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(0, 12, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(76, 76, 76))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(logPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jTabbedPane1.getAccessibleContext().setAccessibleName("BSWMD");
 
-        // Creating the log messages text area
-        logMessagesTextArea = new JTextArea(5, 20); // Suggests height for 5 lines
-        logMessagesTextArea.setEditable(false);
-        logMessagesTextArea.setText("Welcome To Our Program!"); // Set initial message
-        
-        JScrollPane logMessagesScrollPane = new JScrollPane(logMessagesTextArea);
-        logMessagesScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-
-        // Creating a panel for the log messages
-        JPanel logPanel = new JPanel(new BorderLayout());
-        // Create and add a title label for the log messages panel
-        JLabel logTitleLabel = new JLabel("Log Messages");
-        logTitleLabel.setFont(new Font("Arial", Font.BOLD, 12)); // Set font to Arial, bold, size 12
-        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT)); // A panel to hold the title on the left
-        titlePanel.add(logTitleLabel);
-    
-        logPanel.add(titlePanel, BorderLayout.NORTH); // Adding the title panel at the top of the log panel
-
-        // Adding a border to the logPanel to create a frame around the log messages
-        logPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        logPanel.add(logMessagesScrollPane);
-
-        // Creating a main container panel with BorderLayout
-        JPanel mainPanel = new JPanel(new BorderLayout());
-
-        // Adding jLabel1 at the top of the mainPanel
-        mainPanel.add(jLabel1, BorderLayout.NORTH);
-
-        // Adding the JTabbedPane to the center of mainPanel
-        mainPanel.add(jTabbedPane1, BorderLayout.CENTER);
-
-        // Adding the log messages panel at the bottom of the mainPanel
-        mainPanel.add(logPanel, BorderLayout.SOUTH);
-
-        // Setting the mainPanel as the content pane of the JFrame
-        this.getContentPane().setLayout(new BorderLayout());
-        this.getContentPane().add(mainPanel, BorderLayout.CENTER);
         pack();
     }// </editor-fold>//GEN-END:initComponents
    
@@ -1317,11 +1330,15 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             }   
         }
 
-        generateArxml(FilePath);
+//        generateArxml(FilePath);
 
         
         
     }//GEN-LAST:event_jTree2MouseClicked
+
+    private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
+        generateArxml(FilePath);
+    }//GEN-LAST:event_jButton1MouseClicked
 
     public static void main(String args[]) {
         try {
@@ -1567,10 +1584,15 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     private javax.swing.JScrollPane BParamsScrollPane;
     private javax.swing.JScrollPane BTreeScrollPane;
     private javax.swing.JPanel BjPanel;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTree jTree1;
     private javax.swing.JTree jTree2;
+    private javax.swing.JTextArea logMessagesTextArea;
+    private javax.swing.JPanel logPanel;
+    private javax.swing.JLabel titlePanel;
     // End of variables declaration//GEN-END:variables
 
 //    @Override
