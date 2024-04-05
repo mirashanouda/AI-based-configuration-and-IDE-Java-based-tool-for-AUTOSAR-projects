@@ -57,7 +57,7 @@ static inline void CanNm_Internal_RemoteSleepIndTimerExpiredCallback( void* Time
 
 /* State Machine functions */
 static inline void CanNm_Internal_BusSleep_to_BusSleep( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
-static inline void 	 CanNm_Internal_BusSleep_to_RepeatMessage( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
+static inline void CanNm_Internal_BusSleep_to_RepeatMessage( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
 static inline void CanNm_Internal_RepeatMessage_to_RepeatMessage( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
 static inline void CanNm_Internal_RepeatMessage_to_ReadySleep( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
 static inline void CanNm_Internal_RepeatMessage_to_NormalOperation( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
