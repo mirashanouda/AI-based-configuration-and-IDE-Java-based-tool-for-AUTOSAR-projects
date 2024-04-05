@@ -770,9 +770,17 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                 jButton1MouseClicked(evt);
             }
         });
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
+        titlePanel.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         titlePanel.setText("Log Messages");
 
+        logMessagesTextArea.setEditable(false);
+        logMessagesTextArea.setBackground(new java.awt.Color(255, 255, 255));
         logMessagesTextArea.setColumns(20);
         logMessagesTextArea.setRows(5);
         jScrollPane1.setViewportView(logMessagesTextArea);
@@ -1025,7 +1033,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         BigDecimal max_valn = new BigDecimal(max_val);
         if(newValuen.compareTo(max_valn) <= 0 && newValuen.compareTo(min_valn) >= 0) {
             // If value is correct, remove any error for this parameter and reset background
-            errorMessages.remove(parameterName);
+            errorMessages.remove(containerName + "." + parameterName);
         } else {
             // If value is incorrect, update error message and set background to red
             errorMessages.put(containerName + "." + parameterName, 
@@ -1346,7 +1354,11 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     }//GEN-LAST:event_jTree2MouseClicked
 
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
+    if (errorMessages.isEmpty()) {
         generateArxml(FilePath);
+    } else {
+        appendLogMessage("Cannot extract ARXML file before getting valid arguments/values.");
+    }
     }//GEN-LAST:event_jButton1MouseClicked
 
     private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
@@ -1365,13 +1377,21 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             int exitCode = p.waitFor();
             if (exitCode == 0) {
                 System.out.println("Script executed successfully.");
+                appendLogMessage("Script executed successfully.");
+                appendLogMessage("C and H Files Generated From output.arxml.");
+                
             } else {
                 System.out.println("Script execution failed.");
+                appendLogMessage("Script execution failed./n");
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
     }
     }//GEN-LAST:event_jButton2MouseClicked
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     public static void main(String args[]) {
         try {
@@ -1509,6 +1529,8 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             transformer.transform(source, result);
 
             System.out.println("ARXML file has been generated at: " + filePath);
+            appendLogMessage("ARXML file has been generated at: " + filePath);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
