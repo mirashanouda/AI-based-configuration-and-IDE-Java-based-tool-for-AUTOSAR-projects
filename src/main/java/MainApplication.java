@@ -46,7 +46,11 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.math.BigDecimal;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 public class MainApplication extends JFrame implements ConfiguratorInterface {
@@ -70,8 +74,8 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     HashMap<String, String> containers_names_ARXML = new HashMap<>();
     HashMap<Pair<ParameterItem,String>, Pair<String, String>> parameters_names_BSWMD = new HashMap<>();
     HashMap<String, Pair<ParameterItem,String>> parameters_names_ARXML = new HashMap<>();
-   
-
+   String FilePath="output.arxml";
+  
 
     // Method to validate XML (Part 1 of validating)
     private void validateXMLFile(String filePath) {
@@ -119,7 +123,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         DSWMDConstructor();
         AComponentName.setText("Can Network Manager");
         ARXMLConstructor();
-        String FilePath="output.arxml";
+        
         generateArxml(FilePath);
     }
 
@@ -1143,7 +1147,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             if (newValue != null) {
                 // Update the parameter value in the map, handling null for "Not Set" boolean values.
                 parameters_val_update.put(parameterName, newValue);
-                print_paramters_val_update_map(parameters_val_update);
+                ///print_paramters_val_update_map(parameters_val_update);
 
                 // Validation and feedback logic for JTextField inputs.
                 if (source instanceof JTextField) {
@@ -1247,7 +1251,15 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             (param instanceof FloatParameter) ? String.valueOf(((FloatParameter) param).getDefaultValue()) : "");
                         
                             textField.setText(value);
-                    
+                            ParameterItem parameterToUpdate = c.parametersList.get(j);
+                            // Update the parameter object in the list
+                            if (parameterToUpdate instanceof IntegerParameter) {
+                                ((IntegerParameter) parameterToUpdate).setValue(Integer.parseInt(value));
+                            } else if (parameterToUpdate instanceof FloatParameter) {
+                                ((FloatParameter) parameterToUpdate).setValue(Float.parseFloat(value));
+                            }
+                            
+                            
                             textField.addActionListener(new CustomActionListener(c.name, param.getName()));
 
                             gbc.gridx = 1; // Column for text fields
@@ -1256,6 +1268,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                         } else if (param instanceof BooleanParameter) {
 
                             BooleanParameter boolParam = (BooleanParameter) param;
+                           
                             String[] items = {"True", "False", "Not Set"};
                             JComboBox<String> comboBox = new JComboBox<>(items);
 
@@ -1289,7 +1302,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             enumParam.getValue().toString());
                             
                             comboBox.setSelectedItem(selectedValue);
-                    
+                            
                             comboBox.addActionListener(new CustomActionListener(c.name, param.getName()));
 
                             gbc.gridx = 1;
@@ -1303,6 +1316,11 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                 }
             }   
         }
+
+        generateArxml(FilePath);
+
+        
+        
     }//GEN-LAST:event_jTree2MouseClicked
 
     public static void main(String args[]) {
