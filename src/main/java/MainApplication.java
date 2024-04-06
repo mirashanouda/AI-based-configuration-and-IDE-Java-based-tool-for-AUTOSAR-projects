@@ -1150,12 +1150,13 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
 
 
     private class CustomActionListener implements ActionListener { // for chnging values in arxml 
+        private int index;
+        private ContainerItem c;
         private String parameterName;
-        private String containerName;
-
-        public CustomActionListener(String containerName, String parameterName) {
+        public CustomActionListener(int index, ContainerItem c, String parameterName) {
+            this.index = index;
+            this.c = c;
             this.parameterName = parameterName;
-            this.containerName = containerName;
         }
 
        
@@ -1165,6 +1166,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             Object source = e.getSource();
             String newValue = null;
 
+            // Reading the entered value
             if (source instanceof JTextField) {
                 JTextField textField = (JTextField) source;
                 newValue = textField.getText();
@@ -1176,7 +1178,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                 // Determine if the parameter is boolean or enum based on the items in the JComboBox
                 if (comboBox.getItemCount() > 0 && ("True".equals(comboBox.getItemAt(0)) || "False".equals(comboBox.getItemAt(0)) || "Not Set".equals(comboBox.getItemAt(0)))) {
                     // Handle boolean parameters, including "Not Set" as a possible value.
-                    newValue = "True".equals(selectedValue) ? "true" : "False".equals(selectedValue) ? "false" : "Not Set"; // "null" represents "Not Set".
+                    newValue = "True".equals(selectedValue) ? "True" : "False".equals(selectedValue) ? "False" : "Not Set"; 
                 } else {
                     // Handle enum parameters.
                     newValue = selectedValue; // Directly use the enum value as the new value.
@@ -1184,14 +1186,28 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             }
 
             if (newValue != null) {
-                // Update the parameter value in the map, handling null for "Not Set" boolean values.
+                // Here, we update the parameters with the new values
+                // WHETHER IT'S RIGHT OR WRONG. DOESN'T MATTER FOR NOW
+                // Cause when generating ARXML, we check over the error messages first
                 parameters_val_update.put(parameterName, newValue);
-                ///print_paramters_val_update_map(parameters_val_update);
+                ParameterItem parameterToUpdate = c.parametersList.get(index);
+                if (parameterToUpdate instanceof IntegerParameter) {
+                    ((IntegerParameter) parameterToUpdate).setValue(Integer.parseInt(newValue));
+                } else if (parameterToUpdate instanceof FloatParameter) {
+                    ((FloatParameter) parameterToUpdate).setValue(Float.parseFloat(newValue));
+                } else if (parameterToUpdate instanceof BooleanParameter) {
+                    ((BooleanParameter) parameterToUpdate).setValue(Boolean.parseBoolean(newValue));
+                } else if (parameterToUpdate instanceof EnumParameter) {
+                    EnumValue enumValue = Enum.valueOf(EnumValue.class, newValue);
+                    ((EnumParameter) parameterToUpdate).setValue(enumValue);                                
+                }
+
+                            
 
                 // Validation and feedback logic for JTextField inputs.
                 if (source instanceof JTextField) {
                     validateTextFieldAndUpdateUI((JTextField) source, parameterName, newValue);
-                } else if (source instanceof JComboBox && newValue != null) {
+                } else if (source instanceof JComboBox) {
                     // For JComboBox, you might want to add additional validation or feedback logic here.
                     // Note: Since enum and boolean values are straightforward, extensive validation might not be necessary,
                     // but you can implement any specific logic as needed.
@@ -1217,10 +1233,10 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                     } else {
                         textField.setBackground(Color.RED); // Value out of range.
                     }
-                    validateAndDisplayErrors(containerName, parameterName, newValue, min_val, max_val);
+                    validateAndDisplayErrors(c.name, parameterName, newValue, min_val, max_val);
                 } catch (NumberFormatException nfe) {
                     textField.setBackground(Color.RED); // Invalid format.
-                    errorMessages.put(containerName + "." + parameterName, "Invalid format for " + parameterName);
+                    errorMessages.put(c.name + "." + parameterName, "Invalid format for " + parameterName);
                     updateLogMessageArea();
                 }
             }
@@ -1290,8 +1306,8 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             (param instanceof FloatParameter) ? String.valueOf(((FloatParameter) param).getDefaultValue()) : "");
                         
                             textField.setText(value);
-                            
-                            textField.addActionListener(new CustomActionListener(c.name, param.getName()));
+                                         
+                            textField.addActionListener(new CustomActionListener(j ,c, param.getName()));
                             gbc.gridx = 1; // Column for text fields
                             targetPanel.add(textField, gbc);
 
@@ -1307,8 +1323,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             String selectedValue;
 
                             if (updatedValue != null) {
-                                // Convert the string representation back to a boolean and then to the corresponding display value
-                                selectedValue = Boolean.parseBoolean(updatedValue) ? "True" : "False";
+                                selectedValue = updatedValue;
                             } else if (boolParam.hasDefaultValue()) {
                                 // Use the default value if no updated value is found
                                 selectedValue = boolParam.getDefaultValue() ? "True" : "False";
@@ -1318,7 +1333,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             }
                             
                             comboBox.setSelectedItem(selectedValue);
-                            comboBox.addActionListener(new CustomActionListener(c.name, param.getName()));
+                            comboBox.addActionListener(new CustomActionListener(j, c, param.getName()));
                             gbc.gridx = 1;
                             targetPanel.add(comboBox, gbc);
                             
@@ -1333,7 +1348,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             
                             comboBox.setSelectedItem(selectedValue);
                             
-                            comboBox.addActionListener(new CustomActionListener(c.name, param.getName()));
+                            comboBox.addActionListener(new CustomActionListener(j, c, param.getName()));
 
                             gbc.gridx = 1;
                             targetPanel.add(comboBox, gbc);
