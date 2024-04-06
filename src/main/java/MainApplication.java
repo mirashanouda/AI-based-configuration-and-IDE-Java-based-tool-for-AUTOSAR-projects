@@ -52,6 +52,9 @@ import java.math.BigDecimal;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
 
 public class MainApplication extends JFrame implements ConfiguratorInterface {
 
@@ -78,7 +81,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
 
     // Method to validate XML (Part 1 of validating)
     private void validateXMLFile(String filePath) {
-        appendLogMessage("\nCompiling input ARXML File...");
+        appendLogMessage("Compiling input ARXML File...");
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
@@ -611,6 +614,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         titlePanel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         logMessagesTextArea = new javax.swing.JTextArea();
+        jButton2 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setAlwaysOnTop(true);
@@ -758,18 +762,25 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("AUTOSAR Configurator");
 
-        jButton1.setBackground(new java.awt.Color(0, 255, 51));
+        jButton1.setBackground(new java.awt.Color(153, 255, 153));
         jButton1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(0, 0, 0));
         jButton1.setText("Extract ARXML");
         jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jButton1MouseClicked(evt);
             }
         });
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
+        titlePanel.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         titlePanel.setText("Log Messages");
 
+        logMessagesTextArea.setEditable(false);
+        logMessagesTextArea.setBackground(new java.awt.Color(255, 255, 255));
         logMessagesTextArea.setColumns(20);
         logMessagesTextArea.setRows(5);
         jScrollPane1.setViewportView(logMessagesTextArea);
@@ -792,9 +803,18 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             .addGroup(logPanelLayout.createSequentialGroup()
                 .addComponent(titlePanel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 79, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
                 .addContainerGap())
         );
+
+        jButton2.setBackground(new java.awt.Color(255, 153, 153));
+        jButton2.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jButton2.setText("Generate C & H");
+        jButton2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton2MouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -804,27 +824,33 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(269, 269, 269)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 734, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(211, 211, 211)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1348, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(logPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(269, 269, 269)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 734, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
+                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(22, 22, 22))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 12, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 4, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton2)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(logPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
@@ -1007,7 +1033,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         BigDecimal max_valn = new BigDecimal(max_val);
         if(newValuen.compareTo(max_valn) <= 0 && newValuen.compareTo(min_valn) >= 0) {
             // If value is correct, remove any error for this parameter and reset background
-            errorMessages.remove(parameterName);
+            errorMessages.remove(containerName + "." + parameterName);
         } else {
             // If value is incorrect, update error message and set background to red
             errorMessages.put(containerName + "." + parameterName, 
@@ -1124,12 +1150,13 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
 
 
     private class CustomActionListener implements ActionListener { // for chnging values in arxml 
+        private int index;
+        private ContainerItem c;
         private String parameterName;
-        private String containerName;
-
-        public CustomActionListener(String containerName, String parameterName) {
+        public CustomActionListener(int index, ContainerItem c, String parameterName) {
+            this.index = index;
+            this.c = c;
             this.parameterName = parameterName;
-            this.containerName = containerName;
         }
 
        
@@ -1139,6 +1166,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             Object source = e.getSource();
             String newValue = null;
 
+            // Reading the entered value
             if (source instanceof JTextField) {
                 JTextField textField = (JTextField) source;
                 newValue = textField.getText();
@@ -1150,7 +1178,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                 // Determine if the parameter is boolean or enum based on the items in the JComboBox
                 if (comboBox.getItemCount() > 0 && ("True".equals(comboBox.getItemAt(0)) || "False".equals(comboBox.getItemAt(0)) || "Not Set".equals(comboBox.getItemAt(0)))) {
                     // Handle boolean parameters, including "Not Set" as a possible value.
-                    newValue = "True".equals(selectedValue) ? "true" : "False".equals(selectedValue) ? "false" : "Not Set"; // "null" represents "Not Set".
+                    newValue = "True".equals(selectedValue) ? "True" : "False".equals(selectedValue) ? "False" : "Not Set"; 
                 } else {
                     // Handle enum parameters.
                     newValue = selectedValue; // Directly use the enum value as the new value.
@@ -1158,14 +1186,28 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             }
 
             if (newValue != null) {
-                // Update the parameter value in the map, handling null for "Not Set" boolean values.
+                // Here, we update the parameters with the new values
+                // WHETHER IT'S RIGHT OR WRONG. DOESN'T MATTER FOR NOW
+                // Cause when generating ARXML, we check over the error messages first
                 parameters_val_update.put(parameterName, newValue);
-                ///print_paramters_val_update_map(parameters_val_update);
+                ParameterItem parameterToUpdate = c.parametersList.get(index);
+                if (parameterToUpdate instanceof IntegerParameter) {
+                    ((IntegerParameter) parameterToUpdate).setValue(Integer.parseInt(newValue));
+                } else if (parameterToUpdate instanceof FloatParameter) {
+                    ((FloatParameter) parameterToUpdate).setValue(Float.parseFloat(newValue));
+                } else if (parameterToUpdate instanceof BooleanParameter) {
+                    ((BooleanParameter) parameterToUpdate).setValue(Boolean.parseBoolean(newValue));
+                } else if (parameterToUpdate instanceof EnumParameter) {
+                    EnumValue enumValue = Enum.valueOf(EnumValue.class, newValue);
+                    ((EnumParameter) parameterToUpdate).setValue(enumValue);                                
+                }
+
+                            
 
                 // Validation and feedback logic for JTextField inputs.
                 if (source instanceof JTextField) {
                     validateTextFieldAndUpdateUI((JTextField) source, parameterName, newValue);
-                } else if (source instanceof JComboBox && newValue != null) {
+                } else if (source instanceof JComboBox) {
                     // For JComboBox, you might want to add additional validation or feedback logic here.
                     // Note: Since enum and boolean values are straightforward, extensive validation might not be necessary,
                     // but you can implement any specific logic as needed.
@@ -1191,10 +1233,10 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                     } else {
                         textField.setBackground(Color.RED); // Value out of range.
                     }
-                    validateAndDisplayErrors(containerName, parameterName, newValue, min_val, max_val);
+                    validateAndDisplayErrors(c.name, parameterName, newValue, min_val, max_val);
                 } catch (NumberFormatException nfe) {
                     textField.setBackground(Color.RED); // Invalid format.
-                    errorMessages.put(containerName + "." + parameterName, "Invalid format for " + parameterName);
+                    errorMessages.put(c.name + "." + parameterName, "Invalid format for " + parameterName);
                     updateLogMessageArea();
                 }
             }
@@ -1264,17 +1306,8 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             (param instanceof FloatParameter) ? String.valueOf(((FloatParameter) param).getDefaultValue()) : "");
                         
                             textField.setText(value);
-                            ParameterItem parameterToUpdate = c.parametersList.get(j);
-                            // Update the parameter object in the list
-                            if (parameterToUpdate instanceof IntegerParameter) {
-                                ((IntegerParameter) parameterToUpdate).setValue(Integer.parseInt(value));
-                            } else if (parameterToUpdate instanceof FloatParameter) {
-                                ((FloatParameter) parameterToUpdate).setValue(Float.parseFloat(value));
-                            }
-                            
-                            
-                            textField.addActionListener(new CustomActionListener(c.name, param.getName()));
-
+                                         
+                            textField.addActionListener(new CustomActionListener(j ,c, param.getName()));
                             gbc.gridx = 1; // Column for text fields
                             targetPanel.add(textField, gbc);
 
@@ -1290,8 +1323,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             String selectedValue;
 
                             if (updatedValue != null) {
-                                // Convert the string representation back to a boolean and then to the corresponding display value
-                                selectedValue = Boolean.parseBoolean(updatedValue) ? "True" : "False";
+                                selectedValue = updatedValue;
                             } else if (boolParam.hasDefaultValue()) {
                                 // Use the default value if no updated value is found
                                 selectedValue = boolParam.getDefaultValue() ? "True" : "False";
@@ -1301,7 +1333,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             }
                             
                             comboBox.setSelectedItem(selectedValue);
-                            comboBox.addActionListener(new CustomActionListener(c.name, param.getName()));
+                            comboBox.addActionListener(new CustomActionListener(j, c, param.getName()));
                             gbc.gridx = 1;
                             targetPanel.add(comboBox, gbc);
                             
@@ -1316,7 +1348,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             
                             comboBox.setSelectedItem(selectedValue);
                             
-                            comboBox.addActionListener(new CustomActionListener(c.name, param.getName()));
+                            comboBox.addActionListener(new CustomActionListener(j, c, param.getName()));
 
                             gbc.gridx = 1;
                             targetPanel.add(comboBox, gbc);
@@ -1337,8 +1369,44 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     }//GEN-LAST:event_jTree2MouseClicked
 
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
+    if (errorMessages.isEmpty()) {
         generateArxml(FilePath);
+    } else {
+        appendLogMessage("Cannot extract ARXML file before getting valid arguments/values.");
+    }
     }//GEN-LAST:event_jButton1MouseClicked
+
+    private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
+        try {
+            String pythonScriptPath = "../../python_script.py"; // Replace with the actual script path
+            ProcessBuilder pb = new ProcessBuilder("python", pythonScriptPath);
+            Process p = pb.start();
+
+            // If you want to capture the Python script's output
+            BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String line;
+            while ((line = in.readLine()) != null) {
+                System.out.println(line);
+            }
+
+            int exitCode = p.waitFor();
+            if (exitCode == 0) {
+                System.out.println("Script executed successfully.");
+                appendLogMessage("Script executed successfully.");
+                appendLogMessage("C and H Files Generated From output.arxml.");
+                
+            } else {
+                System.out.println("Script execution failed.");
+                appendLogMessage("Script execution failed./n");
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+    }
+    }//GEN-LAST:event_jButton2MouseClicked
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     public static void main(String args[]) {
         try {
@@ -1476,6 +1544,8 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             transformer.transform(source, result);
 
             System.out.println("ARXML file has been generated at: " + filePath);
+            appendLogMessage("ARXML file has been generated at: " + filePath);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1585,6 +1655,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     private javax.swing.JScrollPane BTreeScrollPane;
     private javax.swing.JPanel BjPanel;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;

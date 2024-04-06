@@ -6,10 +6,12 @@ MainApplication.class
 ConfiguratorInterface.class
 ParameterItem.class
 WrapTextPane$WrapLabelView.class
+MainApplication$7.class
 ContainerItem.class
 WrapTextPane$WrapColumnFactory.class
 MainApplication$1.class
 WrapTextPane$WrapEditorKit.class
+MainApplication$6.class
 MainApplication$CustomActionListener.class
 WrapTextPane.class
 MainApplication$3.class
