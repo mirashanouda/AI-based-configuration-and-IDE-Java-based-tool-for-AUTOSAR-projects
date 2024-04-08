@@ -1,0 +1,21 @@
+
+Module:
+    Name: CanNm
+    Container:
+        - Name: CanNmGlobalConfig
+        - Parameter:
+            Name: CanNmStateChangeIndEnabled
+            Value: False
+        - Container:
+            - Name: CanNmChannelConfig
+            - Multiplicity: 23
+            - Parameter:
+                Name: CanNmCarWakeUpRxEnabled
+                Value: False
+            - Container:
+                - Name: CanNmRxPdu
+                - Multiplicity: 24
+                - Parameter:
+                    Name: CanNmRxPduId
+                    Value: 13424
+
