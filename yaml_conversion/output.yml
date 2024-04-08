@@ -4,18 +4,17 @@ Module:
     Container:
         - Name: CanNmGlobalConfig
         - Parameter:
-            Name: CanNmStateChangeIndEnabled
-            Value: False
+            Name: CanNmMainFunctionPeriod
+            Value: 38.504
         - Container:
             - Name: CanNmChannelConfig
             - Multiplicity: 23
             - Parameter:
-                Name: CanNmCarWakeUpRxEnabled
-                Value: False
+                Name: CanNmWaitBusSleepTime
+                Value: 25.023
             - Container:
                 - Name: CanNmRxPdu
-                - Multiplicity: 24
+                - Multiplicity: 18
                 - Parameter:
                     Name: CanNmRxPduId
-                    Value: 13424
-
+                    Value: 35050

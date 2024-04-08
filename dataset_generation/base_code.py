@@ -13,25 +13,12 @@ cwd = go_back(cwd)
 cwd += '/global_dependencies'
 sys.path.insert(0, cwd)
 import items
+import global_vars
 
 cwd = go_back(cwd)
 cwd += '/parsing'
 sys.path.insert(0, cwd)
 import parsing
-
-
-# -------------------------------------------------------------------------
-enumer_value = ['CANNM_PDU_BYTE_0', 'CANNM_PDU_BYTE_1', 'CANMN_PDU_OFF']
-def get_default_value(partype):
-  if partype == 'INTEGER':
-    return 0
-  elif partype == 'FLOAT':
-    return 0
-  elif partype == 'BOOLEAN':
-    return "False"
-  elif partype == 'ENUMERATION':
-    return enumer_value[0]
-# -------------------------------------------------------------------------
 
 # -------------------------------------------------------------------------
 def bslashts(num):
@@ -41,13 +28,13 @@ def bslashts(num):
   return res
 # -------------------------------------------------------------------------
 
-
+enumer_value = ['CANNM_PDU_BYTE_0', 'CANNM_PDU_BYTE_1', 'CANMN_PDU_OFF']
 # -------------------------------------------------------------------------
 def gen_parameter(container_idx, parameter_idx): # Returns a pair (param_name, param_value) given the parameter index
   param_name = ""
   param_value = ""
 
-  param = parsing.container_parameters[container_idx][parameter_idx]
+  param = global_vars.container_parameters[container_idx][parameter_idx]
   
   if str(param.data_type) == 'INTEGER':
       res_value = random.randint(int(param.start_range), int(param.end_range))
@@ -82,7 +69,7 @@ def gen_parameter(container_idx, parameter_idx): # Returns a pair (param_name, p
 # -------------------------------------------------------------------------
 def gen_rand_parameter(container_idx): 
   # Returns a pair (param_name, param_value)
-  selected = int(random.randint(0, len(parsing.container_parameters[container_idx]) - 1))
+  selected = int(random.randint(0, len(global_vars.container_parameters[container_idx]) - 1))
   return gen_parameter(container_idx, selected)
 # -------------------------------------------------------------------------
 
@@ -90,9 +77,9 @@ def gen_rand_parameter(container_idx):
 # -------------------------------------------------------------------------
 def gen_rand_parameters(container_idx, num_params):
   # Returns a list of pairs (param_name, param_value)
-  num_params = int(min(num_params, len(parsing.container_parameters[container_idx])))
+  num_params = int(min(num_params, len(global_vars.container_parameters[container_idx])))
   whole = []
-  for i in range(len(parsing.container_parameters[container_idx])):
+  for i in range(len(global_vars.container_parameters[container_idx])):
     whole.append(i)
   
   # generating a random permutation
@@ -118,9 +105,9 @@ def gen_rand_parameters(container_idx, num_params):
 
 
 # -------------------------------------------------------------------------
-container_dict = {} # container_dict[container_name] = container_index
+global_vars.container_dict = {} # container_dict[container_name] = container_index
 for i in range(7):
-  container_dict.update({str(parsing.container_def[i].name): i})
+  global_vars.container_dict.update({str(global_vars.container_def[i].name): i})
 # -------------------------------------------------------------------------
 
 
@@ -130,14 +117,14 @@ def create_subcontainers(container_idx, depth, max_rand, is_first, is_last, in_e
   yaml_extra = ""
   english_extra = ""
   yaml_extra += bslashts(depth) + "- Container:\\n"
-  yaml_extra += bslashts(depth + 1) + "- Name: " + parsing.container_def[container_idx].name + "\\n"
+  yaml_extra += bslashts(depth + 1) + "- Name: " + global_vars.container_def[container_idx].name + "\\n"
   num = random.randint(1, max_rand)
   if is_first == 0:
     english_extra += " and"
   english_extra += " create "
   english_extra += str(num)
   english_extra += " "
-  english_extra += parsing.container_def[container_idx].name
+  english_extra += global_vars.container_def[container_idx].name
   english_extra += " containers"
   if is_last == 1:
     english_extra += ". "
@@ -153,12 +140,12 @@ def create_single_subcontainer(container_idx, depth, is_first, is_last, in_each)
     yaml_extra = ""
     english_extra = ""
     yaml_extra += bslashts(depth) + "- Container:\\n"
-    yaml_extra += bslashts(depth + 1) + "- Name: " + parsing.container_def[container_idx].name + "\\n"
+    yaml_extra += bslashts(depth + 1) + "- Name: " + global_vars.container_def[container_idx].name + "\\n"
     yaml_extra += bslashts(depth + 1) + "- Multiplicity: 1\\n"
     if is_first == 0:
         english_extra += " and"
     english_extra += " create a "
-    english_extra += parsing.container_def[container_idx].name
+    english_extra += global_vars.container_def[container_idx].name
     english_extra += " container"
     if is_last == 1:
         english_extra += ". "
@@ -247,7 +234,7 @@ def generate_global_parameter():
   yaml_extra = ""
   english_extra = ""
   if int(will_create) == 1:
-    param = gen_rand_parameter(int(container_dict["CanNmGlobalConfig"]))
+    param = gen_rand_parameter(int(global_vars.container_dict["CanNmGlobalConfig"]))
     english_extra += "In the CanNmGlobalConfig container, set the value of " + param[0] + " to " + param[1] + ". "
     yaml_extra += bslashts(2) + "- Parameter:\\n"
     yaml_extra += bslashts(3) + "Name: " + param[0] + "\\n"

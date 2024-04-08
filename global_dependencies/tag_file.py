@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
-import et_init
+import global_vars
+
 
 class tag:
     name = ""
@@ -15,24 +16,24 @@ class tag:
     def declare(self): # mostly if definition-ref or value
         # Assumes all attributes are set
         if self.is_sub == 0:
-            et_init.et_init.et_elements.append(ET.Element(self.name))
-            self.et_element_idx = len(et_init.et_elements) - 1
+            global_vars.et_elements.append(ET.Element(self.name))
+            self.et_element_idx = len(global_vars.et_elements) - 1
 
             if self.text != "":
-                et_init.et_elements[self.et_element_idx].text = self.text
+                global_vars.et_elements[self.et_element_idx].text = self.text
 
             if self.in_tag_value[0] != "":
-                et_init.et_elements[self.et_element_idx].set(self.in_tag_value[0], self.in_tag_value[1])
+                global_vars.et_elements[self.et_element_idx].set(self.in_tag_value[0], self.in_tag_value[1])
 
         else:
-            et_init.et_subelements.append(ET.SubElement(et_init.et_elements[self.par], self.name))
-            self.et_element_idx = len(et_init.et_subelements) - 1
+            global_vars.et_subelements.append(ET.SubElement(global_vars.et_elements[self.par], self.name))
+            self.et_element_idx = len(global_vars.et_subelements) - 1
 
             if self.text != "":
-                et_init.et_subelements[self.et_element_idx].text = self.text
+                global_vars.et_subelements[self.et_element_idx].text = self.text
 
             if self.in_tag_value[0] != "":
-                et_init.et_subelements[self.et_element_idx].set(self.in_tag_value[0], self.in_tag_value[1])
+                global_vars.et_subelements[self.et_element_idx].set(self.in_tag_value[0], self.in_tag_value[1])
 
     def get_name(self):
         return self.name

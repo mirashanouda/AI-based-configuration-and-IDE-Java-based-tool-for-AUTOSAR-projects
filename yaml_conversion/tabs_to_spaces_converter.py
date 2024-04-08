@@ -20,10 +20,3 @@ def convert_tabs_to_spaces(input_file_path, output_file_path):
     except IOError as e:
         # Handle potential file input/output errors
         print(f"An error occurred while processing the file: {e}")
-
-# Example usage:
-input_file_path = 'input.yml'  # Replace with your input file path
-output_file_path = 'output.yml'  # Define the output file path
-
-# Call the function with the paths
-convert_tabs_to_spaces(input_file_path, output_file_path)

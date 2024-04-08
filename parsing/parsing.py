@@ -10,12 +10,16 @@ cwd = go_back(cwd)
 cwd += '/global_dependencies'
 sys.path.insert(0, cwd)
 import items
+import global_vars
 
-max_nodes = 100000
-container_def = []
-par = [-1] * max_nodes
-children = [[] for _ in range(max_nodes)]
-container_parameters = [[] for _ in range(max_nodes)]
+global_vars.start()
+
+global_vars.max_nodes = 100000
+global_vars.container_def = []
+global_vars.par = [-1] * global_vars.max_nodes
+global_vars.children = [[] for _ in range(global_vars.max_nodes)]
+global_vars.container_parameters = [[] for _ in range(global_vars.max_nodes)]
+
 
 cwd = go_back(cwd)
 cwd += '/parsing'
@@ -81,23 +85,23 @@ def process_parameter(ecuc_parameter, typ):
 def get_parameters(params, idx):
   for param in params.findall('./ECUC-INTEGER-PARAM-DEF'):
     p = process_parameter(param, 'INTEGER')
-    container_parameters[idx].append(p)
+    global_vars.container_parameters[idx].append(p)
   for param in params.findall('./ECUC-FLOAT-PARAM-DEF'):
     p = process_parameter(param, 'FLOAT')
-    container_parameters[idx].append(p)
+    global_vars.container_parameters[idx].append(p)
   for param in params.findall('./ECUC-BOOLEAN-PARAM-DEF'):
     p = process_parameter(param, 'BOOLEAN')
-    container_parameters[idx].append(p)
+    global_vars.container_parameters[idx].append(p)
   for param in params.findall('./ECUC-ENUMERATION-PARAM-DEF'):
     p = process_parameter(param, 'ENUMERATION')
-    container_parameters[idx].append(p)
+    global_vars.container_parameters[idx].append(p)
 
 def dfs (ecuc_container, level, p):
   for ecuc_container in ecuc_container.findall('./ECUC-PARAM-CONF-CONTAINER-DEF'):
     c = process_container(ecuc_container)
-    container_def.append(c)
-    idx = len(container_def) - 1
-    par[idx] = p
+    global_vars.container_def.append(c)
+    idx = len(global_vars.container_def) - 1
+    global_vars.par[idx] = p
     for params in ecuc_container.findall('./PARAMETERS'):
       get_parameters(params, idx)
     for sub_cont in ecuc_container.findall('./SUB-CONTAINERS'):
@@ -106,6 +110,20 @@ def dfs (ecuc_container, level, p):
 containers = root.findall('./CONTAINERS')[0]
 dfs(containers, 0, -1)
 
-container_dict = {} # container_dict[container_name] = container_index
+
+global_vars.container_dict = {}
 for i in range(7):
-  container_dict.update({str(container_def[i].name): i})
+  global_vars.container_dict.update({str(global_vars.container_def[i].name): i})
+
+# -------------------------------------------------------------------------
+enumer_value = ['CANNM_PDU_BYTE_0', 'CANNM_PDU_BYTE_1', 'CANMN_PDU_OFF']
+def get_default_value(partype):
+  if partype == 'INTEGER':
+    return 0
+  elif partype == 'FLOAT':
+    return 0
+  elif partype == 'BOOLEAN':
+    return "False"
+  elif partype == 'ENUMERATION':
+    return enumer_value[0]
+# -------------------------------------------------------------------------

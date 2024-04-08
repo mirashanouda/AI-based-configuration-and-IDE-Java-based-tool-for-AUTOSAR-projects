@@ -8,6 +8,10 @@ def go_back(directory):
 
 cwd = os.getcwd()
 cwd = go_back(cwd)
+cwd += '/global_dependencies'
+sys.path.insert(0, cwd)
+import global_vars
+cwd = go_back(cwd)
 cwd += '/parsing'
 sys.path.insert(0, cwd)
 import parsing
@@ -22,11 +26,11 @@ def dfs(data, par_name):
     
     name = yaml_utility.retrieve_single(data, 'Name')
     # Check if this is a valid name
-    if name not in parsing.container_dict:
+    if name not in global_vars.container_dict:
         return False
-    container_idx = parsing.container_dict[name]
-    if parsing.par[container_idx] != -1:    
-        if par_name != parsing.container_def[parsing.par[container_idx]].name:
+    container_idx = global_vars.container_dict[name]
+    if global_vars.par[container_idx] != -1:    
+        if par_name != global_vars.container_def[global_vars.par[container_idx]].name:
             return False
     # I'm truly the son of my parent!
     
@@ -34,11 +38,15 @@ def dfs(data, par_name):
     parameters = yaml_utility.retrieve_list(data, 'Parameter')
     for param in parameters:
         found = False
-        for param2 in parsing.container_parameters[container_idx]:
+        for param2 in global_vars.container_parameters[container_idx]:
             if str(param2.def_name) == str(param['Name']):
                 found = True
                 break
         if not found:
+            return False
+    
+    if name != "CanNmGlobalConfig":
+        if yaml_utility.count(data, 'Multiplicity') != 1:
             return False
         
     res = True
