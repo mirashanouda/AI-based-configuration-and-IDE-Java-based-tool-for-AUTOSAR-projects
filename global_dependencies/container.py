@@ -1,20 +1,18 @@
 import xml.etree.ElementTree as ET
-from lxml import etree
-import random
 import et_init
-import tagfile
+import tag_file
 
-class container(tagfile.tag):
+class container(tag_file.tag):
   def __init__(self):
-      self.short_name = tagfile.tag()
-      self.def_ref = tagfile.tag()
+      self.short_name = tag_file.tag()
+      self.def_ref = tag_file.tag()
       self.container_idx = -1
       self.par_cont = -1 # parent as a container
       self.sub_cont_idx = -1
       self.param_val_idx = -1
       self.has_param_val = 0
       self.has_sub_cont = 0
-      self.parent_def_ref = tagfile.tag()
+      self.parent_def_ref = tag_file.tag()
 
 
   def declare_container(self):

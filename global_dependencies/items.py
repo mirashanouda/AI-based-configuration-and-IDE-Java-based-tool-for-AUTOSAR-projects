@@ -1,9 +1,3 @@
-import xml.etree.ElementTree as ET
-from lxml import etree
-import random
-import et_init
-import tagfile
-
 class parameter_item:
   def __init__(self, def_name, value, data_type, decl_name, is_default, start_range, end_range, lower_mult, upper_mult):
     self.def_name = def_name

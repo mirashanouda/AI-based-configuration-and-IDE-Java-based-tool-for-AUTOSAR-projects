@@ -1,10 +1,28 @@
-import xml.etree.ElementTree as ET
+import os
+import sys
+
+def go_back(directory):
+	return os.path.abspath(os.path.join(directory, '..'))
+
+cwd = os.getcwd()
+
 from lxml import etree
 import random
+
+cwd = go_back(cwd)
+cwd += '/global_dependencies'
+sys.path.insert(0, cwd)
 import items
+
+cwd = go_back(cwd)
+cwd += '/parsing'
+sys.path.insert(0, cwd)
 import parsing
+
+cwd = go_back(cwd)
+cwd += '/dataset_generation'
+sys.path.insert(0, cwd)
 import base_code
-import gen_func
 
 yaml = ""
 english = ""
@@ -35,23 +53,23 @@ with open(dataset_name, "a") as file:
     english += beginning_english
     yaml += beginning_yaml
 
-    listt = gen_func.generate_global_parameter()
+    listt = base_code.generate_global_parameter()
     yaml += listt[0]
     english += listt[1]
 
-    listt = gen_func.create_subcontainers(int(base_code.container_dict["CanNmChannelConfig"]), 2, max_rand, 1, 1, 1)
+    listt = base_code.create_subcontainers(int(base_code.container_dict["CanNmChannelConfig"]), 2, max_rand, 1, 1, 1)
     yaml += listt[0]
     english += listt[1]
 
-    listt = gen_func.create_exact_parameters(int(base_code.container_dict["CanNmChannelConfig"]), 3, 0, 1)
+    listt = base_code.create_exact_parameters(int(base_code.container_dict["CanNmChannelConfig"]), 3, 0, 1)
     yaml += listt[0]
     english += listt[1]
     
-    listt = gen_func.create_subcontainers(int(base_code.container_dict["CanNmRxPdu"]), 3, max_rand, 0, 1, 1)
+    listt = base_code.create_subcontainers(int(base_code.container_dict["CanNmRxPdu"]), 3, max_rand, 0, 1, 1)
     yaml += listt[0]
     english += listt[1]
 
-    listt = gen_func.create_exact_parameters(int(base_code.container_dict["CanNmRxPdu"]), 4, 1, 1)
+    listt = base_code.create_exact_parameters(int(base_code.container_dict["CanNmRxPdu"]), 4, 1, 1)
     yaml += listt[0]
     english += listt[1]
        
@@ -74,15 +92,15 @@ with open(dataset_name, "a") as file:
     english += beginning_english
     yaml += beginning_yaml
 
-    listt = gen_func.generate_global_parameter()
+    listt = base_code.generate_global_parameter()
     yaml += listt[0]
     english += listt[1]
 
-    listt = gen_func.create_subcontainers(int(base_code.container_dict["CanNmChannelConfig"]), 2, max_rand, 1, 1, 1)
+    listt = base_code.create_subcontainers(int(base_code.container_dict["CanNmChannelConfig"]), 2, max_rand, 1, 1, 1)
     yaml += listt[0]
     english += listt[1]
 
-    listt = gen_func.create_random_parameters(int(base_code.container_dict["CanNmChannelConfig"]), 3, 0, 5)
+    listt = base_code.create_random_parameters(int(base_code.container_dict["CanNmChannelConfig"]), 3, 0, 5)
     yaml += listt[0]
     english += listt[1]
     
@@ -90,13 +108,13 @@ with open(dataset_name, "a") as file:
     if len(listt[1]) == 0:
       is_first = 1
 
-    list2 = gen_func.create_random_parameters(int(base_code.container_dict["CanNmRxPdu"]), 4, 1, 5)
+    list2 = base_code.create_random_parameters(int(base_code.container_dict["CanNmRxPdu"]), 4, 1, 5)
 
     in_each = 1
     if len(list2[1]) == 0:
       in_each = 0
     
-    listt = gen_func.create_subcontainers(int(base_code.container_dict["CanNmRxPdu"]), 3, max_rand, is_first, 1, in_each)
+    listt = base_code.create_subcontainers(int(base_code.container_dict["CanNmRxPdu"]), 3, max_rand, is_first, 1, in_each)
     yaml += listt[0]
     english += listt[1]
 
@@ -122,17 +140,17 @@ with open(dataset_name, "a") as file:
     english += beginning_english
     yaml += beginning_yaml
 
-    listt = gen_func.generate_global_parameter()
+    listt = base_code.generate_global_parameter()
     yaml += listt[0]
     english += listt[1]
 
-    list2 = gen_func.create_random_parameters(int(base_code.container_dict["CanNmChannelConfig"]), 3, 1, 1)
+    list2 = base_code.create_random_parameters(int(base_code.container_dict["CanNmChannelConfig"]), 3, 1, 1)
 
     in_each = 1
     if len(list2[1]) == 0:
       in_each = 0
 
-    listt = gen_func.create_subcontainers(int(base_code.container_dict["CanNmChannelConfig"]), 2, max_rand, 1, 1, in_each)
+    listt = base_code.create_subcontainers(int(base_code.container_dict["CanNmChannelConfig"]), 2, max_rand, 1, 1, in_each)
     yaml += listt[0]
     english += listt[1]
 
@@ -159,16 +177,16 @@ with open(dataset_name, "a") as file:
     english += beginning_english
     yaml += beginning_yaml
 
-    listt = gen_func.generate_global_parameter()
+    listt = base_code.generate_global_parameter()
     yaml += listt[0]
     english += listt[1]
 
-    list2 = gen_func.create_random_parameters(int(base_code.container_dict["CanNmChannelConfig"]), 3, 1, 5)
+    list2 = base_code.create_random_parameters(int(base_code.container_dict["CanNmChannelConfig"]), 3, 1, 5)
     in_each = 1
     if len(list2[1]) == 0:
       in_each = 0
 
-    listt = gen_func.create_subcontainers(int(base_code.container_dict["CanNmChannelConfig"]), 2, max_rand, 1, 1, in_each)
+    listt = base_code.create_subcontainers(int(base_code.container_dict["CanNmChannelConfig"]), 2, max_rand, 1, 1, in_each)
     yaml += listt[0]
     english += listt[1]
 
@@ -196,15 +214,15 @@ with open(dataset_name, "a") as file:
     english += beginning_english
     yaml += beginning_yaml
 
-    listt = gen_func.generate_global_parameter()
+    listt = base_code.generate_global_parameter()
     yaml += listt[0]
     english += listt[1]
 
-    listt = gen_func.create_subcontainers(int(base_code.container_dict["CanNmChannelConfig"]), 2, max_rand, 1, 1, 1)
+    listt = base_code.create_subcontainers(int(base_code.container_dict["CanNmChannelConfig"]), 2, max_rand, 1, 1, 1)
     yaml += listt[0]
     english += listt[1]
 
-    listt = gen_func.create_random_parameters(int(base_code.container_dict["CanNmChannelConfig"]), 3, 0, 1)
+    listt = base_code.create_random_parameters(int(base_code.container_dict["CanNmChannelConfig"]), 3, 0, 1)
     yaml += listt[0]
     english += listt[1]
 
@@ -212,12 +230,12 @@ with open(dataset_name, "a") as file:
     if len(listt[1]) == 0:
       is_first = 1
 
-    list2 = gen_func.create_random_parameters(int(base_code.container_dict["CanNmTxPdu"]), 4, 1, 1)
+    list2 = base_code.create_random_parameters(int(base_code.container_dict["CanNmTxPdu"]), 4, 1, 1)
     in_each = 1
     if len(list2[1]) == 0:
       in_each = 0
 
-    listt = gen_func.create_single_subcontainer(int(base_code.container_dict["CanNmTxPdu"]), 3, is_first, 1, in_each)
+    listt = base_code.create_single_subcontainer(int(base_code.container_dict["CanNmTxPdu"]), 3, is_first, 1, in_each)
     yaml += listt[0]
     english += listt[1]
 
@@ -243,15 +261,15 @@ with open(dataset_name, "a") as file:
     english += beginning_english
     yaml += beginning_yaml
 
-    listt = gen_func.generate_global_parameter()
+    listt = base_code.generate_global_parameter()
     yaml += listt[0]
     english += listt[1]
 
-    listt = gen_func.create_subcontainers(int(base_code.container_dict["CanNmChannelConfig"]), 2, max_rand, 1, 1, 1)
+    listt = base_code.create_subcontainers(int(base_code.container_dict["CanNmChannelConfig"]), 2, max_rand, 1, 1, 1)
     yaml += listt[0]
     english += listt[1]
 
-    listt = gen_func.create_random_parameters(int(base_code.container_dict["CanNmChannelConfig"]), 3, 0, 1)
+    listt = base_code.create_random_parameters(int(base_code.container_dict["CanNmChannelConfig"]), 3, 0, 1)
     yaml += listt[0]
     english += listt[1]
 
@@ -259,12 +277,12 @@ with open(dataset_name, "a") as file:
     if len(listt[1]) == 0:
       is_first = 1
 
-    list2 = gen_func.create_random_parameters(int(base_code.container_dict["CanNmUserDataTxPdu"]), 4, 1, 1)
+    list2 = base_code.create_random_parameters(int(base_code.container_dict["CanNmUserDataTxPdu"]), 4, 1, 1)
     in_each = 1
     if len(list2[1]) == 0:
       in_each = 0
 
-    listt = gen_func.create_single_subcontainer(int(base_code.container_dict["CanNmUserDataTxPdu"]), 3, is_first, 1, in_each)
+    listt = base_code.create_single_subcontainer(int(base_code.container_dict["CanNmUserDataTxPdu"]), 3, is_first, 1, in_each)
     yaml += listt[0]
     english += listt[1]
 
@@ -292,17 +310,17 @@ with open(dataset_name, "a") as file:
     english += beginning_english
     yaml += beginning_yaml
 
-    listt = gen_func.generate_global_parameter()
+    listt = base_code.generate_global_parameter()
     yaml += listt[0]
     english += listt[1]
 
-    list2 = gen_func.create_random_parameters(int(base_code.container_dict["CanNmChannelConfig"]), 3, 1, 5)
+    list2 = base_code.create_random_parameters(int(base_code.container_dict["CanNmChannelConfig"]), 3, 1, 5)
 
     in_each = 1
     if len(list2[1]) == 0:
       in_each = 0
 
-    listt = gen_func.create_single_subcontainer(int(base_code.container_dict["CanNmChannelConfig"]), 2, 1, 1, in_each)
+    listt = base_code.create_single_subcontainer(int(base_code.container_dict["CanNmChannelConfig"]), 2, 1, 1, in_each)
     yaml += listt[0]
     english += listt[1]
 
@@ -328,15 +346,15 @@ with open(dataset_name, "a") as file:
     english += beginning_english
     yaml += beginning_yaml
 
-    listt = gen_func.generate_global_parameter()
+    listt = base_code.generate_global_parameter()
     yaml += listt[0]
     english += listt[1]
 
-    listt = gen_func.create_subcontainers(int(base_code.container_dict["CanNmChannelConfig"]), 2, max_rand, 1, 1, 1)
+    listt = base_code.create_subcontainers(int(base_code.container_dict["CanNmChannelConfig"]), 2, max_rand, 1, 1, 1)
     yaml += listt[0]
     english += listt[1]
 
-    listt = gen_func.create_random_parameters(int(base_code.container_dict["CanNmChannelConfig"]), 3, 0, 1)
+    listt = base_code.create_random_parameters(int(base_code.container_dict["CanNmChannelConfig"]), 3, 0, 1)
     yaml += listt[0]
     english += listt[1]
     
@@ -349,11 +367,11 @@ with open(dataset_name, "a") as file:
     for _ in range(num_sets):
       if counter > 0:
         is_first = 0
-      listt = gen_func.create_subcontainers(int(base_code.container_dict["CanNmRxPdu"]), 3, max_rand, is_first, 0, 0)
+      listt = base_code.create_subcontainers(int(base_code.container_dict["CanNmRxPdu"]), 3, max_rand, is_first, 0, 0)
       yaml += listt[0]
       english += listt[1]
        
-      listt = gen_func.create_exact_parameters_parenthesis(int(base_code.container_dict["CanNmRxPdu"]), 4, 1)
+      listt = base_code.create_exact_parameters_parenthesis(int(base_code.container_dict["CanNmRxPdu"]), 4, 1)
       yaml += listt[0]
       english += listt[1]
       counter += 1
@@ -377,7 +395,7 @@ with open(dataset_name, "a") as file:
     english += beginning_english
     yaml += beginning_yaml
 
-    listt = gen_func.generate_global_parameter()
+    listt = base_code.generate_global_parameter()
     yaml += listt[0]
     english += listt[1]
 
@@ -391,13 +409,13 @@ with open(dataset_name, "a") as file:
       if i == num_setss - 1:
         is_last = 1
       
-      listt = gen_func.create_subcontainers(int(base_code.container_dict["CanNmChannelConfig"]), 2, max_rand, is_first, is_last, 0)
+      listt = base_code.create_subcontainers(int(base_code.container_dict["CanNmChannelConfig"]), 2, max_rand, is_first, is_last, 0)
       yaml += listt[0]
       english += listt[1]
 
       english += "("
 
-      listt = gen_func.create_random_parameters_no_parenthesis(int(base_code.container_dict["CanNmChannelConfig"]), 3, 2)
+      listt = base_code.create_random_parameters_no_parenthesis(int(base_code.container_dict["CanNmChannelConfig"]), 3, 2)
       yaml += listt[0]
       english += listt[1]
       
@@ -407,11 +425,11 @@ with open(dataset_name, "a") as file:
         if i != 0 or len(listt[1]) != 0:
           is_first = 0
 
-        listt = gen_func.create_subcontainers(int(base_code.container_dict["CanNmRxPdu"]), 3, max_rand, is_first, 0, 0)
+        listt = base_code.create_subcontainers(int(base_code.container_dict["CanNmRxPdu"]), 3, max_rand, is_first, 0, 0)
         yaml += listt[0]
         english += listt[1]
           
-        listt = gen_func.create_random_parameters_parenthesis(int(base_code.container_dict["CanNmRxPdu"]), 4, 5)
+        listt = base_code.create_random_parameters_parenthesis(int(base_code.container_dict["CanNmRxPdu"]), 4, 5)
         yaml += listt[0]
         english += listt[1]
 
@@ -436,7 +454,7 @@ with open(dataset_name, "a") as file:
     english += beginning_english
     yaml += beginning_yaml
 
-    listt = gen_func.generate_global_parameter()
+    listt = base_code.generate_global_parameter()
     yaml += listt[0]
     english += listt[1]
     
@@ -446,12 +464,12 @@ with open(dataset_name, "a") as file:
       if i == 0:
         is_first = 1
       
-      listt = gen_func.create_subcontainers(int(base_code.container_dict["CanNmChannelConfig"]), 2, max_rand, is_first, 0, 0)
+      listt = base_code.create_subcontainers(int(base_code.container_dict["CanNmChannelConfig"]), 2, max_rand, is_first, 0, 0)
       yaml += listt[0]
       english += listt[1]
 
       
-      listt = gen_func.create_exact_parameters_parenthesis(int(base_code.container_dict["CanNmChannelConfig"]), 3, 1)
+      listt = base_code.create_exact_parameters_parenthesis(int(base_code.container_dict["CanNmChannelConfig"]), 3, 1)
       yaml += listt[0]
       english += listt[1]
 
@@ -476,15 +494,15 @@ with open(dataset_name, "a") as file:
     english += beginning_english
     yaml += beginning_yaml
 
-    listt = gen_func.generate_global_parameter()
+    listt = base_code.generate_global_parameter()
     yaml += listt[0]
     english += listt[1]
 
-    listt = gen_func.create_subcontainers(int(base_code.container_dict["CanNmPnInfo"]), 2, max_rand, 1, 1, 1)
+    listt = base_code.create_subcontainers(int(base_code.container_dict["CanNmPnInfo"]), 2, max_rand, 1, 1, 1)
     yaml += listt[0]
     english += listt[1]
 
-    listt = gen_func.create_random_parameters(int(base_code.container_dict["CanNmPnInfo"]), 3, 0, 1)
+    listt = base_code.create_random_parameters(int(base_code.container_dict["CanNmPnInfo"]), 3, 0, 1)
     yaml += listt[0]
     english += listt[1]
     
@@ -497,11 +515,11 @@ with open(dataset_name, "a") as file:
     for _ in range(num_sets):
       if counter > 0:
         is_first = 0
-      listt = gen_func.create_subcontainers(int(base_code.container_dict["CanNmPnFilterMaskByte"]), 3, max_rand, is_first, 0, 0)
+      listt = base_code.create_subcontainers(int(base_code.container_dict["CanNmPnFilterMaskByte"]), 3, max_rand, is_first, 0, 0)
       yaml += listt[0]
       english += listt[1]
        
-      listt = gen_func.create_exact_parameters_parenthesis(int(base_code.container_dict["CanNmPnFilterMaskByte"]), 4, 1)
+      listt = base_code.create_exact_parameters_parenthesis(int(base_code.container_dict["CanNmPnFilterMaskByte"]), 4, 1)
       yaml += listt[0]
       english += listt[1]
       counter += 1

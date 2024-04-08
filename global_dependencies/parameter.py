@@ -1,18 +1,16 @@
 import xml.etree.ElementTree as ET
-from lxml import etree
-import random
 import et_init
-import tagfile
+import tag_file
 
-class parameter(tagfile.tag):
+class parameter(tag_file.tag):
 
     def __init__(self):
         self.def_name = "" # the actual parameter name
-        self.def_ref = tagfile.tag()
-        self.value = tagfile.tag()
+        self.def_ref = tag_file.tag()
+        self.value = tag_file.tag()
         self.param_type = ""  # float or boolean string
         self.par_cont = -1 # index of parent in the array of containers
-        self.parent_def_ref = tagfile.tag()
+        self.parent_def_ref = tag_file.tag()
 
     def declare_parameter(self):  # adds the parameter to the file
         # assumes par_cont, param_type, def_name, value.text and self.name is set

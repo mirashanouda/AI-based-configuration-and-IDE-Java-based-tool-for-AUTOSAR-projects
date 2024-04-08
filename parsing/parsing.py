@@ -1,10 +1,14 @@
-import xml.etree.ElementTree as ET
+import sys
+import os
+  
+def go_back(directory):
+	return os.path.abspath(os.path.join(directory, '..'))
+  
 from lxml import etree
-import random
-import et_init
-import tagfile
-import parameter
-import container
+cwd = os.getcwd()
+cwd = go_back(cwd)
+cwd += '/global_dependencies'
+sys.path.insert(0, cwd)
 import items
 
 max_nodes = 100000
@@ -13,6 +17,9 @@ par = [-1] * max_nodes
 children = [[] for _ in range(max_nodes)]
 container_parameters = [[] for _ in range(max_nodes)]
 
+cwd = go_back(cwd)
+cwd += '/parsing'
+sys.path.insert(0, cwd)
 file_path = 'CanNM_BSWMD.arxml'
 
 tree = etree.parse(file_path)
@@ -98,3 +105,7 @@ def dfs (ecuc_container, level, p):
 
 containers = root.findall('./CONTAINERS')[0]
 dfs(containers, 0, -1)
+
+container_dict = {} # container_dict[container_name] = container_index
+for i in range(7):
+  container_dict.update({str(container_def[i].name): i})

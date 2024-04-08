@@ -1,6 +1,4 @@
 import xml.etree.ElementTree as ET
-from lxml import etree
-import random
 
 def initialize(et_elements):
   AUTOSAR = ET.Element("AUTOSAR")
