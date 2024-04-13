@@ -36,7 +36,7 @@ CanNm_InternalType CanNm_Internal = {
 /*====================================================================================================================*\
     Local variables (static)
 \*====================================================================================================================*/
-static const CanNmGlobalConfigType* CanNm_ConfigPtr;
+static const CanNmGlobalConfig* CanNm_ConfigPtr;
 
 /*====================================================================================================================*\
     Local functions declarations
@@ -56,31 +56,31 @@ static inline void CanNm_Internal_WaitBusSleepTimerExpiredCallback( void* Timer,
 static inline void CanNm_Internal_RemoteSleepIndTimerExpiredCallback( void* Timer, const uint8_t channel );
 
 /* State Machine functions */
-static inline void CanNm_Internal_BusSleep_to_BusSleep( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
-static inline void CanNm_Internal_BusSleep_to_RepeatMessage( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
-static inline void CanNm_Internal_RepeatMessage_to_RepeatMessage( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
-static inline void CanNm_Internal_RepeatMessage_to_ReadySleep( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
-static inline void CanNm_Internal_RepeatMessage_to_NormalOperation( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
-static inline void CanNm_Internal_NormalOperation_to_RepeatMessage( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
-static inline void CanNm_Internal_NormalOperation_to_NormalOperation( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
-static inline void CanNm_Internal_NormalOperation_to_ReadySleep( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
-static inline void CanNm_Internal_ReadySleep_to_NormalOperation( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
-static inline void CanNm_Internal_ReadySleep_to_RepeatMessage( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
-static inline void CanNm_Internal_ReadySleep_to_PrepareBusSleep( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
-static inline void CanNm_Internal_PrepareBusSleep_to_RepeatMessage( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
-static inline void CanNm_Internal_PrepareBusSleep_to_BusSleep( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
-static inline void CanNm_Internal_NetworkMode_to_NetworkMode( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
+static inline void CanNm_Internal_BusSleep_to_BusSleep( const CanNmChannelConfig* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
+static inline void CanNm_Internal_BusSleep_to_RepeatMessage( const CanNmChannelConfig* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
+static inline void CanNm_Internal_RepeatMessage_to_RepeatMessage( const CanNmChannelConfig* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
+static inline void CanNm_Internal_RepeatMessage_to_ReadySleep( const CanNmChannelConfig* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
+static inline void CanNm_Internal_RepeatMessage_to_NormalOperation( const CanNmChannelConfig* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
+static inline void CanNm_Internal_NormalOperation_to_RepeatMessage( const CanNmChannelConfig* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
+static inline void CanNm_Internal_NormalOperation_to_NormalOperation( const CanNmChannelConfig* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
+static inline void CanNm_Internal_NormalOperation_to_ReadySleep( const CanNmChannelConfig* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
+static inline void CanNm_Internal_ReadySleep_to_NormalOperation( const CanNmChannelConfig* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
+static inline void CanNm_Internal_ReadySleep_to_RepeatMessage( const CanNmChannelConfig* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
+static inline void CanNm_Internal_ReadySleep_to_PrepareBusSleep( const CanNmChannelConfig* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
+static inline void CanNm_Internal_PrepareBusSleep_to_RepeatMessage( const CanNmChannelConfig* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
+static inline void CanNm_Internal_PrepareBusSleep_to_BusSleep( const CanNmChannelConfig* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
+static inline void CanNm_Internal_NetworkMode_to_NetworkMode( const CanNmChannelConfig* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
 
 /* Additional functions */
 static inline uint8_t CanNm_Internal_TxDisable( CanNm_Internal_ChannelType* ChannelInternal );
 static inline uint8_t CanNm_Internal_TxEnable( CanNm_Internal_ChannelType* ChannelInternal );
-static inline uint8_t CanNm_Internal_TransmitMessage( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
-static inline void CanNm_Internal_SetPduCbvBit( const CanNmChannelConfigType* ChannelConf, const uint8_t PduCbvBitPosition );
-static inline void CanNm_Internal_ClearPduCbvBit( const CanNmChannelConfigType* ChannelConf, const uint8_t PduCbvBitPosition );
-static inline void CanNm_Internal_ClearPduCbv( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
-static inline uint8_t CanNm_Internal_GetUserDataOffset( const CanNmChannelConfigType* ChannelConf );
-static inline uint8_t* CanNm_Internal_GetUserDataPtr( const CanNmChannelConfigType* ChannelConf, uint8_t* MessageSduPtr );
-static inline uint8_t CanNm_Internal_GetUserDataLength( const CanNmChannelConfigType* ChannelConf );
+static inline uint8_t CanNm_Internal_TransmitMessage( const CanNmChannelConfig* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
+static inline void CanNm_Internal_SetPduCbvBit( const CanNmChannelConfig* ChannelConf, const uint8_t PduCbvBitPosition );
+static inline void CanNm_Internal_ClearPduCbvBit( const CanNmChannelConfig* ChannelConf, const uint8_t PduCbvBitPosition );
+static inline void CanNm_Internal_ClearPduCbv( const CanNmChannelConfig* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal );
+static inline uint8_t CanNm_Internal_GetUserDataOffset( const CanNmChannelConfig* ChannelConf );
+static inline uint8_t* CanNm_Internal_GetUserDataPtr( const CanNmChannelConfig* ChannelConf, uint8_t* MessageSduPtr );
+static inline uint8_t CanNm_Internal_GetUserDataLength( const CanNmChannelConfig* ChannelConf );
 
 /* Mocked Functions */
 void CanIf_Transmit(uint16_t TxPduId, const PduInfoType* PduInfoPtr) { printf("Transmitting PDU with ID: %u\n", TxPduId); }
@@ -99,12 +99,12 @@ void PduR_CanNmRxIndication(uint8_t channel, const PduInfoType* PduInfoPtr) { pr
  * There are some default values to be initialized from the SWS and they are labeled by a comment in the code.
  * ! TODO: Some are not documented in the SWS such as ChannelInternal.
  */
-void CanNm_Init(const CanNmGlobalConfigType* canNmConfigPtr)
+void CanNm_Init(const CanNmGlobalConfig* canNmConfigPtr)
 {
     CanNm_ConfigPtr = canNmConfigPtr;	//[SWS_CanNm_00060]
 
 	for (uint8_t channel = 0; channel < CANNM_CHANNEL_COUNT; channel++) {
-		const CanNmChannelConfigType* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[channel];
+		const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[channel];
 		CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[channel];
 
 		ChannelInternal->Channel = channel;
@@ -166,7 +166,7 @@ void CanNm_DeInit(void)
  */
 uint8_t CanNm_PassiveStartUp(NetworkHandleType nmChannelHandle)
 {
-	const CanNmChannelConfigType* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
+	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[nmChannelHandle];
 	uint8_t status = E_OK;
 
@@ -188,7 +188,7 @@ uint8_t CanNm_PassiveStartUp(NetworkHandleType nmChannelHandle)
  */
 uint8_t CanNm_NetworkRelease(NetworkHandleType nmChannelHandle)
 {
-	const CanNmChannelConfigType* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
+	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[nmChannelHandle];
 
 	ChannelInternal->Requested = FALSE;	//[SWS_CanNm_00105]
@@ -240,7 +240,7 @@ uint8_t CanNm_EnableCommunication(NetworkHandleType nmChannelHandle)
  */
 uint8_t CanNm_SetUserData(NetworkHandleType nmChannelHandle, const uint8_t* nmUserDataPtr)
 {
-	const CanNmChannelConfigType* ChannelConf = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
+	const CanNmChannelConfig* ChannelConf = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[nmChannelHandle];
 
 	if (CanNm_ConfigPtr->UserDataEnabled && !CanNm_ConfigPtr->ComUserDataSupport) {				//[SWS_CanNm_00158][SWS_CanNm_00327]
@@ -259,7 +259,7 @@ uint8_t CanNm_SetUserData(NetworkHandleType nmChannelHandle, const uint8_t* nmUs
  */
 uint8_t CanNm_GetUserData(NetworkHandleType nmChannelHandle, uint8_t* nmUserDataPtr)
 {
-	const CanNmChannelConfigType* ChannelConf = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
+	const CanNmChannelConfig* ChannelConf = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[nmChannelHandle];
 
 	if (CanNm_ConfigPtr->UserDataEnabled && ChannelInternal->RxLastPdu != NO_PDU_RECEIVED) {	//[SWS_CanNm_00158]
@@ -290,7 +290,7 @@ uint8_t CanNm_Transmit(PduIdType TxPduId, const PduInfoType* PduInfoPtr)
  */
 uint8_t CanNm_GetNodeIdentifier(NetworkHandleType nmChannelHandle, uint8_t*nmNodeIdPtr)
 {
-	const CanNmChannelConfigType* ChannelConf = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
+	const CanNmChannelConfig* ChannelConf = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[nmChannelHandle];
 
 	if (ChannelConf->PduNidPosition != CANNM_PDU_OFF) {
@@ -312,7 +312,7 @@ uint8_t CanNm_GetNodeIdentifier(NetworkHandleType nmChannelHandle, uint8_t*nmNod
  */
 uint8_t CanNm_GetLocalNodeIdentifier(NetworkHandleType nmChannelHandle, uint8_t* nmNodeIdPtr)
 {
-	const CanNmChannelConfigType* ChannelConf = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
+	const CanNmChannelConfig* ChannelConf = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
 
 	*nmNodeIdPtr = ChannelConf->NodeId;	//[SWS_CanNm_00133]
 	return E_OK;
@@ -323,7 +323,7 @@ uint8_t CanNm_GetLocalNodeIdentifier(NetworkHandleType nmChannelHandle, uint8_t*
  */
 uint8_t CanNm_RepeatMessageRequest(NetworkHandleType nmChannelHandle)
 {
-	const CanNmChannelConfigType* ChannelConf = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
+	const CanNmChannelConfig* ChannelConf = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[nmChannelHandle];
 
 	if (ChannelConf->PduCbvPosition != CANNM_PDU_OFF) {
@@ -357,7 +357,7 @@ uint8_t CanNm_RepeatMessageRequest(NetworkHandleType nmChannelHandle)
  */
 uint8_t CanNm_GetPduData(NetworkHandleType nmChannelHandle, uint8_t* nmPduDataPtr)
 {
-	const CanNmChannelConfigType* ChannelConf = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
+	const CanNmChannelConfig* ChannelConf = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[nmChannelHandle];
 
 	if (ChannelConf->NodeDetectionEnabled || CanNm_ConfigPtr->UserDataEnabled || ChannelConf->NodeIdEnabled) {	//[SWS_CanNm_00138]
@@ -392,7 +392,7 @@ uint8_t CanNm_GetState(NetworkHandleType nmChannelHandle, Nm_StateType* nmStateP
  */
 uint8_t CanNm_RequestBusSynchronization(NetworkHandleType nmChannelHandle)
 {
-	const CanNmChannelConfigType* ChannelConf = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
+	const CanNmChannelConfig* ChannelConf = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[nmChannelHandle];
 
     if (!CanNm_ConfigPtr->PassiveModeEnabled) {											//[SWS_CanNm_00130]
@@ -430,7 +430,7 @@ uint8_t CanNm_CheckRemoteSleepIndication(NetworkHandleType nmChannelHandle, bool
  */
 uint8_t CanNm_SetSleepReadyBit(NetworkHandleType nmChannelHandle,bool nmSleepReadyBit)
 {
-	const CanNmChannelConfigType* ChannelConf = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
+	const CanNmChannelConfig* ChannelConf = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
     CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[nmChannelHandle];
 
 	if (ChannelConf->PduCbvPosition != CANNM_PDU_OFF && CanNm_ConfigPtr->CoordinationSyncSupport) {	//[SWS_CanNm_00342]
@@ -448,7 +448,7 @@ uint8_t CanNm_SetSleepReadyBit(NetworkHandleType nmChannelHandle,bool nmSleepRea
  */
 void CanNm_TxConfirmation(PduIdType TxPduId, uint8_t result)
 {
-	const CanNmChannelConfigType* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[TxPduId];
+	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[TxPduId];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[TxPduId];
 
 	if (result == E_OK) {
@@ -484,7 +484,7 @@ void CanNm_ConfirmPnAvailability(NetworkHandleType nmChannelHandle)
  */
 uint8_t CanNm_TriggerTransmit(PduIdType TxPduId, PduInfoType* PduInfoPtr)
 {
-	const CanNmChannelConfigType* ChannelConf = CanNm_ConfigPtr->ChannelConfig[TxPduId];
+	const CanNmChannelConfig* ChannelConf = CanNm_ConfigPtr->ChannelConfig[TxPduId];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[TxPduId];
 
 	if (ChannelConf->TxPdu->TxPduRef->SduLength <= PduInfoPtr->SduLength) {
@@ -555,7 +555,7 @@ static inline void CanNm_Internal_TimerReset( CanNm_Timer* Timer, uint32 timeout
 /***************************/
 /* State machine functions */
 /***************************/
-static inline void CanNm_Internal_NormalOperation_to_ReadySleep( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal )
+static inline void CanNm_Internal_NormalOperation_to_ReadySleep( const CanNmChannelConfig* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal )
 {
 	ChannelInternal->Mode = NM_MODE_NETWORK;
 	ChannelInternal->State = NM_STATE_READY_SLEEP;
@@ -568,7 +568,7 @@ static inline void CanNm_Internal_NormalOperation_to_ReadySleep( const CanNmChan
 /************************/
 /* Additional functions */
 /************************/
-static inline uint8_t CanNm_Internal_GetUserDataOffset( const CanNmChannelConfigType* ChannelConfig )
+static inline uint8_t CanNm_Internal_GetUserDataOffset( const CanNmChannelConfig* ChannelConfig )
 {
 	uint8_t userDataPos = 0;
 	userDataPos += (ChannelConfig->PduNidPosition == CANNM_PDU_OFF) ? 0 : 1;
@@ -576,19 +576,19 @@ static inline uint8_t CanNm_Internal_GetUserDataOffset( const CanNmChannelConfig
 	return userDataPos;
 }
 
-static inline uint8_t* CanNm_Internal_GetUserDataPtr( const CanNmChannelConfigType* ChannelConfig, uint8_t* MessageSduPtr )
+static inline uint8_t* CanNm_Internal_GetUserDataPtr( const CanNmChannelConfig* ChannelConfig, uint8_t* MessageSduPtr )
 {
 	uint8_t userDataOffset = CanNm_Internal_GetUserDataOffset(ChannelConfig);
 	return &MessageSduPtr[userDataOffset];
 }
 
-static inline uint8_t CanNm_Internal_GetUserDataLength( const CanNmChannelConfigType* ChannelConfig )
+static inline uint8_t CanNm_Internal_GetUserDataLength( const CanNmChannelConfig* ChannelConfig )
 {
 	uint8_t userDataOffset = CanNm_Internal_GetUserDataOffset(ChannelConfig);
 	return ChannelConfig->UserDataTxPdu->TxUserDataPduRef->SduLength - userDataOffset;
 }
 
-static inline void CanNm_Internal_BusSleep_to_RepeatMessage( const CanNmChannelConfigType* ChannelConfig, CanNm_Internal_ChannelType* ChannelInternal )
+static inline void CanNm_Internal_BusSleep_to_RepeatMessage( const CanNmChannelConfig* ChannelConfig, CanNm_Internal_ChannelType* ChannelInternal )
 {
 	ChannelInternal->Mode = NM_MODE_NETWORK;
 	ChannelInternal->State = NM_STATE_REPEAT_MESSAGE;
@@ -604,14 +604,14 @@ static inline void CanNm_Internal_BusSleep_to_RepeatMessage( const CanNmChannelC
 	}
 }
 
-static inline void CanNm_Internal_SetPduCbvBit( const CanNmChannelConfigType* ChannelConfig, const uint8_t PduCbvBitPosition )
+static inline void CanNm_Internal_SetPduCbvBit( const CanNmChannelConfig* ChannelConfig, const uint8_t PduCbvBitPosition )
 {
 	ChannelConfig->TxPdu->TxPduRef->SduDataPtr[ChannelConfig->PduCbvPosition] |= (1 << PduCbvBitPosition);
 }
 
 static inline void CanNm_Internal_MessageCycleTimerExpiredCallback( void* Timer, const uint8_t channel )
 {
-	const CanNmChannelConfigType* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[channel];
+	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[channel];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[channel];
 	uint8_t txStatus = E_OK;
 	static uint8_t lastTxStatus;
@@ -637,7 +637,7 @@ static inline void CanNm_Internal_MessageCycleTimerExpiredCallback( void* Timer,
 	lastTxStatus = txStatus;
 }
 
-static inline uint8_t CanNm_Internal_TransmitMessage( const CanNmChannelConfigType* ChannelConfig, CanNm_Internal_ChannelType* ChannelInternal )
+static inline uint8_t CanNm_Internal_TransmitMessage( const CanNmChannelConfig* ChannelConfig, CanNm_Internal_ChannelType* ChannelInternal )
 {
 	if (ChannelInternal->TxEnabled) {
 		CanIf_Transmit(ChannelConfig->TxPdu->TxConfirmationPduId, ChannelConfig->TxPdu->TxPduRef);	//[SWS_CanNm_00032]
@@ -661,7 +661,7 @@ static inline uint8_t CanNm_Internal_TxDisable( CanNm_Internal_ChannelType* Chan
 
 static inline uint8_t CanNm_Internal_TxEnable( CanNm_Internal_ChannelType* ChannelInternal )
 {
-	const CanNmChannelConfigType* ChannelConf = CanNm_ConfigPtr->ChannelConfig[ChannelInternal->Channel];
+	const CanNmChannelConfig* ChannelConf = CanNm_ConfigPtr->ChannelConfig[ChannelInternal->Channel];
 
 	if (!CanNm_ConfigPtr->PassiveModeEnabled) {
 		ChannelInternal->TxEnabled = TRUE;															//[SWS_CanNm_00237]
@@ -676,7 +676,7 @@ static inline uint8_t CanNm_Internal_TxEnable( CanNm_Internal_ChannelType* Chann
 	}
 }
 
-static inline void CanNm_Internal_ReadySleep_to_RepeatMessage( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal )
+static inline void CanNm_Internal_ReadySleep_to_RepeatMessage( const CanNmChannelConfig* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal )
 {
 	ChannelInternal->Mode = NM_MODE_NETWORK;
 	ChannelInternal->State = NM_STATE_REPEAT_MESSAGE;
@@ -694,7 +694,7 @@ static inline void CanNm_Internal_ReadySleep_to_RepeatMessage( const CanNmChanne
 		Nm_StateChangeNotification(ChannelInternal->Channel, NM_STATE_READY_SLEEP, NM_STATE_REPEAT_MESSAGE);
 	}
 }
-static inline void CanNm_Internal_NormalOperation_to_RepeatMessage( const CanNmChannelConfigType* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal )
+static inline void CanNm_Internal_NormalOperation_to_RepeatMessage( const CanNmChannelConfig* ChannelConf, CanNm_Internal_ChannelType* ChannelInternal )
 {
 	ChannelInternal->Mode = NM_MODE_NETWORK;
 	ChannelInternal->State = NM_STATE_REPEAT_MESSAGE;

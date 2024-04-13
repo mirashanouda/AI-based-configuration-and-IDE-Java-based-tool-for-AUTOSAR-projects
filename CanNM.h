@@ -102,7 +102,7 @@ typedef struct {
 	float						WaitBusSleepTime;
 	NetworkHandleType			ComMNetworkHandleRef;
 	PduInfoType					PnEraRxNSduRef;
-} CanNmChannelConfigType;
+} CanNmChannelConfig;
 
 typedef struct {
 	// Containers:
@@ -113,13 +113,13 @@ typedef struct {
 	const uint8_t 					PnInfoOffset;
 } CanNmPnInfo;
 
-/** @brief CanNmGlobalConfigType [SWS_CanNm_00447]
+/** @brief CanNmGlobalConfig [SWS_CanNm_00447]
  * 
  * This type shall contain at least all parameters that are post-build able according to chapter 10.
  */
 typedef struct {
 	// Containers:
-	CanNmChannelConfigType*	ChannelConfig[CANNM_CHANNEL_COUNT];
+	CanNmChannelConfig*	ChannelConfig[CANNM_CHANNEL_COUNT];
 	CanNmPnInfo*		PnInfo;
 
 	// Parameters:
@@ -142,7 +142,7 @@ typedef struct {
 	bool				UserDataEnabled;
 	bool				VersionInfoApi;
 	PduInfoType*		PnEiraRxNSduRef;
-} CanNmGlobalConfigType;
+} CanNmGlobalConfig;
 
 
 /*====================================================================================================================*\
@@ -168,7 +168,7 @@ typedef enum {
 } CanNm_InitStatusType;
 
 // This struct is used to store the internal state of the CanNm individual channels
-// It can't be combined with the CanNmChannelConfigType struct because it is not part of the params and containers. 
+// It can't be combined with the CanNmChannelConfig struct because it is not part of the params and containers. 
 typedef struct {
 	uint8_t						Channel;
 	Nm_ModeType					Mode;					//[SWS_CanNm_00092] // Defined in "NmStack_Types.h"
