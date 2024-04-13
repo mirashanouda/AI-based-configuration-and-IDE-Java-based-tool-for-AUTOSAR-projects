@@ -197,7 +197,7 @@ typedef struct {
 /*====================================================================================================================*\
     Global inline functions and function macros code
 \*====================================================================================================================*/
-void CanNm_Init(const CanNm_ConfigType* cannmConfigPtr);
+void CanNm_Init(const CanNmGlobalConfig* cannmConfigPtr);
 void CanNm_DeInit(void);
 uint8_t CanNm_PassiveStartUp(NetworkHandleType nmChannelHandle);
 uint8_t CanNm_NetworkRequest(NetworkHandleType nmChannelHandle); //! [Skipped]
