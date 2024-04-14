@@ -34,9 +34,9 @@
 	.RepeatMessageTime = 0, \ 
 	.TimeoutTime = 0, \
 	.WaitBusSleepTime = 0, \ 
-	.RxPdu = CanNmRxPdu_1, \ 
-	.TxPdu = CanNmTxPdu_1, \
-	.UserDataTxPdu = CanNmUserDataTxPdu_1 \
+	.c_CanNmRxPdu = CanNmRxPdu_1, \ 
+	.c_CanNmTxPdu = CanNmTxPdu_1, \
+	.c_CanNmUserDataTxPdu = CanNmUserDataTxPdu_1 \
 }
 
 #define CanNmPnFilterMaskByte_1 &(CanNmPnFilterMaskByte) { \
@@ -52,7 +52,7 @@
 #define CanNmPnInfo_1 &(CanNmPnInfo) { \
 	.PnInfoLength = 1, \ 
 	.PnInfoOffset = 1, \
-	.PnFilterMaskByte = {CanNmPnFilterMaskByte_1, CanNmPnFilterMaskByte_2 } \
+	.c_CanNmPnFilterMaskByte = {CanNmPnFilterMaskByte_1, CanNmPnFilterMaskByte_2 } \
 }
 
 CanNmGlobalConfig* pCanNmGlobalConfig = &(CanNmGlobalConfig) { 
@@ -72,6 +72,6 @@ CanNmGlobalConfig* pCanNmGlobalConfig = &(CanNmGlobalConfig) {
 			.UserDataEnabled = false, 
 			.VersionInfoApi = false,
 			.MainFunctionPeriod = 0, 
-			.ChannelConfig = {CanNmChannelConfig_1 } , 
-			.PnInfo = {CanNmPnInfo_1 }  
+			.c_CanNmChannelConfig = {CanNmChannelConfig_1 } , 
+			.c_CanNmPnInfo = {CanNmPnInfo_1 }  
         };

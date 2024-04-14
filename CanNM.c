@@ -109,7 +109,7 @@ void CanNm_Init(const CanNmGlobalConfig* canNmConfigPtr)
     CanNm_ConfigPtr = canNmConfigPtr;	//[SWS_CanNm_00060]
 
 	for (uint8_t channel = 0; channel < CANNM_CHANNEL_COUNT; channel++) {
-		const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[channel];
+		const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->c_CanNmChannelConfig[channel];
 		CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[channel];
 
 		ChannelInternal->Channel = channel;
@@ -126,16 +126,16 @@ void CanNm_Init(const CanNmGlobalConfig* canNmConfigPtr)
 		
 		//! TESTING: setting the PduNidPosition to enum other than CANNM_PDU_OFF and check the ID.
 		if (ChannelConfig->NodeIdEnabled && ChannelConfig->PduNidPosition != CANNM_PDU_OFF) {
-			ChannelConfig->TxPdu->TxPduRef->SduDataPtr[ChannelConfig->PduNidPosition] = ChannelConfig->NodeId;//[SWS_CanNm_00013]
+			ChannelConfig->c_CanNmTxPdu->TxPduRef->SduDataPtr[ChannelConfig->PduNidPosition] = ChannelConfig->NodeId;//[SWS_CanNm_00013]
 		}
 
 		//! TESTING: setting the PduCbvPosition to enum other than CANNM_PDU_OFF and check the control bit vector CBV.
 		if (ChannelConfig->PduCbvPosition != CANNM_PDU_OFF) {
-			ChannelConfig->TxPdu->TxPduRef->SduDataPtr[ChannelConfig->PduCbvPosition] = 0x00;				//[SWS_CanNm_00085]
+			ChannelConfig->c_CanNmTxPdu->TxPduRef->SduDataPtr[ChannelConfig->PduCbvPosition] = 0x00;				//[SWS_CanNm_00085]
 		}										
 
 		//! TESTING: check the destUserData given the offset and the length of the payload.
-		uint8_t* destUserData = CanNm_Internal_GetUserDataPtr(ChannelConfig, ChannelConfig->UserDataTxPdu->TxUserDataPduRef->SduDataPtr); // We pass the channel config and the payload of the PDU
+		uint8_t* destUserData = CanNm_Internal_GetUserDataPtr(ChannelConfig, ChannelConfig->c_CanNmUserDataTxPdu->TxUserDataPduRef->SduDataPtr); // We pass the channel config and the payload of the PDU
 		uint8_t userDataLength = CanNm_Internal_GetUserDataLength(ChannelConfig);
 		memset(destUserData, 0xFF, userDataLength);														//[SWS_CanNm_00025]
 
@@ -171,7 +171,7 @@ void CanNm_DeInit(void)
  */
 uint8_t CanNm_PassiveStartUp(NetworkHandleType nmChannelHandle)
 {
-	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
+	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->c_CanNmChannelConfig[nmChannelHandle];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[nmChannelHandle];
 	uint8_t status = E_OK;
 
@@ -193,7 +193,7 @@ uint8_t CanNm_PassiveStartUp(NetworkHandleType nmChannelHandle)
  */
 uint8_t CanNm_NetworkRelease(NetworkHandleType nmChannelHandle)
 {
-	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
+	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->c_CanNmChannelConfig[nmChannelHandle];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[nmChannelHandle];
 
 	ChannelInternal->Requested = false;	//[SWS_CanNm_00105]
@@ -245,11 +245,11 @@ uint8_t CanNm_EnableCommunication(NetworkHandleType nmChannelHandle)
  */
 uint8_t CanNm_SetUserData(NetworkHandleType nmChannelHandle, const uint8_t* nmUserDataPtr)
 {
-	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
+	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->c_CanNmChannelConfig[nmChannelHandle];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[nmChannelHandle];
 
 	if (CanNm_ConfigPtr->UserDataEnabled && !CanNm_ConfigPtr->ComUserDataSupport) {				//[SWS_CanNm_00158][SWS_CanNm_00327]
-		uint8_t* destUserData = CanNm_Internal_GetUserDataPtr(ChannelConfig, ChannelConfig->UserDataTxPdu->TxUserDataPduRef->SduDataPtr);
+		uint8_t* destUserData = CanNm_Internal_GetUserDataPtr(ChannelConfig, ChannelConfig->c_CanNmUserDataTxPdu->TxUserDataPduRef->SduDataPtr);
 		uint8_t userDataLength = CanNm_Internal_GetUserDataLength(ChannelConfig);
 		memcpy(destUserData, nmUserDataPtr, userDataLength);									//[SWS_CanNm_00159]	
 		return E_OK;
@@ -264,11 +264,11 @@ uint8_t CanNm_SetUserData(NetworkHandleType nmChannelHandle, const uint8_t* nmUs
  */
 uint8_t CanNm_GetUserData(NetworkHandleType nmChannelHandle, uint8_t* nmUserDataPtr)
 {
-	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
+	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->c_CanNmChannelConfig[nmChannelHandle];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[nmChannelHandle];
 
 	if (CanNm_ConfigPtr->UserDataEnabled /*&& ChannelInternal->RxLastPdu != NO_PDU_RECEIVED*/) {	//[SWS_CanNm_00158]
-		uint8_t* srcUserData = CanNm_Internal_GetUserDataPtr(ChannelConfig, ChannelConfig->RxPdu[ChannelInternal->RxLastPdu]->RxPduRef->SduDataPtr);
+		uint8_t* srcUserData = CanNm_Internal_GetUserDataPtr(ChannelConfig, ChannelConfig->c_CanNmRxPdu[ChannelInternal->RxLastPdu]->RxPduRef->SduDataPtr);
 		uint8_t userDataLength = CanNm_Internal_GetUserDataLength(ChannelConfig);
 		memcpy(nmUserDataPtr, srcUserData, userDataLength);										//[SWS_CanNm_00160]
 		return E_OK;
@@ -296,7 +296,7 @@ uint8_t CanNm_Transmit(uint16_t TxPduId, const PduInfoType* PduInfoPtr)
  */
 uint8_t CanNm_GetLocalNodeIdentifier(NetworkHandleType nmChannelHandle, uint8_t* nmNodeIdPtr)
 {
-	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
+	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->c_CanNmChannelConfig[nmChannelHandle];
 
 	*nmNodeIdPtr = ChannelConfig->NodeId;	//[SWS_CanNm_00133]
 	return E_OK;
@@ -308,7 +308,7 @@ uint8_t CanNm_GetLocalNodeIdentifier(NetworkHandleType nmChannelHandle, uint8_t*
  */
 uint8_t CanNm_RepeatMessageRequest(NetworkHandleType nmChannelHandle)
 {
-	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
+	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->c_CanNmChannelConfig[nmChannelHandle];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[nmChannelHandle];
 
 	if (ChannelConfig->PduCbvPosition != CANNM_PDU_OFF) {
@@ -355,7 +355,7 @@ uint8_t CanNm_GetState(NetworkHandleType nmChannelHandle, Nm_StateType* nmStateP
  */
 uint8_t CanNm_RequestBusSynchronization(NetworkHandleType nmChannelHandle)
 {
-	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
+	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->c_CanNmChannelConfig[nmChannelHandle];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[nmChannelHandle];
 
     if (!CanNm_ConfigPtr->PassiveModeEnabled) {											//[SWS_CanNm_00130]
@@ -393,7 +393,7 @@ uint8_t CanNm_CheckRemoteSleepIndication(NetworkHandleType nmChannelHandle, bool
  */
 uint8_t CanNm_SetSleepReadyBit(NetworkHandleType nmChannelHandle,bool nmSleepReadyBit)
 {
-	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
+	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->c_CanNmChannelConfig[nmChannelHandle];
     CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[nmChannelHandle];
 
 	if (ChannelConfig->PduCbvPosition != CANNM_PDU_OFF && CanNm_ConfigPtr->CoordinatorSyncSupport) {	//[SWS_CanNm_00342]
@@ -411,14 +411,14 @@ uint8_t CanNm_SetSleepReadyBit(NetworkHandleType nmChannelHandle,bool nmSleepRea
  */
 void CanNm_TxConfirmation(uint16_t TxPduId, uint8_t result)
 {
-	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[TxPduId];
+	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->c_CanNmChannelConfig[TxPduId];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[TxPduId];
 
 	if (result == E_OK) {
 		CanNm_Internal_TimerStart(&ChannelInternal->TimeoutTimer, ChannelConfig->TimeoutTime);				//[SWS_CanNm_00099]
 	}
 	if (CanNm_ConfigPtr->ComUserDataSupport) {
-		PduR_CanNmRxIndication(TxPduId, ChannelConfig->TxPdu->TxPduRef); 						//[SWS_CanNm_00329]
+		PduR_CanNmRxIndication(TxPduId, ChannelConfig->c_CanNmTxPdu->TxPduRef); 						//[SWS_CanNm_00329]
 	}
 }
 
@@ -447,12 +447,12 @@ void CanNm_ConfirmPnAvailability(NetworkHandleType nmChannelHandle)
  */
 uint8_t CanNm_TriggerTransmit(uint16_t TxPduId, PduInfoType* PduInfoPtr)
 {
-	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[TxPduId];
+	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->c_CanNmChannelConfig[TxPduId];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[TxPduId];
 
-	if (ChannelConfig->TxPdu->TxPduRef->SduLength <= PduInfoPtr->SduLength) {
-		memcpy(PduInfoPtr->SduDataPtr, ChannelConfig->TxPdu->TxPduRef->SduDataPtr, ChannelConfig->TxPdu->TxPduRef->SduLength);	//[SWS_CanNm_00351]
-		PduInfoPtr->SduLength = ChannelConfig->TxPdu->TxPduRef->SduLength;
+	if (ChannelConfig->c_CanNmTxPdu->TxPduRef->SduLength <= PduInfoPtr->SduLength) {
+		memcpy(PduInfoPtr->SduDataPtr, ChannelConfig->c_CanNmTxPdu->TxPduRef->SduDataPtr, ChannelConfig->c_CanNmTxPdu->TxPduRef->SduLength);	//[SWS_CanNm_00351]
+		PduInfoPtr->SduLength = ChannelConfig->c_CanNmTxPdu->TxPduRef->SduLength;
 		return E_OK;
 	} else {
 		return E_NOT_OK;
@@ -548,7 +548,7 @@ static inline uint8_t* CanNm_Internal_GetUserDataPtr( const CanNmChannelConfig* 
 static inline uint8_t CanNm_Internal_GetUserDataLength( const CanNmChannelConfig* ChannelConfig )
 {
 	uint8_t userDataOffset = CanNm_Internal_GetUserDataOffset(ChannelConfig);
-	return ChannelConfig->UserDataTxPdu->TxUserDataPduRef->SduLength - userDataOffset;
+	return ChannelConfig->c_CanNmUserDataTxPdu->TxUserDataPduRef->SduLength - userDataOffset;
 }
 
 static inline void CanNm_Internal_BusSleep_to_RepeatMessage( const CanNmChannelConfig* ChannelConfig, CanNm_Internal_ChannelType* ChannelInternal )
@@ -569,12 +569,12 @@ static inline void CanNm_Internal_BusSleep_to_RepeatMessage( const CanNmChannelC
 
 static inline void CanNm_Internal_SetPduCbvBit( const CanNmChannelConfig* ChannelConfig, const uint8_t PduCbvBitPosition )
 {
-	ChannelConfig->TxPdu->TxPduRef->SduDataPtr[ChannelConfig->PduCbvPosition] |= (1 << PduCbvBitPosition);
+	ChannelConfig->c_CanNmTxPdu->TxPduRef->SduDataPtr[ChannelConfig->PduCbvPosition] |= (1 << PduCbvBitPosition);
 }
 
 static inline void CanNm_Internal_MessageCycleTimerExpiredCallback( void* Timer, const uint8_t channel )
 {
-	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[channel];
+	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->c_CanNmChannelConfig[channel];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[channel];
 	uint8_t txStatus = E_OK;
 	static uint8_t lastTxStatus;
@@ -603,7 +603,7 @@ static inline void CanNm_Internal_MessageCycleTimerExpiredCallback( void* Timer,
 static inline uint8_t CanNm_Internal_TransmitMessage( const CanNmChannelConfig* ChannelConfig, CanNm_Internal_ChannelType* ChannelInternal )
 {
 	if (ChannelInternal->TxEnabled) {
-		CanIf_Transmit(ChannelConfig->TxPdu->TxConfirmationPduId, ChannelConfig->TxPdu->TxPduRef);	//[SWS_CanNm_00032]
+		CanIf_Transmit(ChannelConfig->c_CanNmTxPdu->TxConfirmationPduId, ChannelConfig->c_CanNmTxPdu->TxPduRef);	//[SWS_CanNm_00032]
 		return E_NOT_OK;
 	} else {
 		return E_OK;
@@ -624,7 +624,7 @@ static inline uint8_t CanNm_Internal_TxDisable( CanNm_Internal_ChannelType* Chan
 
 static inline uint8_t CanNm_Internal_TxEnable( CanNm_Internal_ChannelType* ChannelInternal )
 {
-	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->ChannelConfig[ChannelInternal->Channel];
+	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->c_CanNmChannelConfig[ChannelInternal->Channel];
 
 	if (!CanNm_ConfigPtr->PassiveModeEnabled) {
 		ChannelInternal->TxEnabled = true;															//[SWS_CanNm_00237]

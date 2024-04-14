@@ -74,9 +74,9 @@ typedef struct {
 
 typedef struct {
 	// Containers:
-	CanNmUserDataTxPdu*		    UserDataTxPdu;
-	CanNmRxPdu*			    	RxPdu[CANNM_RXPDU_MAX_COUNT];
-	CanNmTxPdu*			    	TxPdu;
+	CanNmUserDataTxPdu*		    c_CanNmUserDataTxPdu;
+	CanNmRxPdu*			    	c_CanNmRxPdu[CANNM_RXPDU_MAX_COUNT];
+	CanNmTxPdu*			    	c_CanNmTxPdu;
 
 	// Parameters:
 	bool						ActiveWakeupBitEnabled;
@@ -111,7 +111,7 @@ typedef struct {
 
 typedef struct {
 	// Containers:
-	const CanNmPnFilterMaskByte* 	PnFilterMaskByte;
+	const CanNmPnFilterMaskByte* 	c_CanNmPnFilterMaskByte;
 	
 	// Parameters:
 	const uint8_t 					PnInfoLength;
@@ -124,8 +124,8 @@ typedef struct {
  */
 typedef struct {
 	// Containers:
-	CanNmChannelConfig*	ChannelConfig[CANNM_CHANNEL_COUNT];
-	CanNmPnInfo*		PnInfo;
+	CanNmChannelConfig*	c_CanNmChannelConfig[CANNM_CHANNEL_COUNT];
+	CanNmPnInfo*		c_CanNmPnInfo;
 
 	// Parameters:
 	bool				BusLoadReductionEnabled;
