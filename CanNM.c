@@ -433,7 +433,7 @@ uint8_t CanNm_SetSleepReadyBit(NetworkHandleType nmChannelHandle,bool nmSleepRea
 	const CanNmChannelConfig* ChannelConf = CanNm_ConfigPtr->ChannelConfig[nmChannelHandle];
     CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[nmChannelHandle];
 
-	if (ChannelConf->PduCbvPosition != CANNM_PDU_OFF && CanNm_ConfigPtr->CoordinationSyncSupport) {	//[SWS_CanNm_00342]
+	if (ChannelConf->PduCbvPosition != CANNM_PDU_OFF && CanNm_ConfigPtr->CoordinatorSyncSupport) {	//[SWS_CanNm_00342]
 		CanNm_Internal_SetPduCbvBit(ChannelConf, NM_COORDINATOR_SLEEP_READY_BIT);
 		CanNm_Internal_TransmitMessage(ChannelConf, ChannelInternal);
 		return E_OK;

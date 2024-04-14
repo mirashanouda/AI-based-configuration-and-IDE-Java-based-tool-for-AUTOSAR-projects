@@ -2,7 +2,7 @@
 CC=gcc
 
 # Define any compile-time flags
-CFLAGS=-Wall
+CFLAGS=-std=c99 #-Wall 
 
 # Define the target executable
 TARGET=main

@@ -4,5 +4,8 @@
     ],
     "cSpell.ignoreWords": [
         "ECUC"
-    ]
+    ],
+    "files.associations": {
+        "dynamic.h": "c"
+    }
 }

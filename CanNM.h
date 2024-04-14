@@ -6,13 +6,18 @@
 \*====================================================================================================================*/
 
 /*====================================================================================================================*\
+	System Headers
+\*====================================================================================================================*/
+#include "stdint.h"
+#include "stdbool.h"
+#include <stddef.h>
+
+/*====================================================================================================================*\
     Include headers [SWS_CanNm_00245]
 \*====================================================================================================================*/
 // TODO: Check SWS for correct included headers
 /* [SWS_CanNm_00309] */
 #include "NmStack_Types.h"
-
-//#include "CanNm_Cfg.h
 
 /*====================================================================================================================*\
     Local macros
@@ -127,7 +132,7 @@ typedef struct {
 	bool				BusSynchronizationEnabled;
 	bool				ComControlEnabled;
 	bool				ComUserDataSupport;
-	bool				CoordinationSyncSupport;
+	bool				CoordinatorSyncSupport;
 	bool				DevErrorDetect;
 	bool				GlobalPnSupport;
 	bool				ImmediateRestartEnabled;
@@ -148,7 +153,7 @@ typedef struct {
 /*====================================================================================================================*\
     Local types
 \*====================================================================================================================*/
-typedef void (*CanNmTimerCallback)(void* Timer, const uint8_t_t channel);
+typedef void (*CanNmTimerCallback)(void* Timer, const uint8_t channel);
 
 typedef enum {
 	CANNM_TIMER_STOPPED,
