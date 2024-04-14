@@ -2,6 +2,7 @@
 from lxml import etree
 from collections import defaultdict
 import sys
+import os 
 
 # Global Varialbles
 cont_cnt = defaultdict(int)
@@ -75,7 +76,7 @@ def get_container(main_cont, my_name):
     
   output_string += "\n\n"
 
-  with open("dynamic.h", "a") as file:
+  with open("Generated_Code/Initialization.h", "a") as file:
       file.write(output_string)
       
 
@@ -94,7 +95,9 @@ def init():
 '''
 
 # Open the file in write mode. If the file does not exist, it will be created.
-  with open("dynamic.h", "w") as file:
+  if not os.path.exists('Generated_Code'): 
+    os.mkdir('Generated_Code') 
+  with open("Generated_Code/Initialization.h", "w") as file:
       file.write(text)
 
 
