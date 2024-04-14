@@ -180,7 +180,7 @@ typedef struct {
 	Nm_StateType				State;					//[SWS_CanNm_00089]
 	bool						Requested;
 	bool						TxEnabled;
-	// int8_t						RxLastPdu;
+	int8_t						RxLastPdu;
 	CanNm_Timer					TimeoutTimer;			//NM-Timeout Timer, Tx Timeout Timer
 	CanNm_Timer					MessageCycleTimer;
 	CanNm_Timer					RepeatMessageTimer;
@@ -189,7 +189,7 @@ typedef struct {
 	uint8_t						ImmediateNmTransmissions;
 	bool						BusLoadReduction;		//[SWS_CanNm_00238]
 	bool						RemoteSleepInd;
-	// bool						RemoteSleepIndEnabled;
+	bool						RemoteSleepIndEnabled;
 	bool						NmPduFilterAlgorithm;
 } CanNm_Internal_ChannelType;
 
@@ -202,27 +202,27 @@ typedef struct {
 /*====================================================================================================================*\
     Global inline functions and function macros code
 \*====================================================================================================================*/
-void CanNm_Init(const CanNmGlobalConfig* cannmConfigPtr);
+void CanNm_Init(const CanNmGlobalConfig* canNmConfigPtr);
 void CanNm_DeInit(void);
 uint8_t CanNm_PassiveStartUp(NetworkHandleType nmChannelHandle);
-uint8_t CanNm_NetworkRequest(NetworkHandleType nmChannelHandle); //! [Skipped]
+// uint8_t CanNm_NetworkRequest(NetworkHandleType nmChannelHandle); //! [Skipped]
 uint8_t CanNm_NetworkRelease(NetworkHandleType nmChannelHandle);
 uint8_t CanNm_DisableCommunication(NetworkHandleType nmChannelHandle);
 uint8_t CanNm_EnableCommunication(NetworkHandleType nmChannelHandle);
 uint8_t CanNm_SetUserData(NetworkHandleType nmChannelHandle, const uint8_t* nmUserDataPtr);
 uint8_t CanNm_GetUserData(NetworkHandleType nmChannelHandle, uint8_t* nmUserDataPtr);
 uint8_t CanNm_Transmit(uint16_t TxPduId, const PduInfoType* PduInfoPtr);
-uint8_t CanNm_GetNodeIdentifier(NetworkHandleType nmChannelHandle, uint8_t*nmNodeIdPtr);
+// uint8_t CanNm_GetNodeIdentifier(NetworkHandleType nmChannelHandle, uint8_t*nmNodeIdPtr);  //! [Skipped]
 uint8_t CanNm_GetLocalNodeIdentifier(NetworkHandleType nmChannelHandle, uint8_t* nmNodeIdPtr);
 uint8_t CanNm_RepeatMessageRequest(NetworkHandleType nmChannelHandle);
-uint8_t CanNm_GetPduData(NetworkHandleType nmChannelHandle, uint8_t* nmPduDataPtr);
+// uint8_t CanNm_GetPduData(NetworkHandleType nmChannelHandle, uint8_t* nmPduDataPtr); //! [Skipped]
 uint8_t CanNm_GetState(NetworkHandleType nmChannelHandle, Nm_StateType* nmStatePtr, Nm_ModeType* nmModePtr);
 uint8_t CanNm_RequestBusSynchronization(NetworkHandleType nmChannelHandle);
 uint8_t CanNm_CheckRemoteSleepIndication(NetworkHandleType nmChannelHandle, bool* nmRemoteSleepIndPtr);
 uint8_t CanNm_SetSleepReadyBit(NetworkHandleType nmChannelHandle,bool nmSleepReadyBit);
 
 void CanNm_TxConfirmation(uint16_t TxPduId, uint8_t result);
-void CanNm_RxIndication(uint16_t RxPduId, const PduInfoType* PduInfoPtr);//! [Skipped]
+// void CanNm_RxIndication(uint16_t RxPduId, const PduInfoType* PduInfoPtr);//! [Skipped]
 void CanNm_ConfirmPnAvailability(NetworkHandleType nmChannelHandle);
 uint8_t CanNm_TriggerTransmit(uint16_t TxPduId, PduInfoType* PduInfoPtr);
 

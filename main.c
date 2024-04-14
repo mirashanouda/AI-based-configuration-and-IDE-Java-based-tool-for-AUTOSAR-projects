@@ -4,6 +4,6 @@
 
 int main()
 {
-    // CanNm_Init(CanNmGlobalConfig_1);
+    CanNm_Init(pCanNmGlobalConfig);
     // assert(CanNm_Internal.State == CANNM_INIT);
 }

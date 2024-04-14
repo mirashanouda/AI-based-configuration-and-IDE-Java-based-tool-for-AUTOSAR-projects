@@ -11,7 +11,7 @@ TARGET=main
 all: $(TARGET)
 
 $(TARGET): $(TARGET).c
-	$(CC) $(CFLAGS) -o $(TARGET) $(TARGET).c
+	$(CC) $(CFLAGS) -o $(TARGET) $(TARGET).c CanNM.c
 
 # Clean the build
 clean:
