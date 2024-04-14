@@ -202,15 +202,15 @@ typedef struct {
 /*====================================================================================================================*\
     Global inline functions and function macros code
 \*====================================================================================================================*/
-void CanNm_Init(const CanNmGlobalConfig* canNmConfigPtr);
+void CanNm_Init(const CanNmGlobalConfig* canNmConfigPtr); //* Ref
 void CanNm_DeInit(void);
 uint8_t CanNm_PassiveStartUp(NetworkHandleType nmChannelHandle);
 // uint8_t CanNm_NetworkRequest(NetworkHandleType nmChannelHandle); //! [Skipped]
 uint8_t CanNm_NetworkRelease(NetworkHandleType nmChannelHandle);
 uint8_t CanNm_DisableCommunication(NetworkHandleType nmChannelHandle);
 uint8_t CanNm_EnableCommunication(NetworkHandleType nmChannelHandle);
-uint8_t CanNm_SetUserData(NetworkHandleType nmChannelHandle, const uint8_t* nmUserDataPtr);
-uint8_t CanNm_GetUserData(NetworkHandleType nmChannelHandle, uint8_t* nmUserDataPtr);
+uint8_t CanNm_SetUserData(NetworkHandleType nmChannelHandle, const uint8_t* nmUserDataPtr); //* Ref
+uint8_t CanNm_GetUserData(NetworkHandleType nmChannelHandle, uint8_t* nmUserDataPtr); //* Ref
 uint8_t CanNm_Transmit(uint16_t TxPduId, const PduInfoType* PduInfoPtr);
 // uint8_t CanNm_GetNodeIdentifier(NetworkHandleType nmChannelHandle, uint8_t*nmNodeIdPtr);  //! [Skipped]
 uint8_t CanNm_GetLocalNodeIdentifier(NetworkHandleType nmChannelHandle, uint8_t* nmNodeIdPtr);
@@ -224,6 +224,6 @@ uint8_t CanNm_SetSleepReadyBit(NetworkHandleType nmChannelHandle,bool nmSleepRea
 void CanNm_TxConfirmation(uint16_t TxPduId, uint8_t result);
 // void CanNm_RxIndication(uint16_t RxPduId, const PduInfoType* PduInfoPtr);//! [Skipped]
 void CanNm_ConfirmPnAvailability(NetworkHandleType nmChannelHandle);
-uint8_t CanNm_TriggerTransmit(uint16_t TxPduId, PduInfoType* PduInfoPtr);
+uint8_t CanNm_TriggerTransmit(uint16_t TxPduId, PduInfoType* PduInfoPtr); //* Ref
 
 #endif /* CANNM_H */
