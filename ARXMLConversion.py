@@ -1,18 +1,15 @@
 #!/usr/bin/env python
 from lxml import etree
 from collections import defaultdict
+import sys
 
 # Global Varialbles
 cont_cnt = defaultdict(int)
 
-# # Parsing the ARXML
+# Parsing the ARXML
 def get_container(main_cont, my_name):
-
-  # for x in main_cont.findall('./autosar:SHORT-NAME', namespaces=namespaces):
-  #   print(x.text)
-
   # Getting the params and save them in a map
-  param_mp = {}
+  param_mp = {} # the parameter and its value
   params = main_cont.findall('./autosar:PARAMETER-VALUES', namespaces=namespaces)
   if (len(params) > 0):
     params = params[0]
@@ -32,49 +29,63 @@ def get_container(main_cont, my_name):
       k = k.split('_', 1)[0]
       cont_cnt[k] += 1
       cont_name = k + "_" + str(cont_cnt[k])
-      #cont_mp[k].append(cont_name)
+      if k not in cont_mp:
+            cont_mp[k] = []
+      cont_mp[k].append(cont_name)
       get_container(cont, cont_name)
 
   # Printing the instantiation of the object
   f = 0
   struct_name = my_name.split('_', 1)[0]
-  output_string = f"{struct_name} {my_name} = {{ "
+  if struct_name == "CanNmGlobalConfig":
+    output_string = f"CanNmGlobalConfig* p{struct_name} = &({struct_name}) {{ \ \n"  # to make only the global config as a pointer
+  else:
+    output_string = f"#define {my_name} &({struct_name}) {{ \ \n"
   # Params
   for key, value in param_mp.items():
     if f == 0:
       f = 1
     else:
-      output_string += ", \n"
-    output_string += "." + key[5:] + " = " + value
+      output_string += ", \ \n"
+    if type(value) == str: # To convert Ture and False to true and false
+      value = value.lower()
+    output_string += "\t\t\t." + key[5:] + " = " + value
+  
   # Containers
   for key, values in cont_mp.items():
     if f == 0:
       f = 1
     else:
-      output_string += ", \n"  # Subsequent items start with comma
-    output_string += "." + key + " = {\n"
+      output_string += ", \\"  # Subsequent items start with comma
+    output_string += "\n\t\t\t.c_" + key + " = {" # the c_ stands for a container
     fp = 0
     for value in values:
       if fp == 0:
         fp = 1
       else:
-        output_string += ", \n"
+        output_string += ", "        
       output_string += value
+        
     output_string += " } "
 
   output_string += " }"
-  output_string += "\n"
+
+  if struct_name == "CanNmGlobalConfig":
+    output_string += ";"  # to make only the global config as a pointer
+    
+  output_string += "\n\n"
 
   with open("dynamic.c", "a") as file:
       file.write(output_string)
-
+      
 
 # Writing the header
 def init():
   text = '''/*====================================================================================================================*\\
     Include headers
 \\*====================================================================================================================*/
-#include "CanNm.h"
+/* [SWS_CanNm_00326] */
+#include "CanNM.h"
 
 /*====================================================================================================================*\\
     Object Initialization
@@ -87,9 +98,9 @@ def init():
       file.write(text)
 
 
-
 # The main fucntion
-file_path = 'CanNm_Template.arxml'
+file_path = sys.argv[1]
+print(file_path)
 # Parse the ARXML file
 tree = etree.parse(file_path)
 root = tree.getroot()
