@@ -75,7 +75,7 @@ def get_container(main_cont, my_name):
     
   output_string += "\n\n"
 
-  with open("dynamic.c", "a") as file:
+  with open("dynamic.h", "a") as file:
       file.write(output_string)
       
 
@@ -94,7 +94,7 @@ def init():
 '''
 
 # Open the file in write mode. If the file does not exist, it will be created.
-  with open("dynamic.c", "w") as file:
+  with open("dynamic.h", "w") as file:
       file.write(text)
 
 
