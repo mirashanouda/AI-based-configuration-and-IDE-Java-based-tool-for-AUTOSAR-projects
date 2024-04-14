@@ -55,6 +55,13 @@ import javax.swing.SwingUtilities;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class MainApplication extends JFrame implements ConfiguratorInterface {
 
@@ -1462,6 +1469,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                 appendLogMessage("Script executed successfully.");
                 appendLogMessage("C and H Files Generated From output.arxml.");
                 
+                
             } else {
                 System.out.println("Script execution failed.");
                 appendLogMessage("Script execution failed./n");
@@ -1483,36 +1491,53 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
 
     private void jButton4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton4MouseClicked
             try {
-            // Get the text from the JTextArea
-            String textFromTextArea = "Helloooooo"; //jTextArea1.getText();
+            String textFromTextArea = jTextArea1.getText();
+            // Write the text to a file
+            File file = new File("user_input.txt");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write(textFromTextArea);
+            writer.close();
+            
+            String pythonScriptPath = "../../python_script2_for_AI.py"; // Replace with the actual script path
+            ProcessBuilder builder = new ProcessBuilder("python", pythonScriptPath);
+            Process p = builder.start();
 
-            // Set up the command to execute the Python script with the text as an argument
-            List<String> command = new ArrayList<>();
-            command.add("python"); // or "python3" depending on your environment
-            command.add("../../python_script2_for_AI.py");
-            command.add(textFromTextArea);
-
-            // Execute the Python script using ProcessBuilder
-            ProcessBuilder builder = new ProcessBuilder(command);
-            Process process = builder.start();
-
-            // Read the output from the script (if any)
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            // If you want to capture the Python script's output
+            BufferedReader inn = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line;
-            while ((line = reader.readLine()) != null) {
+            while ((line = inn.readLine()) != null) {
                 System.out.println(line);
             }
 
-            // Check the exit value of the process
-            int exitVal = process.waitFor();
-            if (exitVal != 0) {
-                // Handle the case where the script returns a non-zero exit value
-                System.out.println("Python script exited with non-zero code: " + exitVal);
+            int exitCode = p.waitFor();
+            if (exitCode == 0) {
+                System.out.println("Script executed successfully.");
+                appendLogMessage("Script executed successfully.");
+                
+                // TODO:
+                /*
+                // Check the contents of error.txt
+                File file = new File("error.txt");
+                BufferedReader fileReader = new BufferedReader(new FileReader(file));
+                String status = fileReader.readLine(); // Assumes only one of the two strings is in the file
+                fileReader.close();
+
+                if ("Success!".equals(status)) {
+                    System.out.println("AI-Generated ARXML is generated Successfully.");
+                    appendLogMessage("AI-Generated ARXML is generated Successfully.");
+                } else if ("Failure!".equals(status)) {
+                    System.out.println("The user input is not valid/vague.");
+                    appendLogMessage("The user input is not valid/vague.");
+                }
+                */
+                
+            } else {
+                System.out.println("Script execution failed.");
+                appendLogMessage("Script execution failed.");
             }
-        } catch (IOException | InterruptedException ex) {
-            // Handle exceptions
-            ex.printStackTrace();
-        }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+    }
     }//GEN-LAST:event_jButton4MouseClicked
 
     public static void main(String args[]) {

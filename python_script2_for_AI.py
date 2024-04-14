@@ -1,13 +1,19 @@
-import sys
+# Define the file paths
+input_file_path = 'user_input.txt'
+output_file_path = 'outputAI.txt'
 
-def write_to_file(input_string):
-    # This function writes the input string to a text file
-    with open("OutputAI.txt", "w") as file:
-        file.write(input_string)
-
-if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        input_string = sys.argv[1]  # Get the string passed as an argument
-        write_to_file(input_string)
+# Open and read the input file
+with open(input_file_path, 'r') as input_file:
+    # Read all lines in the file
+    lines = input_file.readlines()
+    
+    # Check if there are at least 1 line
+    if len(lines) >= 1:
+        # Get the first line
+        first_line = lines[0]
+        
+        # Open and write the first line to the output file
+        with open(output_file_path, 'w') as output_file:
+            output_file.write(first_line)
     else:
-        print("Please provide a string as an input argument.")
+        print("The input file does not have at least 1 line.")
