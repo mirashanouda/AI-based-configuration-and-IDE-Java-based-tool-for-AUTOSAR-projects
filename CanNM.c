@@ -125,19 +125,20 @@ void CanNm_Init(const CanNmGlobalConfig* canNmConfigPtr)
 		ChannelInternal->NmPduFilterAlgorithm = false;													//[SWS_CanNm_00403]
 		
 		//! TESTING: setting the PduNidPosition to enum other than CANNM_PDU_OFF and check the ID.
-		if (ChannelConfig->NodeIdEnabled && ChannelConfig->PduNidPosition != CANNM_PDU_OFF) {
-			ChannelConfig->c_CanNmTxPdu->TxPduRef->SduDataPtr[ChannelConfig->PduNidPosition] = ChannelConfig->NodeId;//[SWS_CanNm_00013]
-		}
+		// if (ChannelConfig->NodeIdEnabled && ChannelConfig->PduNidPosition != CANNM_PDU_OFF && ChannelConfig->c_CanNmTxPdu->TxPduRef->SduDataPtr) {
+		// 	ChannelConfig->c_CanNmTxPdu->TxPduRef->SduDataPtr[ChannelConfig->PduNidPosition] = ChannelConfig->NodeId;//[SWS_CanNm_00013]
+		// }
 
 		//! TESTING: setting the PduCbvPosition to enum other than CANNM_PDU_OFF and check the control bit vector CBV.
-		if (ChannelConfig->PduCbvPosition != CANNM_PDU_OFF) {
-			ChannelConfig->c_CanNmTxPdu->TxPduRef->SduDataPtr[ChannelConfig->PduCbvPosition] = 0x00;				//[SWS_CanNm_00085]
-		}										
+		// if (ChannelConfig->PduCbvPosition != CANNM_PDU_OFF && ChannelConfig->c_CanNmTxPdu->TxPduRef->SduDataPtr) {
+		// 	printf(ChannelConfig->c_CanNmTxPdu->TxPduRef->SduDataPtr);
+		// 	ChannelConfig->c_CanNmTxPdu->TxPduRef->SduDataPtr[ChannelConfig->PduCbvPosition] = 0x00;				//[SWS_CanNm_00085]
+		// }										
 
 		//! TESTING: check the destUserData given the offset and the length of the payload.
-		uint8_t* destUserData = CanNm_Internal_GetUserDataPtr(ChannelConfig, ChannelConfig->c_CanNmUserDataTxPdu->TxUserDataPduRef->SduDataPtr); // We pass the channel config and the payload of the PDU
-		uint8_t userDataLength = CanNm_Internal_GetUserDataLength(ChannelConfig);
-		memset(destUserData, 0xFF, userDataLength);														//[SWS_CanNm_00025]
+		//uint8_t* destUserData = CanNm_Internal_GetUserDataPtr(ChannelConfig, ChannelConfig->c_CanNmUserDataTxPdu->TxUserDataPduRef->SduDataPtr); // We pass the channel config and the payload of the PDU
+		//uint8_t userDataLength = CanNm_Internal_GetUserDataLength(ChannelConfig);
+		//memset(destUserData, 0xFF, userDataLength);														//[SWS_CanNm_00025]
 
 		// CanNm_Internal_TimersInit(channel);																//[SWS_CanNm_00061][SWS_CanNm_00033]
 	}
