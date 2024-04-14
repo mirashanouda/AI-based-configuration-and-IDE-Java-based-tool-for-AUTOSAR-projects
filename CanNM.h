@@ -136,7 +136,7 @@ typedef struct {
 	bool				DevErrorDetect;
 	bool				GlobalPnSupport;
 	bool				ImmediateRestartEnabled;
-	bool				ImmediateTxConfEnabled;				//[SWS_CanNm_00071]
+	bool				ImmediateTxconfEnabled;				//[SWS_CanNm_00071]
 	float				MainFunctionPeriod;
 	bool				PassiveModeEnabled;
 	bool				PduRxIndicationEnabled;
