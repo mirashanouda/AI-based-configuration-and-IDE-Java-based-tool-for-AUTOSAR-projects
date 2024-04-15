@@ -1452,7 +1452,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
 
     private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
         try {
-            String pythonScriptPath = "../../python_script.py"; // Replace with the actual script path
+            String pythonScriptPath = "../../ARXMLConversion.py"; // Replace with the actual script path
             ProcessBuilder pb = new ProcessBuilder("python", pythonScriptPath);
             Process p = pb.start();
 
@@ -1472,7 +1472,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                 
             } else {
                 System.out.println("Script execution failed.");
-                appendLogMessage("Script execution failed./n");
+                appendLogMessage("Script execution failed.");
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -1498,7 +1498,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             writer.write(textFromTextArea);
             writer.close();
             
-            String pythonScriptPath = "../../python_script2_for_AI.py"; // Replace with the actual script path
+            String pythonScriptPath = "../../python_script_for_AI.py"; // Replace with the actual script path
             ProcessBuilder builder = new ProcessBuilder("python", pythonScriptPath);
             Process p = builder.start();
 
