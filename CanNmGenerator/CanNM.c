@@ -19,6 +19,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef MOCKED_FUNC
+DEFINE_FFF_GLOBALS;
+FAKE_VOID_FUNC(PduR_CanNmRxIndication, uint8_t, const PduInfoType*);
+#endif
 
 /*====================================================================================================================*\
 	Local macros
@@ -26,10 +30,6 @@
 /* Control Bit Vector */
 #define REPEAT_MESSAGE_REQUEST 			0
 #define NM_COORDINATOR_SLEEP_READY_BIT 	3
-
-#define E_OK        0x00U
-#define E_NOT_OK    0x01U
-
 
 /*====================================================================================================================*\
     Global variables
@@ -88,11 +88,25 @@ static inline uint8_t* CanNm_Internal_GetUserDataPtr( const CanNmChannelConfig* 
 static inline uint8_t CanNm_Internal_GetUserDataLength( const CanNmChannelConfig* ChannelConfig );
 
 /* Mocked Functions */
-void CanIf_Transmit(uint16_t TxPduId, const PduInfoType* PduInfoPtr) { printf("Transmitting PDU with ID: %u\n", TxPduId); }
-void Nm_NetworkMode(uint8_t channel) { printf("Network Mode on channel: %u\n", channel); }
-void Nm_StateChangeNotification(uint8_t channel, Nm_StateType oldState, Nm_StateType newState) { printf("State changed from %u to %u on channel: %u\n", oldState, newState, channel); }
-void Nm_RemoteSleepCancellation(uint8_t channel) { printf("Remote Sleep Cancellation on channel: %u\n", channel); }
-void PduR_CanNmRxIndication(uint8_t channel, const PduInfoType* PduInfoPtr) { printf("PduR_CanNmRxIndication on channel: %u\n", channel); }
+// void CanIf_Transmit(uint16_t TxPduId, const PduInfoType* PduInfoPtr) { 
+// 	printf("Transmitting PDU with ID: %u\n", TxPduId);
+// }
+
+// void Nm_NetworkMode(uint8_t channel) { 
+// 	printf("Network Mode on channel: %u\n", channel);
+// }
+
+// void Nm_StateChangeNotification(uint8_t channel, Nm_StateType oldState, Nm_StateType newState) { 
+// 	printf("State changed from %u to %u on channel: %u\n", oldState, newState, channel);
+// }
+
+// void Nm_RemoteSleepCancellation(uint8_t channel) { 
+// 	printf("Remote Sleep Cancellation on channel: %u\n", channel);
+// }
+
+// void PduR_CanNmRxIndication(uint8_t channel, const PduInfoType* PduInfoPtr) { 
+// 	printf("PduR_CanNmRxIndication on channel: %u\n", channel);
+// }
 
 /*====================================================================================================================*\
     Global functions code
@@ -284,7 +298,7 @@ uint8_t CanNm_GetUserData(NetworkHandleType nmChannelHandle, uint8_t* nmUserData
 uint8_t CanNm_Transmit(uint16_t TxPduId, const PduInfoType* PduInfoPtr)
 {
 	if (CanNm_ConfigPtr->ComUserDataSupport || CanNm_ConfigPtr->GlobalPnSupport) {				//[SWS_CanNm_00330]
-		 CanIf_Transmit(TxPduId, PduInfoPtr);
+		//  CanIf_Transmit(TxPduId, PduInfoPtr);
 		 return E_OK;
 	} else {
 		return E_NOT_OK;
@@ -410,7 +424,7 @@ uint8_t CanNm_SetSleepReadyBit(NetworkHandleType nmChannelHandle,bool nmSleepRea
  * 
  * The lower layer communication interface module confirms the transmission of a PDU, or the failure to transmit a PDU.
  */
-void CanNm_TxConfirmation(uint16_t TxPduId, uint8_t result)
+void CanNm_TxConfirmation(uint16_t TxPduId, uint8_t result, CanNm_InternalType* p_CanNm_Internal, const CanNmGlobalConfig* p_CanNm_ConfigPtr)
 {
 	const CanNmChannelConfig* ChannelConfig = CanNm_ConfigPtr->c_CanNmChannelConfig[TxPduId];
 	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[TxPduId];
@@ -525,7 +539,7 @@ static inline void CanNm_Internal_NormalOperation_to_ReadySleep( const CanNmChan
 	ChannelInternal->State = NM_STATE_READY_SLEEP;
 	ChannelInternal->TxEnabled = false;																//[SWS_CanNm_00108]
 	if (CanNm_ConfigPtr->StateChangeIndEnabled) {
-		Nm_StateChangeNotification(ChannelInternal->Channel, NM_STATE_NORMAL_OPERATION, NM_STATE_READY_SLEEP);
+		// Nm_StateChangeNotification(ChannelInternal->Channel, NM_STATE_NORMAL_OPERATION, NM_STATE_READY_SLEEP);
 	}
 }
 
@@ -562,9 +576,9 @@ static inline void CanNm_Internal_BusSleep_to_RepeatMessage( const CanNmChannelC
 	CanNm_Internal_TimerStart(&ChannelInternal->MessageCycleTimer, ChannelConfig->MsgCycleOffset);		//[SWS_CanNm_00100]
 	
 	//! Fake functions. Can be tested using mock testing.
-	Nm_NetworkMode(ChannelInternal->Channel);															//[SWS_CanNm_00097]
+	// Nm_NetworkMode(ChannelInternal->Channel);															//[SWS_CanNm_00097]
 	if (CanNm_ConfigPtr->StateChangeIndEnabled) {
-		Nm_StateChangeNotification(ChannelInternal->Channel, NM_STATE_BUS_SLEEP, NM_STATE_REPEAT_MESSAGE); //[SWS_CanNm_00166]
+		// Nm_StateChangeNotification(ChannelInternal->Channel, NM_STATE_BUS_SLEEP, NM_STATE_REPEAT_MESSAGE); //[SWS_CanNm_00166]
 	}
 }
 
@@ -604,7 +618,7 @@ static inline void CanNm_Internal_MessageCycleTimerExpiredCallback( void* Timer,
 static inline uint8_t CanNm_Internal_TransmitMessage( const CanNmChannelConfig* ChannelConfig, CanNm_Internal_ChannelType* ChannelInternal )
 {
 	if (ChannelInternal->TxEnabled) {
-		CanIf_Transmit(ChannelConfig->c_CanNmTxPdu->TxConfirmationPduId, ChannelConfig->c_CanNmTxPdu->TxPduRef);	//[SWS_CanNm_00032]
+		// CanIf_Transmit(ChannelConfig->c_CanNmTxPdu->TxConfirmationPduId, ChannelConfig->c_CanNmTxPdu->TxPduRef);	//[SWS_CanNm_00032]
 		return E_NOT_OK;
 	} else {
 		return E_OK;
@@ -652,10 +666,10 @@ static inline void CanNm_Internal_ReadySleep_to_RepeatMessage( const CanNmChanne
 	CanNm_Internal_TimerStart(&ChannelInternal->MessageCycleTimer, ChannelConfig->MsgCycleOffset);	//[SWS_CanNm_00100]
 	if (ChannelInternal->RemoteSleepInd) {
 		ChannelInternal->RemoteSleepInd = false;
-		Nm_RemoteSleepCancellation(ChannelInternal->Channel);										//[SWS_CanNm_00151]
+		// Nm_RemoteSleepCancellation(ChannelInternal->Channel);										//[SWS_CanNm_00151]
 	}
 	if (CanNm_ConfigPtr->StateChangeIndEnabled) {
-		Nm_StateChangeNotification(ChannelInternal->Channel, NM_STATE_READY_SLEEP, NM_STATE_REPEAT_MESSAGE);
+		// Nm_StateChangeNotification(ChannelInternal->Channel, NM_STATE_READY_SLEEP, NM_STATE_REPEAT_MESSAGE);
 	}
 }
 static inline void CanNm_Internal_NormalOperation_to_RepeatMessage( const CanNmChannelConfig* ChannelConfig, CanNm_Internal_ChannelType* ChannelInternal )
@@ -667,9 +681,9 @@ static inline void CanNm_Internal_NormalOperation_to_RepeatMessage( const CanNmC
 	CanNm_Internal_TimerStart(&ChannelInternal->MessageCycleTimer, ChannelConfig->MsgCycleOffset);	//[SWS_CanNm_00100]
 	if (ChannelInternal->RemoteSleepInd) {
 		ChannelInternal->RemoteSleepInd = false;
-		Nm_RemoteSleepCancellation(ChannelInternal->Channel);										//[SWS_CanNm_00151]
+		// Nm_RemoteSleepCancellation(ChannelInternal->Channel);										//[SWS_CanNm_00151]
 	}
 	if (CanNm_ConfigPtr->StateChangeIndEnabled) {
-		Nm_StateChangeNotification(ChannelInternal->Channel, NM_STATE_NORMAL_OPERATION, NM_STATE_REPEAT_MESSAGE);
+		// Nm_StateChangeNotification(ChannelInternal->Channel, NM_STATE_NORMAL_OPERATION, NM_STATE_REPEAT_MESSAGE);
 	}
 }

@@ -6,6 +6,7 @@
         "ECUC"
     ],
     "files.associations": {
-        "dynamic.h": "c"
+        "dynamic.h": "c",
+        "nmstack_types.h": "c"
     }
 }

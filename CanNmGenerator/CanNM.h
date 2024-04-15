@@ -18,6 +18,7 @@
 // TODO: Check SWS for correct included headers
 /* [SWS_CanNm_00309] */
 #include "NmStack_Types.h"
+#include "fff.h"
 
 /*====================================================================================================================*\
     Local macros
@@ -31,6 +32,8 @@
 #define CANNM_RXPDU_MAX_COUNT 128
 #endif
 
+#define E_OK        0x00U
+#define E_NOT_OK    0x01U
 
 /*====================================================================================================================*\
     Included Types from ComStack_Types.h [SWS_CanNm_00305]
@@ -221,9 +224,17 @@ uint8_t CanNm_RequestBusSynchronization(NetworkHandleType nmChannelHandle);
 uint8_t CanNm_CheckRemoteSleepIndication(NetworkHandleType nmChannelHandle, bool* nmRemoteSleepIndPtr);
 uint8_t CanNm_SetSleepReadyBit(NetworkHandleType nmChannelHandle,bool nmSleepReadyBit);
 
-void CanNm_TxConfirmation(uint16_t TxPduId, uint8_t result);
+void CanNm_TxConfirmation(uint16_t TxPduId, uint8_t result, CanNm_InternalType* p_CanNm_Internal, const CanNmGlobalConfig* p_CanNm_ConfigPtr);
 // void CanNm_RxIndication(uint16_t RxPduId, const PduInfoType* PduInfoPtr);//! [Skipped]
 void CanNm_ConfirmPnAvailability(NetworkHandleType nmChannelHandle, CanNm_InternalType* p_CanNm_Internal, const CanNmGlobalConfig* p_CanNm_ConfigPtr);
 uint8_t CanNm_TriggerTransmit(uint16_t TxPduId, PduInfoType* PduInfoPtr); //* Ref
 
+
+/* Mocked Functions */
+// FAKE_VOID_FUNC(CanIf_Transmit, uint16_t, const PduInfoType*);
+// FAKE_VOID_FUNC(Nm_NetworkMode, uint8_t);
+// FAKE_VOID_FUNC(Nm_StateChangeNotification, uint8_t, Nm_StateType, Nm_StateType);
+// FAKE_VOID_FUNC(Nm_RemoteSleepCancellation, uint8_t);
+
 #endif /* CANNM_H */
+
