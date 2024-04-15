@@ -5,7 +5,7 @@ import org.w3c.dom.NodeList;
 
 public interface ConfiguratorInterface {
     void DSWMDConstructor();
-    void ARXMLConstructor();
+    void ARXMLConstructor(boolean shichPath, String arxmlPath);
     Element FileReader(String filePath);
     void BSWMDParserDFS(Node ecucContainer, int parentIndex);
     void ARXMLParserDFS(Node ecucContainer, int parentIndex);

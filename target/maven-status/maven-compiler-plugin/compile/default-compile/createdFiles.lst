@@ -8,10 +8,11 @@ ParameterItem.class
 WrapTextPane$WrapLabelView.class
 MainApplication$7.class
 FileReader.class
+MainApplication$10.class
 ContainerItem.class
 WrapTextPane$WrapColumnFactory.class
-WrapTextPane$WrapEditorKit.class
 MainApplication$1.class
+WrapTextPane$WrapEditorKit.class
 MainApplication$6.class
 MainApplication$CustomActionListener.class
 MainApplication$8.class

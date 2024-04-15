@@ -68,6 +68,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+
 
 public class MainApplication extends JFrame implements ConfiguratorInterface {
 
@@ -137,7 +141,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         BComponentName.setText("Can Network Manager");
         DSWMDConstructor();
         AComponentName.setText("Can Network Manager");
-        ARXMLConstructor();
+        ARXMLConstructor(false,"");
         
 //        generateArxml(FilePath);
     }
@@ -187,13 +191,14 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     }
     
     @Override
-    public void ARXMLConstructor()
+    public void ARXMLConstructor(boolean whichPath, String arxmlPath)
     {
         // Try-Catch to validate if XML is well-formed
-        try {
-            String arxmlPath = "src/main/java/CanNm_Template.arxml";
-            validateXMLFile(arxmlPath);
-            Element root = FileReader(arxmlPath);
+        // try {
+            String path = whichPath ? arxmlPath: "src/main/java/CanNm_Template.arxml" ;
+            System.out.println(path);
+            validateXMLFile(path);
+            Element root = FileReader(path);
             //System.out.print(root);
             Element first = (Element) root.getElementsByTagName("AR-PACKAGES").item(0);
             Element second = (Element) first.getElementsByTagName("AR-PACKAGE").item(0);
@@ -222,10 +227,11 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             ARXMLTree.setRoot(canNM_root_node);
             ARXMLTree.reload();
             jTree2.setModel(ARXMLTree);
-        } catch (Exception e) {
-            appendLogMessage("An error occurred and the XML cannot be processed: " + e.getMessage());
-            return;
-        }
+            // TODO: uncomment the exception and solve the bug
+        //  } catch (Exception e) {
+        //      appendLogMessage("An error occurred and the XML cannot be processed: " + e.getMessage());
+        //      return;
+        //  }
 
     }
     
@@ -634,6 +640,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         logMessagesTextArea = new javax.swing.JTextArea();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
 
         jDialog1.setTitle("English Text Description");
         jDialog1.setAlwaysOnTop(true);
@@ -891,6 +898,17 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             }
         });
 
+        jButton5.setBackground(new java.awt.Color(204, 204, 204));
+        jButton5.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jButton5.setText("Upload ARXML File");
+        jButton5.setToolTipText("");
+        jButton5.setBorder(null);
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -904,7 +922,9 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             .addComponent(logPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(269, 269, 269)
+                        .addGap(8, 8, 8)
+                        .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(105, 105, 105)
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 734, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -927,7 +947,8 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jButton1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton2)))))
+                                .addComponent(jButton2))))
+                    .addComponent(jButton5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1565,6 +1586,38 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     }
     }//GEN-LAST:event_jButton4MouseClicked
 
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        // Run the file chooser in a separate thread to ensure the UI remains responsive
+        new Thread(() -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Select an ARXML File");
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fileChooser.setAcceptAllFileFilterUsed(false);
+            fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("ARXML Files", "arxml"));
+
+            // Ensures the file chooser is displayed in the Event Dispatch Thread
+            SwingUtilities.invokeLater(() -> {
+                int result = fileChooser.showOpenDialog(MainApplication.this);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    // Run the file handling in the EDT
+                    SwingUtilities.invokeLater(() -> {
+                        handleSelectedFile(selectedFile);
+                    });
+                }
+            });
+        }).start();
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void handleSelectedFile(File file) {
+        // Implement the file processing logic here
+        System.out.println("Selected file: " + file.getAbsolutePath());
+        ARXMLConstructor(true,file.getAbsolutePath());
+        // Here you might set the path to the file or perform other actions based on the file path
+        // For example, you could start parsing the file or pass the file path to another part of your application
+    }
+
+    
     public static void main(String args[]) {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -1815,6 +1868,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
     private javax.swing.JDialog jDialog1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
