@@ -1765,7 +1765,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         Element parameterElement = doc.createElement("DEFINITION-REF");
         parameterElement.setAttribute("DEST", elementType);
         parameterElement.setTextContent("/AUTOSAR/EcucDefs/CanNm/"+parameter.name);
-        Element parameterValue = doc.createElement("Value");
+        Element parameterValue = doc.createElement("VALUE");
        // System.out.print(value);
         parameterValue.setTextContent(value);
         parametertype.appendChild(parameterElement);
