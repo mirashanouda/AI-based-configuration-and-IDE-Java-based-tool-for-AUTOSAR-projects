@@ -1493,12 +1493,12 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             try {
             String textFromTextArea = jTextArea1.getText();
             // Write the text to a file
-            File file = new File("user_input.txt");
+            File file = new File("final_model/user_input.txt");
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
             writer.write(textFromTextArea);
             writer.close();
             
-            String pythonScriptPath = "../../python_script_for_AI.py"; // Replace with the actual script path
+            String pythonScriptPath = "final_model/python_script_for_AI.py"; // Replace with the actual script path
             ProcessBuilder builder = new ProcessBuilder("python", pythonScriptPath);
             Process p = builder.start();
 
