@@ -1517,14 +1517,14 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                 // TODO:
                 /*
                 // Check the contents of error.txt
-                File file = new File("error.txt");
-                BufferedReader fileReader = new BufferedReader(new FileReader(file));
+                File file_error = new File("final_model/error.txt");
+                BufferedReader fileReader = new BufferedReader(new FileReader(file_error));
                 String status = fileReader.readLine(); // Assumes only one of the two strings is in the file
                 fileReader.close();
 
                 if ("Success!".equals(status)) {
-                    System.out.println("AI-Generated ARXML is generated Successfully.");
-                    appendLogMessage("AI-Generated ARXML is generated Successfully.");
+                    System.out.println("AI-Generated ARXML is generated Successfully in /final_model/generated_arxml.arxml");
+                    appendLogMessage("AI-Generated ARXML is generated Successfully in /final_model/generated_arxml.arxml.");
                 } else if ("Failure!".equals(status)) {
                     System.out.println("The user input is not valid/vague.");
                     appendLogMessage("The user input is not valid/vague.");

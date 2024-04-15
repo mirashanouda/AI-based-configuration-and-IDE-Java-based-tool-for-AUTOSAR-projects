@@ -1,2 +1,0 @@
-Hello! It's me!
-D:\AUC\Courses\Spring 2024\Thesis2\Final_Tasks\AI-based-configuration-and-IDE-Java-based-tool-for-AUTOSAR-projects\final_model
