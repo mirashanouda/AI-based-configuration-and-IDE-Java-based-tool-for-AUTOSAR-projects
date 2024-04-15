@@ -35,7 +35,6 @@ def validate_yaml(line_list):
 
 def extract_yaml(filename, output_filename):
     line_list = read_file_with_formatting(filename)
-    print(line_list)
     start = 0
     counter = 0
     for line in line_list:

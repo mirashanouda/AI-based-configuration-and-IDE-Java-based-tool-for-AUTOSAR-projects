@@ -69,44 +69,21 @@ model = AutoModelForCausalLM.from_pretrained(
     quantization_config=bnb_config,
     device_map=device_map
 )
-# model.config.use_cache = False
-# model.config.pretraining_tp = 1
 
-# # Load LLaMA tokenizer
-# tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-# tokenizer.pad_token = tokenizer.eos_token
-# tokenizer.padding_side = "right" # Fix weird overflow issue with fp16 training
-
-# # Load adapter weights; this is a simplified example assuming the state dict matches.
-# adapter_weights = torch.load("pretrained_models/Llama-2-7b-finetune/adapter_model.bin")
-# model.load_state_dict(adapter_weights, strict=False)
-
-# Load the pre-trained model and tokenizer
-# model = AutoModelWithHeads.from_pretrained(model_name)
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 # Load your custom adapter. Replace 'path_to_adapter' with the actual path to your adapter
 os.chdir(os.path.dirname(os.path.realpath(__file__)))
-print("################################################")
-print("################################################")
-print(os.getcwd())
-print("################################################")
-print("################################################")
 adapter_path = "pretrained_models/Llama-2-7b-finetune"
 adapter_name = model.load_adapter(adapter_path)
 
 # Activate the adapter
 model.active_adapters = adapter_name
 
-prompt = input("Enter your question: ")
-# print(prompt)
-# pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=200)
-# prompt = f"<s>[INST] {prompt} [/INST] </s>"
-# #result = pipe(f"<s>[INST] {prompt} [/INST]")
-# #generated_text = result[0]['generated_text']
-# input_ids = tokenizer.encode(prompt, return_tensors="pt").to(model.device)
-# output_sequences = model.generate(input_ids, max_length=200) 
-# generated_text = tokenizer.decode(output_sequences[0], skip_special_tokens=True)
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
+with open("user_input.txt", "r") as f:
+    prompt = f.read()
+
 # Ignore warnings
 logging.set_verbosity(logging.CRITICAL)
 
@@ -114,22 +91,6 @@ logging.set_verbosity(logging.CRITICAL)
 # prompt = "Create a CanNm module with a GlobalConfig container. In the CanNmGlobalConfig container, create 24 CanNmChannelConfig containers. In each, set the value of CanNmMsgReducedTime to 6.256 and create 20 CanNmRxPdu containers. In each, set the value of CanNmRxPduId to 54079."
 pipe = pipeline(task="text-generation", model=model, tokenizer=tokenizer, max_length=500)
 result = pipe(f"<s>[INST] {prompt} [/INST]")
-# with open("llama_output.yaml", "w") as f:
-#     f.write(result[0]['generated_text'])
-print("")
-print("")
-print(result[0]['generated_text'])
-print("")
-print("")
-
-# # Prepare the input text, which might need to be tokenized
-# input_ids = tokenizer.encode(prompt, return_tensors="pt").to(model.device)
-
-# # Generate an output sequence from the input
-# output_sequences = model.generate(input_ids, max_length=200) 
-
-# # Decode the output sequences to text
-# generated_text = tokenizer.decode(output_sequences[0], skip_special_tokens=True)
 
 # Now, save the file inside the subdirectory
 generated_file = "generated_yaml.yml"

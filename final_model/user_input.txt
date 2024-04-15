@@ -1,0 +1,1 @@
+Create a CanNm module with a GlobalConfig container. In the CanNmGlobalConfig container, create 24 CanNmChannelConfig containers. In each, set the value of CanNmMsgReducedTime to 6.256 and create 20 CanNmRxPdu containers. In each, set the value of CanNmRxPduId to 54079.
