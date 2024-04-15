@@ -78,13 +78,32 @@ def dfs_convert(data, parent_dr):
             c.add_child(dfs_convert(child, c.parent_def_ref.text + '/' + c.short_name.text))
     return c
 
+
+def is_valid_yaml(filename):
+    try:
+        with open(filename, 'r') as file:
+            yaml.safe_load(file)  # Attempt to load the YAML data
+        return True  # Return True if parsing is successful
+    except yaml.YAMLError:  # Catch any YAML parsing errors
+        return False  # Return False if an error occurs
+
 def convert(input_yaml, output_xml):
-    tabs_to_spaces_converter.convert_tabs_to_spaces(input_yaml, 'output.yml')
-    with open('output.yml', 'r') as file:
+    cwd = os.getcwd()
+    cwd = go_back(cwd)
+    cwd += '/yaml_conversion'
+    input_yaml_path = cwd + '/' + input_yaml
+    output_yaml_path = cwd + '/output.yml'
+    tabs_to_spaces_converter.convert_tabs_to_spaces(input_yaml_path, output_yaml_path)
+    if not is_valid_yaml(output_yaml_path):
+        with open("error.txt", "w") as file:
+            file.write("Failure!")
+        return
+    with open(output_yaml_path, 'r') as file:
         data = yaml.safe_load(file)
         
     if not yaml_validator.validate(data):
-        print("The YAML file is not valid!")
+        with open("error.txt", "w") as file:
+            file.write("Failure!")
         return
     
     c = container_file.container()
@@ -137,6 +156,5 @@ def convert(input_yaml, output_xml):
     
     et_init.final_out(output_xml, AS)
     
-    print("Success!")
-    
-convert('input.yml', 'output_sample.xml')
+    with open("error.txt", "w") as file:
+        file.write("Success!")

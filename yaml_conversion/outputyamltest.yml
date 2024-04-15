@@ -1,0 +1,16 @@
+Module:
+    Name: CanNm
+    Container:
+        - Name: CanNmGlobalConfig
+        - Container:
+            - Name: CanNmChannelConfig
+            - Multiplicity: 4
+            - Parameter:
+                Name: CanNmBusLoadReductionActive
+                Value: False
+            - Container:
+                - Name: CanNmRxPdu
+                - Multiplicity: 9
+                - Parameter:
+                    Name: CanNmRxPduId
+                    Value: 1798
