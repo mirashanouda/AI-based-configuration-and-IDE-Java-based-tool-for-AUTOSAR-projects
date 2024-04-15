@@ -62,6 +62,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 
 public class MainApplication extends JFrame implements ConfiguratorInterface {
 
@@ -1452,7 +1456,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
 
     private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
         try {
-            String pythonScriptPath = "../../ARXMLConversion.py"; // Replace with the actual script path
+            String pythonScriptPath = "ARXMLConversion.py"; // Replace with the actual script path
             ProcessBuilder pb = new ProcessBuilder("python", pythonScriptPath);
             Process p = pb.start();
 
@@ -1498,7 +1502,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             writer.write(textFromTextArea);
             writer.close();
             
-            String pythonScriptPath = "final_model/python_script_for_AI.py"; // Replace with the actual script path
+            String pythonScriptPath = "final_model/ai_arxml_generation.py"; // Replace with the actual script path
             ProcessBuilder builder = new ProcessBuilder("python", pythonScriptPath);
             Process p = builder.start();
 
@@ -1514,10 +1518,9 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                 System.out.println("Script executed successfully.");
                 appendLogMessage("Script executed successfully.");
                 
-                // TODO:
-                /*
+                
                 // Check the contents of error.txt
-                File file_error = new File("final_model/error.txt");
+                File file_error = new File("yaml_conversion/error.txt");
                 BufferedReader fileReader = new BufferedReader(new FileReader(file_error));
                 String status = fileReader.readLine(); // Assumes only one of the two strings is in the file
                 fileReader.close();
@@ -1529,7 +1532,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                     System.out.println("The user input is not valid/vague.");
                     appendLogMessage("The user input is not valid/vague.");
                 }
-                */
+                
                 
             } else {
                 System.out.println("Script execution failed.");
