@@ -79,87 +79,87 @@
                                     <Value>0.0</Value>
                                 </ECUC-NUMERICAL-PARAM-VALUE>
                             </PARAMETER-VALUES>
+                            <SUB-CONTAINERS>
+                                <ECUC-CONTAINER-VALUE>
+                                    <SHORT-NAME>CanNmChannelConfig</SHORT-NAME>
+                                    <DEFINITION-REF DEST="ECUC-PARAM-CONF-CONTAINER-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmChannelConfig</DEFINITION-REF>
+                                    <PARAMETER-VALUES>
+                                        <ECUC-NUMERICAL-PARAM-VALUE>
+                                            <DEFINITION-REF DEST="ECUC-INTEGER-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmImmediateNmTransmissions</DEFINITION-REF>
+                                            <Value>0</Value>
+                                        </ECUC-NUMERICAL-PARAM-VALUE>
+                                        <ECUC-NUMERICAL-PARAM-VALUE>
+                                            <DEFINITION-REF DEST="ECUC-INTEGER-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmNodeId</DEFINITION-REF>
+                                            <Value>0</Value>
+                                        </ECUC-NUMERICAL-PARAM-VALUE>
+                                        <ECUC-NUMERICAL-PARAM-VALUE>
+                                            <DEFINITION-REF DEST="ECUC-BOOLEAN-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmBusLoadReductionActive</DEFINITION-REF>
+                                            <Value>false</Value>
+                                        </ECUC-NUMERICAL-PARAM-VALUE>
+                                        <ECUC-NUMERICAL-PARAM-VALUE>
+                                            <DEFINITION-REF DEST="ECUC-BOOLEAN-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmCarWakeUpRxEnabled</DEFINITION-REF>
+                                            <Value>false</Value>
+                                        </ECUC-NUMERICAL-PARAM-VALUE>
+                                        <ECUC-NUMERICAL-PARAM-VALUE>
+                                            <DEFINITION-REF DEST="ECUC-BOOLEAN-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmNodeDetectionEnabled</DEFINITION-REF>
+                                            <Value>false</Value>
+                                        </ECUC-NUMERICAL-PARAM-VALUE>
+                                        <ECUC-NUMERICAL-PARAM-VALUE>
+                                            <DEFINITION-REF DEST="ECUC-BOOLEAN-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmNodeIdEnabled</DEFINITION-REF>
+                                            <Value>false</Value>
+                                        </ECUC-NUMERICAL-PARAM-VALUE>
+                                        <ECUC-NUMERICAL-PARAM-VALUE>
+                                            <DEFINITION-REF DEST="ECUC-BOOLEAN-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmRepeatMsgIndEnabled</DEFINITION-REF>
+                                            <Value>false</Value>
+                                        </ECUC-NUMERICAL-PARAM-VALUE>
+                                        <ECUC-NUMERICAL-PARAM-VALUE>
+                                            <DEFINITION-REF DEST="ECUC-FLOAT-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmMsgCycleOffset</DEFINITION-REF>
+                                            <Value>0.0</Value>
+                                        </ECUC-NUMERICAL-PARAM-VALUE>
+                                        <ECUC-NUMERICAL-PARAM-VALUE>
+                                            <DEFINITION-REF DEST="ECUC-FLOAT-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmMsgCycleTime</DEFINITION-REF>
+                                            <Value>0.0</Value>
+                                        </ECUC-NUMERICAL-PARAM-VALUE>
+                                        <ECUC-NUMERICAL-PARAM-VALUE>
+                                            <DEFINITION-REF DEST="ECUC-FLOAT-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmMsgReducedTime</DEFINITION-REF>
+                                            <Value>0.0</Value>
+                                        </ECUC-NUMERICAL-PARAM-VALUE>
+                                        <ECUC-NUMERICAL-PARAM-VALUE>
+                                            <DEFINITION-REF DEST="ECUC-FLOAT-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmRepeatMessageTime</DEFINITION-REF>
+                                            <Value>0.0</Value>
+                                        </ECUC-NUMERICAL-PARAM-VALUE>
+                                        <ECUC-NUMERICAL-PARAM-VALUE>
+                                            <DEFINITION-REF DEST="ECUC-FLOAT-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmTimeoutTime</DEFINITION-REF>
+                                            <Value>0.0</Value>
+                                        </ECUC-NUMERICAL-PARAM-VALUE>
+                                        <ECUC-NUMERICAL-PARAM-VALUE>
+                                            <DEFINITION-REF DEST="ECUC-FLOAT-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmWaitBusSleepTime</DEFINITION-REF>
+                                            <Value>0.0</Value>
+                                        </ECUC-NUMERICAL-PARAM-VALUE>
+                                        <ECUC-TEXTUAL-PARAM-VALUE>
+                                            <DEFINITION-REF DEST="ECUC-ENUMERATION-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmPduCbvPosition</DEFINITION-REF>
+                                            <Value>CANNM_PDU_BYTE_0</Value>
+                                        </ECUC-TEXTUAL-PARAM-VALUE>
+                                        <ECUC-TEXTUAL-PARAM-VALUE>
+                                            <DEFINITION-REF DEST="ECUC-ENUMERATION-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmPduNidPosition</DEFINITION-REF>
+                                            <Value>CANNM_PDU_BYTE_0</Value>
+                                        </ECUC-TEXTUAL-PARAM-VALUE>
+                                    </PARAMETER-VALUES>
+                                    <SUB-CONTAINERS>
+                                        <ECUC-CONTAINER-VALUE>
+                                            <SHORT-NAME>CanNmRxPdu</SHORT-NAME>
+                                            <DEFINITION-REF DEST="ECUC-PARAM-CONF-CONTAINER-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmRxPdu</DEFINITION-REF>
+                                            <PARAMETER-VALUES>
+                                                <ECUC-NUMERICAL-PARAM-VALUE>
+                                                    <DEFINITION-REF DEST="ECUC-INTEGER-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmRxPduId</DEFINITION-REF>
+                                                    <Value>0</Value>
+                                                </ECUC-NUMERICAL-PARAM-VALUE>
+                                            </PARAMETER-VALUES>
+                                        </ECUC-CONTAINER-VALUE>
+                                    </SUB-CONTAINERS>
+                                </ECUC-CONTAINER-VALUE>
+                            </SUB-CONTAINERS>
                         </ECUC-CONTAINER-VALUE>
-                        <SUB-CONTAINERS>
-                            <ECUC-CONTAINER-VALUE>
-                                <SHORT-NAME>CanNmChannelConfig</SHORT-NAME>
-                                <DEFINITION-REF DEST="ECUC-PARAM-CONF-CONTAINER-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmChannelConfig</DEFINITION-REF>
-                                <PARAMETER-VALUES>
-                                    <ECUC-NUMERICAL-PARAM-VALUE>
-                                        <DEFINITION-REF DEST="ECUC-INTEGER-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmImmediateNmTransmissions</DEFINITION-REF>
-                                        <Value>0</Value>
-                                    </ECUC-NUMERICAL-PARAM-VALUE>
-                                    <ECUC-NUMERICAL-PARAM-VALUE>
-                                        <DEFINITION-REF DEST="ECUC-INTEGER-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmNodeId</DEFINITION-REF>
-                                        <Value>0</Value>
-                                    </ECUC-NUMERICAL-PARAM-VALUE>
-                                    <ECUC-NUMERICAL-PARAM-VALUE>
-                                        <DEFINITION-REF DEST="ECUC-BOOLEAN-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmBusLoadReductionActive</DEFINITION-REF>
-                                        <Value>false</Value>
-                                    </ECUC-NUMERICAL-PARAM-VALUE>
-                                    <ECUC-NUMERICAL-PARAM-VALUE>
-                                        <DEFINITION-REF DEST="ECUC-BOOLEAN-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmCarWakeUpRxEnabled</DEFINITION-REF>
-                                        <Value>false</Value>
-                                    </ECUC-NUMERICAL-PARAM-VALUE>
-                                    <ECUC-NUMERICAL-PARAM-VALUE>
-                                        <DEFINITION-REF DEST="ECUC-BOOLEAN-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmNodeDetectionEnabled</DEFINITION-REF>
-                                        <Value>false</Value>
-                                    </ECUC-NUMERICAL-PARAM-VALUE>
-                                    <ECUC-NUMERICAL-PARAM-VALUE>
-                                        <DEFINITION-REF DEST="ECUC-BOOLEAN-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmNodeIdEnabled</DEFINITION-REF>
-                                        <Value>false</Value>
-                                    </ECUC-NUMERICAL-PARAM-VALUE>
-                                    <ECUC-NUMERICAL-PARAM-VALUE>
-                                        <DEFINITION-REF DEST="ECUC-BOOLEAN-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmRepeatMsgIndEnabled</DEFINITION-REF>
-                                        <Value>false</Value>
-                                    </ECUC-NUMERICAL-PARAM-VALUE>
-                                    <ECUC-NUMERICAL-PARAM-VALUE>
-                                        <DEFINITION-REF DEST="ECUC-FLOAT-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmMsgCycleOffset</DEFINITION-REF>
-                                        <Value>0.0</Value>
-                                    </ECUC-NUMERICAL-PARAM-VALUE>
-                                    <ECUC-NUMERICAL-PARAM-VALUE>
-                                        <DEFINITION-REF DEST="ECUC-FLOAT-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmMsgCycleTime</DEFINITION-REF>
-                                        <Value>0.0</Value>
-                                    </ECUC-NUMERICAL-PARAM-VALUE>
-                                    <ECUC-NUMERICAL-PARAM-VALUE>
-                                        <DEFINITION-REF DEST="ECUC-FLOAT-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmMsgReducedTime</DEFINITION-REF>
-                                        <Value>0.0</Value>
-                                    </ECUC-NUMERICAL-PARAM-VALUE>
-                                    <ECUC-NUMERICAL-PARAM-VALUE>
-                                        <DEFINITION-REF DEST="ECUC-FLOAT-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmRepeatMessageTime</DEFINITION-REF>
-                                        <Value>0.0</Value>
-                                    </ECUC-NUMERICAL-PARAM-VALUE>
-                                    <ECUC-NUMERICAL-PARAM-VALUE>
-                                        <DEFINITION-REF DEST="ECUC-FLOAT-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmTimeoutTime</DEFINITION-REF>
-                                        <Value>0.0</Value>
-                                    </ECUC-NUMERICAL-PARAM-VALUE>
-                                    <ECUC-NUMERICAL-PARAM-VALUE>
-                                        <DEFINITION-REF DEST="ECUC-FLOAT-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmWaitBusSleepTime</DEFINITION-REF>
-                                        <Value>0.0</Value>
-                                    </ECUC-NUMERICAL-PARAM-VALUE>
-                                    <ECUC-NUMERICAL-PARAM-VALUE>
-                                        <DEFINITION-REF DEST="ECUC-ENUMERATION-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmPduCbvPosition</DEFINITION-REF>
-                                        <Value>CANNM_PDU_BYTE_0</Value>
-                                    </ECUC-NUMERICAL-PARAM-VALUE>
-                                    <ECUC-NUMERICAL-PARAM-VALUE>
-                                        <DEFINITION-REF DEST="ECUC-ENUMERATION-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmPduNidPosition</DEFINITION-REF>
-                                        <Value>CANNM_PDU_BYTE_1</Value>
-                                    </ECUC-NUMERICAL-PARAM-VALUE>
-                                </PARAMETER-VALUES>
-                                <SUB-CONTAINERS>
-                                    <ECUC-CONTAINER-VALUE>
-                                        <SHORT-NAME>CanNmRxPdu</SHORT-NAME>
-                                        <DEFINITION-REF DEST="ECUC-PARAM-CONF-CONTAINER-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmRxPdu</DEFINITION-REF>
-                                        <PARAMETER-VALUES>
-                                            <ECUC-NUMERICAL-PARAM-VALUE>
-                                                <DEFINITION-REF DEST="ECUC-INTEGER-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmRxPduId</DEFINITION-REF>
-                                                <Value>0</Value>
-                                            </ECUC-NUMERICAL-PARAM-VALUE>
-                                        </PARAMETER-VALUES>
-                                    </ECUC-CONTAINER-VALUE>
-                                </SUB-CONTAINERS>
-                            </ECUC-CONTAINER-VALUE>
-                        </SUB-CONTAINERS>
                     </CONTAINERS>
                 </ECUC-MODULE-CONFIGURATION-VALUES>
             </ELEMENTS>

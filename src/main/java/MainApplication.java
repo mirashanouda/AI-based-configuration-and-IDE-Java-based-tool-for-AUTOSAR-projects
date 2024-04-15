@@ -531,7 +531,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                 String value;
                 if (hasDefaultValue) {
                     value = defaultValueElement.getTextContent();
-                    defVal = (!"false".equals(value));
+                    defVal = (!"False".equals(value));
                 }
                 return new BooleanParameter(name, UUID, "", Desc, LM, UM, hasDefaultValue, defVal);
             }
@@ -1526,8 +1526,8 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             // Loop through each container to add them to the document
             
             for (ContainerItem container : ARXML_containers_with_no_parent) {
-                containers.appendChild(createContainerElement(doc, container));
-                containers.appendChild(ARXML_DFS_Costruct_containers(doc, container));
+                containers.appendChild(createContainerElement(doc, container,true));
+                //containers.appendChild(ARXML_DFS_Costruct_containers(doc, container));
             }
 
             // Write the content into the ARXML file
@@ -1552,10 +1552,9 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     }
     
 
-    private Element createContainerElement(Document doc, ContainerItem container) {
+    private Element createContainerElement(Document doc, ContainerItem container, boolean flg) {
         Element containerElement = doc.createElement("ECUC-CONTAINER-VALUE");
         //containerElement.setAttribute("UUID", container.getUUID());
-        
         // Short name
         Element shortName = doc.createElement("SHORT-NAME");
         shortName.setTextContent(container.getName());
@@ -1577,6 +1576,8 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             Element parameterElement = createParameterElement(doc, parameter);
             parameterValues.appendChild(parameterElement);
         }
+        if(flg)containerElement.appendChild(ARXML_DFS_Costruct_containers(doc, container));
+
         return containerElement;
 
     }
@@ -1604,7 +1605,11 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             elementType = "ECUC-ENUMERATION-PARAM-DEF";
             value = String.valueOf(((EnumParameter) parameter).getValue());
         }
-        Element parametertype = doc.createElement("ECUC-NUMERICAL-PARAM-VALUE");
+        Element parametertype;
+        if(elementType == "ECUC-ENUMERATION-PARAM-DEF")
+             parametertype = doc.createElement("ECUC-TEXTUAL-PARAM-VALUE");
+        else parametertype = doc.createElement("ECUC-NUMERICAL-PARAM-VALUE");
+        
         Element parameterElement = doc.createElement("DEFINITION-REF");
         parameterElement.setAttribute("DEST", elementType);
         parameterElement.setTextContent("/AUTOSAR/EcucDefs/CanNm/"+parameter.name);
@@ -1624,7 +1629,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         if (children != null  && !children.isEmpty()) {
             Element contain = doc.createElement("SUB-CONTAINERS");
             for (ContainerItem child : children) {
-                Element subContainer = createContainerElement(doc, child); // Create sub-container
+                Element subContainer = createContainerElement(doc, child,false); // Create sub-container
                 Element subContainersElement = ARXML_DFS_Costruct_containers(doc, child); // Recursive call
 
                 if (subContainersElement != null) {
