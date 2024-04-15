@@ -59,6 +59,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -1503,14 +1505,34 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             writer.close();
             
             String pythonScriptPath = "final_model/ai_arxml_generation.py"; // Replace with the actual script path
-            ProcessBuilder builder = new ProcessBuilder("python", pythonScriptPath);
+            ProcessBuilder builder = new ProcessBuilder("/home/gadmin/miniconda3/bin/python3", pythonScriptPath);
             Process p = builder.start();
+            
+            InputStream stdout = p.getInputStream();
+            InputStream stderr = p.getErrorStream();
+
+            // Create buffered readers to read the output and errors
+            BufferedReader outputReader = new BufferedReader(new InputStreamReader(stdout));
+            BufferedReader errorReader = new BufferedReader(new InputStreamReader(stderr));
+
+            // Read and display the output from stdout
+            System.out.println("Output from the Python script:");
+            String line;
+            while ((line = outputReader.readLine()) != null) {
+                System.out.println(line);
+            }
+
+            // Read and display the errors from stderr
+            System.out.println("Errors from the Python script (if any):");
+            while ((line = errorReader.readLine()) != null) {
+                System.out.println(line);
+            }
 
             // If you want to capture the Python script's output
             BufferedReader inn = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line;
-            while ((line = inn.readLine()) != null) {
-                System.out.println(line);
+            String line2;
+            while ((line2 = inn.readLine()) != null) {
+                System.out.println(line2);
             }
 
             int exitCode = p.waitFor();

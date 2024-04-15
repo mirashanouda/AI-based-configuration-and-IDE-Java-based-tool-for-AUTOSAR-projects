@@ -16,6 +16,8 @@ from collections import Counter
 def go_back(directory):
 	return os.path.abspath(os.path.join(directory, '..'))
 
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
+
 cwd = os.getcwd()
 cwd = go_back(cwd)
 cwd += '/yaml_conversion'
