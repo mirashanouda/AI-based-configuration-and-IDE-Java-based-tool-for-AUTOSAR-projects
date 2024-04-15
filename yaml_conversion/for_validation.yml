@@ -4,13 +4,13 @@ Module:
         - Name: CanNmGlobalConfig
         - Container:
             - Name: CanNmChannelConfig
-            - Multiplicity: 4
+            - Multiplicity: 24
             - Parameter:
-                Name: CanNmBusLoadReductionActive
-                Value: False
+                Name: CanNmMsgReducedTime
+                Value: 6.256
             - Container:
                 - Name: CanNmRxPdu
-                - Multiplicity: 9
+                - Multiplicity: 20
                 - Parameter:
                     Name: CanNmRxPduId
-                    Value: 1798
+                    Value: 54079

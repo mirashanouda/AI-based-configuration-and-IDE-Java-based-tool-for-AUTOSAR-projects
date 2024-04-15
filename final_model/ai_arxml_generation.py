@@ -136,4 +136,4 @@ with open(generated_file_path, "w") as f:
 
 # Change the file path to inside the "yaml_conversion" directory
 sys.path.insert(0, cwd)
-yaml_converter.convert(generated_file, "generated_arxml.arxml")
+yaml_converter.extract_and_convert(generated_file, "generated_arxml.arxml")

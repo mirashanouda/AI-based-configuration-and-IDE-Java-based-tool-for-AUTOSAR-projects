@@ -1,6 +1,11 @@
 import os
 import sys
 import yaml
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
+# sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+
+def go_back(directory):
+	return os.path.abspath(os.path.join(directory, '..'))
 
 def is_valid_yaml(filename):
     try:
@@ -43,17 +48,9 @@ def extract_yaml(filename, output_filename):
         res_list.append(reformat_string(line_list[i]))
     
     while not validate_yaml(res_list):
-        for line in res_list:
-            print(line)
-
-        print("")
-        print("")
-        print("")
         res_list.pop()
     
     with open(output_filename, "w") as f:
         for line in res_list:
             f.write(line)
             f.write("\n")
-
-extract_yaml("inputyamltest.yml", "outputyamltest.yml")

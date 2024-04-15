@@ -1,22 +1,16 @@
-<s>[INST] Create a CanNm module with a GlobalConfig container. In the CanNmGlobalConfig container, set the value of CanNmComUserDataSupport to False. Also, create 10 CanNmChannelConfig containers. In each, set the value of CanNmCarWakeUpFilterEnabled to True and create 6 CanNmRxPdu containers. In each, set the value of CanNmRxPduId to 21558. [/INST] 
 Module:
     Name: CanNm
     Container:
         - Name: CanNmGlobalConfig
-        - Parameter:
-            Name: CanNmComUserDataSupport
-            Value: False
         - Container:
             - Name: CanNmChannelConfig
-            - Multiplicity: 10
+            - Multiplicity: 24
             - Parameter:
-                Name: CanNmCarWakeUpFilterEnabled
-                Value: True
+                Name: CanNmMsgReducedTime
+                Value: 6.256
             - Container:
                 - Name: CanNmRxPdu
-                - Multiplicity: 6
+                - Multiplicity: 20
                 - Parameter:
                     Name: CanNmRxPduId
-                    Value: 21558
-</s>
-</script>
+                    Value: 54079

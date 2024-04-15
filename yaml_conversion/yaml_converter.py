@@ -6,6 +6,7 @@ import sys
 import yaml_utility
 import yaml_validator
 import tabs_to_spaces_converter
+import extract_yaml
 
 def go_back(directory):
 	return os.path.abspath(os.path.join(directory, '..'))
@@ -158,3 +159,7 @@ def convert(input_yaml, output_xml):
     
     with open("error.txt", "w") as file:
         file.write("Success!")
+
+def extract_and_convert(input_file, output_arxml):
+    extract_yaml.extract_yaml(input_file, "extracted.yml")
+    convert("extracted.yml", output_arxml)
