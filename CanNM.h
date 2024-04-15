@@ -223,7 +223,7 @@ uint8_t CanNm_SetSleepReadyBit(NetworkHandleType nmChannelHandle,bool nmSleepRea
 
 void CanNm_TxConfirmation(uint16_t TxPduId, uint8_t result);
 // void CanNm_RxIndication(uint16_t RxPduId, const PduInfoType* PduInfoPtr);//! [Skipped]
-void CanNm_ConfirmPnAvailability(NetworkHandleType nmChannelHandle);
+void CanNm_ConfirmPnAvailability(NetworkHandleType nmChannelHandle, CanNm_InternalType* p_CanNm_Internal, const CanNmGlobalConfig* p_CanNm_ConfigPtr);
 uint8_t CanNm_TriggerTransmit(uint16_t TxPduId, PduInfoType* PduInfoPtr); //* Ref
 
 #endif /* CANNM_H */

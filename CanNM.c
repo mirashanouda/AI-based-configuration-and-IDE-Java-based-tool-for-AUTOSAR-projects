@@ -429,11 +429,11 @@ void CanNm_TxConfirmation(uint16_t TxPduId, uint8_t result)
  * Enables the PN filter functionality on the indicated NM channel.
  * Availability: The API is only available if CanNmGlobalPnSupport is true.
  */
-void CanNm_ConfirmPnAvailability(NetworkHandleType nmChannelHandle)
+void CanNm_ConfirmPnAvailability(NetworkHandleType nmChannelHandle, CanNm_InternalType* p_CanNm_Internal, const CanNmGlobalConfig* p_CanNm_ConfigPtr)
 {
-	CanNm_Internal_ChannelType* ChannelInternal = &CanNm_Internal.Channels[nmChannelHandle];
+	CanNm_Internal_ChannelType* ChannelInternal = &p_CanNm_Internal->Channels[nmChannelHandle];
 
-    if (CanNm_ConfigPtr->GlobalPnSupport) {
+    if (p_CanNm_ConfigPtr->GlobalPnSupport) {
 		ChannelInternal->NmPduFilterAlgorithm = true;
 	}
 }
