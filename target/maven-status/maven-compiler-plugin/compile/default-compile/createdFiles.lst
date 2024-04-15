@@ -1,4 +1,5 @@
 com\mycompany\autosarconfigurator\AUTOSARConfigurator.class
+MainApplication$9.class
 MainApplication$2.class
 MainApplication$4.class
 ArxmlGeneration.class
@@ -7,11 +8,13 @@ ConfiguratorInterface.class
 ParameterItem.class
 WrapTextPane$WrapLabelView.class
 MainApplication$7.class
+FileReader.class
 ContainerItem.class
 WrapTextPane$WrapColumnFactory.class
 MainApplication$1.class
 WrapTextPane$WrapEditorKit.class
 MainApplication$6.class
 MainApplication$CustomActionListener.class
+MainApplication$8.class
 WrapTextPane.class
 MainApplication$3.class

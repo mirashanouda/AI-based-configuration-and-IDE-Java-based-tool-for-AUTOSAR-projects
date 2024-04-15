@@ -55,6 +55,17 @@ import javax.swing.SwingUtilities;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 
 public class MainApplication extends JFrame implements ConfiguratorInterface {
 
@@ -593,6 +604,11 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jDialog1 = new javax.swing.JDialog();
+        jButton4 = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         BjPanel = new javax.swing.JPanel();
         BTreeScrollPane = new javax.swing.JScrollPane();
@@ -615,6 +631,53 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         jScrollPane1 = new javax.swing.JScrollPane();
         logMessagesTextArea = new javax.swing.JTextArea();
         jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+
+        jDialog1.setTitle("English Text Description");
+        jDialog1.setAlwaysOnTop(true);
+
+        jButton4.setBackground(new java.awt.Color(255, 255, 204));
+        jButton4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jButton4.setText("Done!");
+        jButton4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton4MouseClicked(evt);
+            }
+        });
+
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel2.setText("  Enter Your English Description for your ARXML File:");
+
+        jTextArea1.setColumns(20);
+        jTextArea1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jTextArea1.setLineWrap(true);
+        jTextArea1.setRows(10);
+        jTextArea1.setWrapStyleWord(true);
+        jScrollPane2.setViewportView(jTextArea1);
+
+        javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
+        jDialog1.getContentPane().setLayout(jDialog1Layout);
+        jDialog1Layout.setHorizontalGroup(
+            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialog1Layout.createSequentialGroup()
+                .addGap(22, 22, 22)
+                .addGroup(jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane2)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
+                    .addComponent(jButton4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(29, Short.MAX_VALUE))
+        );
+        jDialog1Layout.setVerticalGroup(
+            jDialog1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jDialog1Layout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(27, Short.MAX_VALUE))
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setAlwaysOnTop(true);
@@ -803,7 +866,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
             .addGroup(logPanelLayout.createSequentialGroup()
                 .addComponent(titlePanel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 83, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 79, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -813,6 +876,16 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         jButton2.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jButton2MouseClicked(evt);
+            }
+        });
+
+        jButton3.setBackground(new java.awt.Color(255, 204, 255));
+        jButton3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jButton3.setText("AI Magic");
+        jButton3.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
             }
         });
 
@@ -832,6 +905,8 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                         .addGap(269, 269, 269)
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 734, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
                             .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -840,14 +915,17 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 4, Short.MAX_VALUE)
+                .addGap(0, 0, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(6, 6, 6)
-                        .addComponent(jButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton2)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jButton1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton2)))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1378,7 +1456,7 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
 
     private void jButton2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton2MouseClicked
         try {
-            String pythonScriptPath = "../../python_script.py"; // Replace with the actual script path
+            String pythonScriptPath = "ARXMLConversion.py"; // Replace with the actual script path
             ProcessBuilder pb = new ProcessBuilder("python", pythonScriptPath);
             Process p = pb.start();
 
@@ -1395,9 +1473,10 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
                 appendLogMessage("Script executed successfully.");
                 appendLogMessage("C and H Files Generated From output.arxml.");
                 
+                
             } else {
                 System.out.println("Script execution failed.");
-                appendLogMessage("Script execution failed./n");
+                appendLogMessage("Script execution failed.");
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -1407,6 +1486,62 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+            jDialog1.pack(); // Optional: To adjust dialog size to fit its contents
+            jDialog1.setLocationRelativeTo(this); // To center the dialog relative to the main frame
+            jDialog1.setVisible(true); // To make the dialog visible        
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton4MouseClicked
+            try {
+            String textFromTextArea = jTextArea1.getText();
+            // Write the text to a file
+            File file = new File("final_model/user_input.txt");
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write(textFromTextArea);
+            writer.close();
+            
+            String pythonScriptPath = "final_model/ai_arxml_generation.py"; // Replace with the actual script path
+            ProcessBuilder builder = new ProcessBuilder("python", pythonScriptPath);
+            Process p = builder.start();
+
+            // If you want to capture the Python script's output
+            BufferedReader inn = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String line;
+            while ((line = inn.readLine()) != null) {
+                System.out.println(line);
+            }
+
+            int exitCode = p.waitFor();
+            if (exitCode == 0) {
+                System.out.println("Script executed successfully.");
+                appendLogMessage("Script executed successfully.");
+                
+                
+                // Check the contents of error.txt
+                File file_error = new File("yaml_conversion/error.txt");
+                BufferedReader fileReader = new BufferedReader(new FileReader(file_error));
+                String status = fileReader.readLine(); // Assumes only one of the two strings is in the file
+                fileReader.close();
+
+                if ("Success!".equals(status)) {
+                    System.out.println("AI-Generated ARXML is generated Successfully in /final_model/generated_arxml.arxml");
+                    appendLogMessage("AI-Generated ARXML is generated Successfully in /final_model/generated_arxml.arxml.");
+                } else if ("Failure!".equals(status)) {
+                    System.out.println("The user input is not valid/vague.");
+                    appendLogMessage("The user input is not valid/vague.");
+                }
+                
+                
+            } else {
+                System.out.println("Script execution failed.");
+                appendLogMessage("Script execution failed.");
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+    }
+    }//GEN-LAST:event_jButton4MouseClicked
 
     public static void main(String args[]) {
         try {
@@ -1656,9 +1791,15 @@ public class MainApplication extends JFrame implements ConfiguratorInterface {
     private javax.swing.JPanel BjPanel;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JDialog jDialog1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTree jTree1;
     private javax.swing.JTree jTree2;
     private javax.swing.JTextArea logMessagesTextArea;

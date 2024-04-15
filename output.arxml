@@ -143,7 +143,7 @@
                                     </ECUC-NUMERICAL-PARAM-VALUE>
                                     <ECUC-NUMERICAL-PARAM-VALUE>
                                         <DEFINITION-REF DEST="ECUC-ENUMERATION-PARAM-DEF">/AUTOSAR/EcucDefs/CanNm/CanNmPduNidPosition</DEFINITION-REF>
-                                        <Value>CANNM_PDU_BYTE_1</Value>
+                                        <Value>CANNM_PDU_BYTE_0</Value>
                                     </ECUC-NUMERICAL-PARAM-VALUE>
                                 </PARAMETER-VALUES>
                                 <SUB-CONTAINERS>
