@@ -16,6 +16,7 @@ def is_valid_yaml(filename):
         return False  # Return False if an error occurs
     
 def read_file_with_formatting(filename):
+    os.chdir(os.path.dirname(os.path.realpath(__file__)))
     lines = []
     with open(filename, 'r') as file: 
         for line in file:

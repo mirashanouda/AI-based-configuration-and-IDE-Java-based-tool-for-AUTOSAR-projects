@@ -23,6 +23,7 @@ sys.path.insert(0, cwd)
 import yaml_converter
 cwd = go_back(cwd)
 cwd += '/final_model'
+sys.path.insert(0, cwd)
 
 
 model_name = "NousResearch/Llama-2-7b-hf"
@@ -85,6 +86,12 @@ model = AutoModelForCausalLM.from_pretrained(
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 # Load your custom adapter. Replace 'path_to_adapter' with the actual path to your adapter
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
+print("################################################")
+print("################################################")
+print(os.getcwd())
+print("################################################")
+print("################################################")
 adapter_path = "pretrained_models/Llama-2-7b-finetune"
 adapter_name = model.load_adapter(adapter_path)
 
