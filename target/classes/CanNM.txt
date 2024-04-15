@@ -1,0 +1,14 @@
+CanNmGlobalConfig:
+    CanNmChannelConfig
+        CanNmRxPdu
+        CanNmTxPdu
+        CanNmUserDataTxPdu
+    CanNmPnInfo
+        CanNmPnFilterMaskByte
+
+
+- type cast the range value
+- for each child class, get the corrosponding GUI widget.
+- sidebar interaction.
+- figma view for the configurator UI/UX.
+- adding the parent of the containerItem
