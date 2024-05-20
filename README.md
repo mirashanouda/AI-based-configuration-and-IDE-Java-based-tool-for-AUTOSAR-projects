@@ -28,5 +28,4 @@ AUtoMoto has a generator that converts ARXML into C and H files that are used in
 The most important feature of AutoMoto is its ability to generate ARXML from English prompts from the engineers based on a strong LLM.
 
 # Demo of the Tool
-[Watch the video]([https://drive.google.com/file/d/FILE_ID/preview](https://drive.google.com/file/d/15FAXd-CQaj4FWOSdvOAJCujGx3Tn_AEr/view))
-[Watch the video](https://drive.google.com/file/d/FILE_ID/preview)
+[Watch the video](https://drive.google.com/file/d/1IcwEQeU4r6On4w1K3JHrR8HFcah7steM/view?usp=sharing)
